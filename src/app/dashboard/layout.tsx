@@ -4,6 +4,8 @@ import { SearchProvider } from "@/hooks/useSearchOverlay";
 import { GlobalSearchOverlay } from "@/components/search/GlobalSearchOverlay";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { NotificationsPanel } from "@/components/layout/NotificationsPanel";
+import { NewProjectModal } from "@/components/projects/NewProjectModal";
+import { TaskDetailPanel } from "@/components/tasks/TaskDetailPanel";
 
 export default function DashboardLayout({
   children,
@@ -90,6 +92,8 @@ export default function DashboardLayout({
       </div>
       <GlobalSearchOverlay />
       <NotificationsPanel />
+      <NewProjectModal />
+      <TaskDetailPanel />
     </SearchProvider>
   );
 }

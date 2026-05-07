@@ -8,6 +8,7 @@ import { isPast, parseISO, format } from "date-fns";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@/lib/utils";
+import { useTaskPanel } from "@/hooks/useTaskPanel";
 
 const PRIORITY_CONFIG: Record<Priority, { label: string; color: string; bg: string }> = {
   Critical: { label: "Critical", color: "text-danger", bg: "bg-danger/10 border-danger/30" },
@@ -23,6 +24,7 @@ interface KanbanCardProps {
 }
 
 export function KanbanCard({ task, isDragging, isOverlay }: KanbanCardProps) {
+  const { openTask } = useTaskPanel();
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: task.id,
   });
@@ -37,6 +39,11 @@ export function KanbanCard({ task, isDragging, isOverlay }: KanbanCardProps) {
   const isOverdue = isPast(dueDate);
   const visibleAssignees = task.assignees.slice(0, 2);
   const overflowCount = task.assignees.length - 2;
+
+  const handleOpen = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    openTask(task.id);
+  };
 
   return (
     <motion.div
@@ -58,15 +65,22 @@ export function KanbanCard({ task, isDragging, isOverlay }: KanbanCardProps) {
     >
       {/* Top Row: ID + Drag Handle */}
       <div className="flex items-start justify-between gap-2 mb-2">
-        <IDChip
-          id={task.id}
-          className="text-[10px] px-1.5 py-0.5 bg-transparent border-none shadow-none text-text-secondary/60 hover:text-accent"
-        />
+        <div onClick={handleOpen} className="cursor-pointer">
+          <IDChip
+            id={task.id}
+            className="text-[10px] px-1.5 py-0.5 bg-transparent border-none shadow-none text-text-secondary/60 hover:text-accent pointer-events-none"
+          />
+        </div>
         <GripVertical className="w-3.5 h-3.5 text-[#3A3A3A] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-0.5" />
       </div>
 
       {/* Title */}
-      <p className="text-sm font-medium text-text-primary leading-snug mb-3">{task.title}</p>
+      <p 
+        onClick={handleOpen}
+        className="text-sm font-medium text-text-primary leading-snug mb-3 cursor-pointer hover:text-accent transition-colors"
+      >
+        {task.title}
+      </p>
 
       {/* Footer */}
       <div className="flex items-center justify-between gap-2">

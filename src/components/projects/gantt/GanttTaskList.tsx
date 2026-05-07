@@ -5,6 +5,7 @@ import { IDChip } from "@/components/ui/IDChip";
 import { ProjectStatusChip } from "@/components/projects/ProjectStatusChip";
 import { ProjectStatus } from "@/lib/mockData/projects";
 import { cn } from "@/lib/utils";
+import { useTaskPanel } from "@/hooks/useTaskPanel";
 
 const STATUS_MAP: Record<string, ProjectStatus> = {
   "In Progress": "Active",
@@ -19,6 +20,8 @@ interface GanttTaskListProps {
 }
 
 export function GanttTaskList({ tasks, rowHeight }: GanttTaskListProps) {
+  const { openTask } = useTaskPanel();
+
   return (
     <div className="w-[280px] flex-shrink-0 border-r border-[#1A1A1A] bg-[#050505]">
       {/* Header placeholder to align with timeline header */}
@@ -35,7 +38,8 @@ export function GanttTaskList({ tasks, rowHeight }: GanttTaskListProps) {
       {tasks.map((task) => (
         <div
           key={task.id}
-          className="flex items-center gap-3 px-4 border-b border-[#0F0F0F] hover:bg-[#0A0A0A] transition-colors"
+          onClick={() => openTask(task.id)}
+          className="flex items-center gap-3 px-4 border-b border-[#0F0F0F] hover:bg-[#0A0A0A] transition-colors cursor-pointer group"
           style={{ height: rowHeight }}
         >
           {/* Assignee Avatar */}
@@ -54,9 +58,9 @@ export function GanttTaskList({ tasks, rowHeight }: GanttTaskListProps) {
           <div className="flex-1 min-w-0">
             <IDChip
               id={task.id}
-              className="text-[9px] px-1 py-0 bg-transparent border-none shadow-none text-text-secondary/50 mb-0.5"
+              className="text-[9px] px-1 py-0 bg-transparent border-none shadow-none text-text-secondary/50 mb-0.5 group-hover:text-accent transition-colors"
             />
-            <div className="text-[12px] font-medium text-text-primary truncate leading-none">
+            <div className="text-[12px] font-medium text-text-primary truncate leading-none group-hover:text-accent transition-colors">
               {task.name}
             </div>
           </div>
