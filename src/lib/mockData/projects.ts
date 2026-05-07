@@ -1,0 +1,148 @@
+export type ProjectStatus = "Active" | "OnHold" | "Completed" | "Draft" | "Review";
+
+export interface Project {
+  id: string;
+  name: string;
+  clientId: string;
+  clientName: string;
+  startDate: string;   // ISO date string
+  deadline: string;    // ISO date string
+  progress: number;    // 0-100
+  budget: number;      // in USD
+  status: ProjectStatus;
+}
+
+export const MOCK_PROJECTS: Project[] = [
+  {
+    id: "PRJ-GOOG-26-001",
+    name: "Alpha Core Migration",
+    clientId: "CLI-GOOG-01",
+    clientName: "Google",
+    startDate: "2026-01-12",
+    deadline: "2026-12-20",
+    progress: 78,
+    budget: 1200000,
+    status: "Active",
+  },
+  {
+    id: "PRJ-GOOG-26-002",
+    name: "Data Lake Infrastructure",
+    clientId: "CLI-GOOG-01",
+    clientName: "Google",
+    startDate: "2026-02-01",
+    deadline: "2026-09-30",
+    progress: 45,
+    budget: 870000,
+    status: "Active",
+  },
+  {
+    id: "PRJ-GOOG-26-003",
+    name: "ML Pipeline Automation",
+    clientId: "CLI-GOOG-01",
+    clientName: "Google",
+    startDate: "2026-03-15",
+    deadline: "2027-01-15",
+    progress: 22,
+    budget: 2100000,
+    status: "Draft",
+  },
+  {
+    id: "PRJ-AMZN-26-003",
+    name: "Logistics Node Omega",
+    clientId: "CLI-AMZN-04",
+    clientName: "Amazon",
+    startDate: "2026-03-05",
+    deadline: "2026-11-15",
+    progress: 92,
+    budget: 850000,
+    status: "Review",
+  },
+  {
+    id: "PRJ-AMZN-26-004",
+    name: "Fulfillment Engine v3",
+    clientId: "CLI-AMZN-04",
+    clientName: "Amazon",
+    startDate: "2026-01-20",
+    deadline: "2026-10-01",
+    progress: 65,
+    budget: 1450000,
+    status: "Active",
+  },
+  {
+    id: "PRJ-AMZN-26-005",
+    name: "Warehouse Robotics API",
+    clientId: "CLI-AMZN-04",
+    clientName: "Amazon",
+    startDate: "2026-04-10",
+    deadline: "2027-02-28",
+    progress: 10,
+    budget: 3200000,
+    status: "Draft",
+  },
+  {
+    id: "PRJ-MSFT-26-002",
+    name: "Quantum Sync Protocol",
+    clientId: "CLI-MSFT-09",
+    clientName: "Microsoft",
+    startDate: "2026-06-20",
+    deadline: "2027-02-10",
+    progress: 34,
+    budget: 2400000,
+    status: "Active",
+  },
+  {
+    id: "PRJ-MSFT-26-007",
+    name: "Azure Cost Optimizer",
+    clientId: "CLI-MSFT-09",
+    clientName: "Microsoft",
+    startDate: "2026-02-14",
+    deadline: "2026-08-30",
+    progress: 100,
+    budget: 680000,
+    status: "Completed",
+  },
+  {
+    id: "PRJ-MSFT-26-008",
+    name: "Copilot Integration Layer",
+    clientId: "CLI-MSFT-09",
+    clientName: "Microsoft",
+    startDate: "2026-05-01",
+    deadline: "2026-12-01",
+    progress: 55,
+    budget: 990000,
+    status: "Active",
+  },
+  {
+    id: "PRJ-META-26-012",
+    name: "Nexus Integration",
+    clientId: "CLI-AAPL-02",
+    clientName: "Meta",
+    startDate: "2026-08-01",
+    deadline: "2026-10-30",
+    progress: 15,
+    budget: 450000,
+    status: "OnHold",
+  },
+  {
+    id: "PRJ-META-26-004",
+    name: "Social Graph V2",
+    clientId: "CLI-AAPL-02",
+    clientName: "Meta",
+    startDate: "2026-01-05",
+    deadline: "2026-07-31",
+    progress: 88,
+    budget: 1750000,
+    status: "Completed",
+  },
+  {
+    id: "PRJ-META-26-009",
+    name: "Reality OS Dashboard",
+    clientId: "CLI-AAPL-02",
+    clientName: "Meta",
+    startDate: "2026-03-01",
+    deadline: "2026-11-30",
+    progress: 41,
+    budget: 2800000,
+    status: "OnHold",
+  },
+];
