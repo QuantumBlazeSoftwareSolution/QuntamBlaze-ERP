@@ -1,3 +1,6 @@
+import { Lead } from "@/types/lead";
+import { Client } from "@/types/client";
+
 /**
  * ID Engine for Quantum Blaze ERP
  * Generates structured IDs for all entities.
@@ -72,6 +75,14 @@ export function generateProjectId(clientName: string, existingCount: number): st
   return `PRJ-${abbr}-${year}-${seq}`;
 }
 
+/** Generates a CLI-ID from company name and existing client count */
+export function generateClientId(companyName: string, existingCount: number): string {
+  const abbr = companyName.slice(0, 4).toUpperCase();
+  const year = new Date().getFullYear().toString().slice(-2);
+  const seq = String(existingCount + 1).padStart(3, "0");
+  return `CLI-${abbr}-${year}-${seq}`;
+}
+
 /** Generates an MST-ID for a milestone */
 export function generateMilestoneId(prjId: string, seq: number): string {
   return `MST-${prjId}-${String(seq).padStart(2, "0")}`;
@@ -85,5 +96,62 @@ export function generateTaskId(prjId: string, seq: number): string {
 /** Generates an SRS document ID for a project */
 export function generateSrsId(prjId: string): string {
   return `SRS-${prjId}`;
+}
+
+/** Converts a Lead to a Client object with generated CLI-ID */
+export function convertLeadToClient(lead: Lead, existingClientCount: number): Client {
+  return {
+    id: generateClientId(lead.companyName, existingClientCount),
+    name: lead.companyName,
+    billingAddress: "", // To be filled in modal
+    paymentTerms: "Net-30", // Default
+    contactPerson: lead.contactName,
+    contactEmail: lead.contactEmail,
+    contactPhone: lead.contactPhone,
+    joinedAt: new Date().toISOString(),
+    industry: "Other",
+    activeProjects: [],
+    totalBilled: 0,
+    status: "Active",
+  };
+}
+
+/** Generates an INV-ID (INV-YYMM-Seq) */
+export function generateInvoiceId(seq: number): string {
+  const now = new Date();
+  const yy = now.getFullYear().toString().slice(-2);
+  const mm = (now.getMonth() + 1).toString().padStart(2, "0");
+  return `INV-${yy}${mm}-${seq.toString().padStart(4, "0")}`;
+}
+
+/** Generates an RCT-ID (RCT-YYMM-Seq) */
+export function generateReceiptId(seq: number): string {
+  const now = new Date();
+  const yy = now.getFullYear().toString().slice(-2);
+  const mm = (now.getMonth() + 1).toString().padStart(2, "0");
+  return `RCT-${yy}${mm}-${seq.toString().padStart(4, "0")}`;
+}
+
+export function generateNextId(type: string, seq: number, context?: { comp?: string, prjId?: string }): string {
+  const now = new Date();
+  const yy = now.getFullYear().toString().slice(-2);
+  const mm = (now.getMonth() + 1).toString().padStart(2, "0");
+  const seqStr = seq.toString().padStart(4, "0");
+  const comp = context?.comp || "CORP";
+  const prjId = context?.prjId || "PRJ-XXXX";
+
+  switch (type) {
+    case "CLI": return `CLI-${comp}-${yy}-${seqStr}`;
+    case "PRJ": return `PRJ-${comp}-${yy}-${seqStr}`;
+    case "PRO": return `PRO-${prjId}-${seqStr}`;
+    case "INV": return `INV-${yy}${mm}-${seqStr}`;
+    case "TSK": return `TSK-${prjId}-${seqStr}`;
+    case "LED": return `LED-${yy}-${seqStr}`;
+    case "QTO": return `QTO-${yy}${mm}-${seqStr}`;
+    case "RCT": return `RCT-${yy}${mm}-${seqStr}`;
+    case "AGR": return `AGR-${prjId}-V${seq}`;
+    case "SRS": return `SRS-${prjId}`;
+    default: return `${type}-${seqStr}`;
+  }
 }
 

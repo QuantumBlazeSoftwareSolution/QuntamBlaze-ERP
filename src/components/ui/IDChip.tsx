@@ -1,45 +1,29 @@
 "use client";
 
-import { useState } from "react";
-import { Copy, Check } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 interface IDChipProps {
   id: string;
+  href?: string;
   className?: string;
+  size?: "xs" | "sm" | "md";
 }
 
-export function IDChip({ id, className }: IDChipProps) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(id);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy!", err);
-    }
-  };
-
-  return (
-    <button
-      onClick={handleCopy}
-      className={cn(
-        "group inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-mono tracking-wide transition-all",
-        "bg-accent/5 border border-accent/20 text-accent hover:bg-accent/10 hover:border-accent/40",
-        className
-      )}
-      title="Click to copy"
-    >
+export function IDChip({ id, href, className, size = "sm" }: IDChipProps) {
+  const content = (
+    <span className={cn(
+      "rounded-md bg-white/5 border border-border font-mono font-bold tracking-tight text-text-secondary hover:text-accent hover:border-accent/50 transition-all cursor-pointer inline-flex items-center",
+      size === "xs" ? "px-1.5 py-0.5 text-[10px]" : "px-2.5 py-1 text-[11px]",
+      className
+    )}>
       {id}
-      <span className="opacity-0 group-hover:opacity-100 transition-opacity">
-        {copied ? (
-          <Check className="w-3 h-3 text-success" />
-        ) : (
-          <Copy className="w-3 h-3" />
-        )}
-      </span>
-    </button>
+    </span>
   );
+
+  if (href) {
+    return <Link href={href}>{content}</Link>;
+  }
+
+  return content;
 }
