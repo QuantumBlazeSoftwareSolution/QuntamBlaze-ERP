@@ -66,12 +66,12 @@ export function IDSequenceRow({ config }: { config: IDEntityConfig }) {
                 placeholder="Type RESET"
                 value={resetInput}
                 onChange={(e) => setResetInput(e.target.value)}
-                className="w-[100px] bg-[#0A0A0A] border border-[#FF4444]/40 rounded px-3 py-1.5 text-[11px] focus:border-[#FF4444] outline-none"
+                className="w-[100px] bg-white border border-danger/40 rounded px-3 py-1.5 text-[11px] text-text-primary focus:border-danger outline-none placeholder:text-text-muted"
               />
-              <button onClick={handleReset} className="p-1.5 text-[#FF4444] hover:bg-[#FF4444]/10 rounded">
+              <button onClick={handleReset} className="p-1.5 text-danger hover:bg-danger/10 rounded">
                 <Check className="w-4 h-4" />
               </button>
-              <button onClick={() => setShowConfirm(false)} className="p-1.5 text-text-muted hover:bg-white/10 rounded">
+              <button onClick={() => setShowConfirm(false)} className="p-1.5 text-text-muted hover:bg-page-bg rounded">
                 <X className="w-4 h-4" />
               </button>
            </motion.div>

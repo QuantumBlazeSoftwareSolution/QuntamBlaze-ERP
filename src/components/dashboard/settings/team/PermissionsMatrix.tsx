@@ -24,7 +24,7 @@ function PermissionToggle({
          onClick={() => onChange(!active)}
          className={cn(
            "w-[28px] h-[16px] rounded-full relative transition-all duration-300",
-           active ? "bg-accent" : "bg-[#1A1A1A]"
+           active ? "bg-accent" : "bg-border"
          )}
        >
          <motion.div 
@@ -45,14 +45,14 @@ export function PermissionsMatrix() {
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-bg-surface/50 border-b border-border">
+            <tr className="bg-page-bg border-b border-border">
               <th className="px-8 py-6 text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] border-r border-border">Permission Role</th>
               {MODULES.map((mod, idx) => (
                 <th 
                   key={mod} 
                   className={cn(
-                    "px-6 py-6 text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] text-center",
-                    idx % 2 === 0 ? "bg-[#0A0A0A]" : "bg-[#050505]"
+                    "px-6 py-6 text-[11px] font-bold text-text-secondary uppercase tracking-[0.2em] text-center",
+                    idx % 2 === 0 ? "bg-page-bg" : "bg-white"
                   )}
                 >
                   {mod}
@@ -62,7 +62,7 @@ export function PermissionsMatrix() {
           </thead>
           <tbody>
             {ROLES.map((role) => (
-              <tr key={role} className="border-b border-border/50 hover:bg-white/[0.01] transition-colors">
+              <tr key={role} className="border-b border-divider hover:bg-page-bg transition-colors">
                 <td className="px-8 py-6 border-r border-border">
                   <div className="flex flex-col">
                     <span className="text-[14px] font-bold text-text-primary">{role}</span>
@@ -74,7 +74,7 @@ export function PermissionsMatrix() {
                     key={mod} 
                     className={cn(
                       "px-6 py-6",
-                      idx % 2 === 0 ? "bg-[#0A0A0A]/50" : "bg-[#050505]/50"
+                      idx % 2 === 0 ? "bg-page-bg/60" : "bg-white"
                     )}
                   >
                     <div className="flex items-center justify-center gap-4">
