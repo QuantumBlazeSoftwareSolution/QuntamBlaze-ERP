@@ -95,7 +95,8 @@ export default function LeaveManagementPage() {
            {/* Side Stats & Information */}
            <div className="xl:col-span-1 space-y-8">
               {activeTab === 'availability' ? <DepartmentAvailabilityMatrix /> : (
-                <div className="bg-white border border-[#E2E8F0] rounded-3xl p-8 shadow-sm">
+                <>
+                  <div className="bg-white border border-[#E2E8F0] rounded-3xl p-8 shadow-sm">
                  <h4 className="text-sm font-black text-[#0F172A] uppercase tracking-widest mb-6">Leave Distribution</h4>
                  <div className="space-y-6">
                     <ProgressStat label="Annual Leave" percentage={45} color="bg-blue-500" />
@@ -105,20 +106,22 @@ export default function LeaveManagementPage() {
                  </div>
               </div>
 
-              <div className="bg-[#0F172A] rounded-3xl p-8 text-white relative overflow-hidden group cursor-pointer hover:scale-[1.02] transition-all">
-                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full group-hover:scale-110 transition-transform" />
-                 <h4 className="text-base font-black mb-2 flex items-center gap-2">
-                    <ShieldCheck className="w-5 h-5 text-[#10B981]" />
-                    Compliance Audit
-                 </h4>
-                 <p className="text-[11px] text-slate-400 leading-relaxed mb-6">
-                    Last audit completed on May 05, 2024. All leave policies are compliant with SL-Labour regulations.
-                 </p>
-                 <button className="text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-1 hover:underline">
-                    View Audit Log
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                 </button>
-              </div>
+                  <div className="bg-[#0F172A] rounded-3xl p-8 text-white relative overflow-hidden group cursor-pointer hover:scale-[1.02] transition-all">
+                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full group-hover:scale-110 transition-transform" />
+                     <h4 className="text-base font-black mb-2 flex items-center gap-2">
+                        <ShieldCheck className="w-5 h-5 text-[#10B981]" />
+                        Compliance Audit
+                     </h4>
+                     <p className="text-[11px] text-slate-400 leading-relaxed mb-6">
+                        Last audit completed on May 05, 2024. All leave policies are compliant with SL-Labour regulations.
+                     </p>
+                     <button className="text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-1 hover:underline">
+                        View Audit Log
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                     </button>
+                  </div>
+                </>
+              )}
            </div>
         </div>
       </div>
