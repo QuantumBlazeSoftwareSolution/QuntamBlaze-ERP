@@ -6,6 +6,7 @@ import { GeneralSettingsForm } from "@/components/dashboard/settings/GeneralSett
 import { IDConfigTable } from "@/components/dashboard/settings/IDConfigTable";
 import { IntegrationsTab } from "@/components/dashboard/settings/IntegrationsTab";
 import { AuditComplianceTab } from "@/components/dashboard/settings/AuditComplianceTab";
+import { RolesTab } from "@/components/dashboard/settings/RolesTab";
 import { cn } from "@/lib/utils";
 
 const TABS = [
@@ -13,6 +14,7 @@ const TABS = [
   { id: "id-config", label: "ID Configuration" },
   { id: "integrations", label: "Integrations" },
   { id: "audit", label: "Audit & Compliance" },
+  { id: "roles", label: "Roles & Permissions" },
 ];
 
 export default function SettingsPage() {
@@ -59,6 +61,7 @@ export default function SettingsPage() {
         {activeTab === "id-config" && <IDConfigTable />}
         {activeTab === "integrations" && <IntegrationsTab />}
         {activeTab === "audit" && <AuditComplianceTab />}
+        {activeTab === "roles" && <RolesTab />}
       </motion.div>
     </div>
   );

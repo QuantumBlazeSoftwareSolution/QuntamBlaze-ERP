@@ -10,9 +10,9 @@ export function NotificationGroup({ label, notifications }: NotificationGroupPro
   if (notifications.length === 0) return null;
 
   return (
-    <div className="mb-4">
-      <div className="sticky top-0 bg-[#0A0A0A]/95 backdrop-blur-sm z-10 px-5 py-3 border-b border-[#1A1A1A]">
-        <h4 className="text-[10px] font-bold tracking-[0.1em] text-[#3A3A3A] uppercase">
+    <div className="mb-2">
+      <div className="sticky top-0 bg-white/95 backdrop-blur-sm z-10 px-6 py-2.5 border-b border-divider">
+        <h4 className="text-[10px] font-bold tracking-widest text-text-muted uppercase">
           {label}
         </h4>
       </div>
