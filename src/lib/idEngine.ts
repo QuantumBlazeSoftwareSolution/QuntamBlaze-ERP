@@ -135,13 +135,13 @@ export function generateReceiptId(seq: number): string {
 export function generateNextId(
   type: string,
   seq: number,
-  context?: { comp?: string; prjId?: string }
+  context?: { compAbbr?: string; prjId?: string }
 ): string {
   const now = new Date();
   const yy = now.getFullYear().toString().slice(-2);
   const mm = (now.getMonth() + 1).toString().padStart(2, "0");
   const seqStr = seq.toString().padStart(4, "0");
-  const comp = context?.comp || "CORP";
+  const comp = context?.compAbbr || "CORP";
   const prjId = context?.prjId || "PRJ-XXXX";
 
   switch (type) {
@@ -154,7 +154,8 @@ export function generateNextId(
     case "INV":
       return `INV-${yy}${mm}-${seqStr}`;
     case "TSK":
-      return `TSK-${prjId}-${seqStr}`;
+      const taskSeq = seq.toString().padStart(2, "0");
+      return `TSK-${prjId}-${taskSeq}`;
     case "LED":
       return `LED-${yy}-${seqStr}`;
     case "QTO":

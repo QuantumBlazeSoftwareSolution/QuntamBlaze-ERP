@@ -20,3 +20,6 @@ This project is a comprehensive ERP system built with Next.js 14 App Router, Tai
 - Use `react-hook-form` + `zod` for forms.
 - Follow the ID Engine patterns strictly.
 - All colors must be referenced from `src/lib/theme.ts` (to be created).
+
+## DB Changes
+- If you do any DB changes, Please do not try to run drizzle-kit commands, instead notify me at the end of the your response to do that manually.
