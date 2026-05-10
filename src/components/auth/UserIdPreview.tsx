@@ -1,33 +1,28 @@
-"use client";
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-import { motion, AnimatePresence } from "framer-motion";
-
-interface UserIdPreviewProps {
-  userId: string;
-  isVisible: boolean;
+interface UserIDPreviewProps {
+  userId: string | null;
 }
 
-export function UserIdPreview({ userId, isVisible }: UserIdPreviewProps) {
+export const UserIDPreview = ({ userId }: UserIDPreviewProps) => {
   return (
     <AnimatePresence>
-      {isVisible && (
+      {userId && (
         <motion.div
-          initial={{ opacity: 0, y: -10, height: 0 }}
-          animate={{ opacity: 1, y: 0, height: "auto" }}
-          exit={{ opacity: 0, y: -10, height: 0 }}
-          transition={{ duration: 0.3 }}
-          className="overflow-hidden"
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          className="mt-2"
         >
-          <div className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-accent/20 bg-accent/5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
-              Generated ID
-            </span>
-            <span className="text-sm font-mono font-medium text-accent">
+          <div className="flex items-center gap-2">
+            <span className="text-text-secondary text-xs">Your assigned User ID:</span>
+            <div className="bg-accent-light border border-accent-border text-accent-text font-mono text-sm px-3 py-1 rounded-md">
               {userId}
-            </span>
+            </div>
           </div>
         </motion.div>
       )}
     </AnimatePresence>
   );
-}
+};

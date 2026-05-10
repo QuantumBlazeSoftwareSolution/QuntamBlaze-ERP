@@ -1,232 +1,299 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useForm, useWatch } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { motion, AnimatePresence } from "framer-motion";
-import { User, Badge, Lock, LockKeyhole, Loader2, AlertCircle, ChevronDown, ArrowRight } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { generateUserId } from "@/lib/idEngine";
-import { USER_ROLES } from "@/types/auth";
-import { UserIdPreview } from "./UserIdPreview";
+import React, { useState, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Lock, Eye, EyeOff, Loader2, ChevronDown, Check } from 'lucide-react';
+import { UserRole } from '@/types/auth';
+import { inviteSchema, InviteFormValues } from '@/lib/schemas/authSchema';
+import { useDebounce } from '@/hooks/useDebounce';
+import { generateUserId } from '@/lib/idEngine';
+import { StepIndicator } from './StepIndicator';
+import { UserIDPreview } from './UserIdPreview';
 
-const inviteSchema = z.object({
-  fullName: z.string().min(2, "Full Name is required"),
-  role: z.enum(["Admin", "PM", "Developer", "Finance"], {
-    message: "Please select a valid role",
-  }),
-  password: z.string().min(8, "Security key must be at least 8 characters"),
-  confirmPassword: z.string().min(8, "Please confirm your security key"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Security keys do not match",
-  path: ["confirmPassword"],
-});
+const roleOptions = Object.values(UserRole);
 
-type InviteFormInputs = z.infer<typeof inviteSchema>;
-
-export function InviteForm() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [generatedId, setGeneratedId] = useState("");
+export const InviteForm = () => {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isRoleOpen, setIsRoleOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [generatedId, setGeneratedId] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
-    setValue,
+    watch,
     control,
+    trigger,
     formState: { errors },
-  } = useForm<InviteFormInputs>({
+  } = useForm<InviteFormValues>({
     resolver: zodResolver(inviteSchema),
     defaultValues: {
-      fullName: "",
-      role: undefined as unknown as "Admin" | "PM" | "Developer" | "Finance",
-      password: "",
-      confirmPassword: "",
-    },
+      email: "jane.doe@example.com", // Pre-filled mock
+      role: UserRole.Client, // Default
+    }
   });
 
-  const watchFullName = useWatch({ control, name: "fullName" });
-  const watchRole = useWatch({ control, name: "role" });
+  const fullNameValue = watch('fullName');
+  const debouncedFullName = useDebounce(fullNameValue, 600);
 
-  // Debounced ID Generation
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (watchFullName && watchFullName.trim().length >= 2) {
-        // Using mock sequence 4 for demo purposes
-        const newId = generateUserId(watchFullName, 4);
-        setGeneratedId(newId);
-      } else {
-        setGeneratedId("");
-      }
-    }, 600);
+    if (debouncedFullName && debouncedFullName.trim().length >= 2) {
+      setGeneratedId(generateUserId(debouncedFullName, 4)); // Mock seq 4
+    } else {
+      setGeneratedId(null);
+    }
+  }, [debouncedFullName]);
 
-    return () => clearTimeout(timer);
-  }, [watchFullName]);
+  const onNextStep = async () => {
+    const isStep1Valid = await trigger();
+    if (isStep1Valid) {
+      setCurrentStep(2);
+    }
+  };
 
-  const onSubmit = async (data: InviteFormInputs) => {
-    setIsLoading(true);
-    // Mock authentication/registration delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log("[REGISTER] User registered successfully", { ...data, userId: generatedId });
-    setIsLoading(false);
-    // Use relative path for mock purposes or absolute if actual route exists
-    // We haven't created dashboard, so it might 404, but that satisfies the prompt logic
-    router.push("/dashboard"); 
+  const onSubmit = async (data: InviteFormValues) => {
+    setIsSubmitting(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log(`[QB-AUTH] Invite accepted for ${data.email} as ${data.role}`);
+      // Redirect or success state logic here
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const formValues = watch();
+
+  const stepVariants = {
+    enter: { x: 24, opacity: 0 },
+    center: { x: 0, opacity: 1 },
+    exit: { x: -24, opacity: 0 }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 w-full">
-      {/* Full Name */}
-      <div className="flex flex-col gap-1.5 group">
-        <label className="text-[11px] font-bold tracking-[0.1em] text-text-secondary uppercase group-focus-within:text-accent transition-colors">
-          Full Name
-        </label>
-        <div className="relative">
-          <User className="absolute left-0 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-secondary group-focus-within:text-accent transition-colors" />
-          <input
-            type="text"
-            placeholder="Enter your full name"
-            disabled={isLoading}
-            className="w-full bg-transparent border-0 border-b border-border hover:border-border-hover focus:border-accent focus:ring-0 text-sm font-medium text-text-primary pl-8 py-2.5 placeholder:text-text-muted transition-all focus:shadow-[0_4px_12px_-4px_rgba(0,229,255,0.3)] disabled:opacity-50"
-            {...register("fullName")}
-          />
-        </div>
-        {errors.fullName && (
-          <div className="flex items-center gap-1.5 mt-1 text-danger">
-            <AlertCircle className="w-3.5 h-3.5" />
-            <span className="text-xs">{errors.fullName.message}</span>
-          </div>
-        )}
-        
-        {/* Animated User ID Preview */}
-        <UserIdPreview userId={generatedId} isVisible={!!generatedId} />
-      </div>
+    <div className="w-full">
+      <StepIndicator currentStep={currentStep} />
+      
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
+        <AnimatePresence mode="wait">
+          {currentStep === 1 && (
+            <motion.div
+              key="step1"
+              variants={stepVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.3 }}
+              className="space-y-5"
+            >
+              {/* Full Name */}
+              <div>
+                <label className="block text-text-primary text-sm font-medium mb-1.5">
+                  Full Name
+                </label>
+                <input
+                  {...register('fullName')}
+                  type="text"
+                  className="w-full border border-border rounded-lg h-11 px-4 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder:text-text-muted bg-white"
+                  placeholder="Jane Doe"
+                />
+                {errors.fullName && (
+                  <p className="text-red-500 text-xs mt-1.5">{errors.fullName.message}</p>
+                )}
+                <UserIDPreview userId={generatedId} />
+              </div>
 
-      {/* Custom Role Dropdown */}
-      <div className="flex flex-col gap-1.5 group">
-        <label className="text-[11px] font-bold tracking-[0.1em] text-text-secondary uppercase transition-colors">
-          Assigned Role
-        </label>
-        <div className="relative">
-          <Badge className="absolute left-0 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-secondary z-10" />
-          
-          <button
-            type="button"
-            onClick={() => !isLoading && setIsDropdownOpen(!isDropdownOpen)}
-            disabled={isLoading}
-            className={`w-full text-left bg-transparent border-0 border-b ${isDropdownOpen ? 'border-accent shadow-[0_4px_12px_-4px_rgba(0,229,255,0.3)]' : 'border-border hover:border-border-hover'} focus:ring-0 text-sm font-medium pl-8 py-2.5 transition-all disabled:opacity-50 relative`}
-          >
-            <span className={watchRole ? "text-text-primary" : "text-text-muted"}>
-              {watchRole || "Select a role"}
-            </span>
-            <ChevronDown className={`absolute right-0 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-secondary transition-transform ${isDropdownOpen ? "rotate-180 text-accent" : ""}`} />
-          </button>
-          
-          <AnimatePresence>
-            {isDropdownOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                transition={{ duration: 0.2 }}
-                className="absolute top-full left-0 w-full mt-2 bg-bg-surface border border-border rounded-lg shadow-2xl z-50 overflow-hidden"
-              >
-                {USER_ROLES.map((role) => (
+              {/* Email (Pre-filled) */}
+              <div>
+                <label className="block text-text-primary text-sm font-medium mb-1.5">
+                  Email (Invite Sent To)
+                </label>
+                <div className="relative">
+                  <input
+                    {...register('email')}
+                    type="email"
+                    readOnly
+                    className="w-full border border-border rounded-lg h-11 pl-4 pr-10 text-sm text-text-muted bg-page-bg cursor-not-allowed focus:outline-none"
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <Lock className="h-4 w-4 text-text-muted" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Custom Role Dropdown */}
+              <div className="relative">
+                <label className="block text-text-primary text-sm font-medium mb-1.5">
+                  Assigned Role
+                </label>
+                <Controller
+                  name="role"
+                  control={control}
+                  render={({ field }) => (
+                    <>
+                      <div 
+                        className="w-full border border-border rounded-lg h-11 px-4 flex items-center justify-between cursor-pointer bg-white"
+                        onClick={() => setIsRoleOpen(!isRoleOpen)}
+                      >
+                        <span className="text-sm text-text-primary">{field.value || "Select Role"}</span>
+                        <ChevronDown className="w-4 h-4 text-text-muted" />
+                      </div>
+                      <AnimatePresence>
+                        {isRoleOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            className="absolute z-10 w-full mt-1 bg-white border border-border rounded-lg shadow-lg py-1"
+                          >
+                            {roleOptions.map((role) => (
+                              <div
+                                key={role}
+                                className={`px-4 py-2.5 text-sm cursor-pointer flex items-center justify-between
+                                  ${field.value === role ? 'bg-accent-light text-accent-text' : 'text-text-primary hover:bg-accent-light hover:text-accent-text'}
+                                `}
+                                onClick={() => {
+                                  field.onChange(role);
+                                  setIsRoleOpen(false);
+                                }}
+                              >
+                                <span>{role}</span>
+                                {field.value === role && <Check className="w-4 h-4 text-accent" />}
+                              </div>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </>
+                  )}
+                />
+                {errors.role && (
+                  <p className="text-red-500 text-xs mt-1.5">{errors.role.message}</p>
+                )}
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="block text-text-primary text-sm font-medium mb-1.5">
+                  Set Password
+                </label>
+                <div className="relative">
+                  <input
+                    {...register('password')}
+                    type={showPassword ? "text" : "password"}
+                    className="w-full border border-border rounded-lg h-11 px-4 pr-10 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder:text-text-muted bg-white"
+                    placeholder="••••••••"
+                  />
                   <button
-                    key={role}
                     type="button"
-                    onClick={() => {
-                      setValue("role", role, { shouldValidate: true });
-                      setIsDropdownOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-3 text-sm text-text-primary hover:bg-accent/10 hover:text-accent transition-colors border-b border-border/50 last:border-0"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-text-muted hover:text-text-primary transition-colors"
                   >
-                    {role}
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-        {errors.role && (
-          <div className="flex items-center gap-1.5 mt-1 text-danger">
-            <AlertCircle className="w-3.5 h-3.5" />
-            <span className="text-xs">{errors.role.message}</span>
-          </div>
-        )}
-      </div>
+                </div>
+                {errors.password && (
+                  <p className="text-red-500 text-xs mt-1.5">{errors.password.message}</p>
+                )}
+              </div>
 
-      {/* Password */}
-      <div className="flex flex-col gap-1.5 group">
-        <label className="text-[11px] font-bold tracking-[0.1em] text-text-secondary uppercase group-focus-within:text-accent transition-colors">
-          Security Clearance Key
-        </label>
-        <div className="relative">
-          <Lock className="absolute left-0 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-secondary group-focus-within:text-accent transition-colors" />
-          <input
-            type="password"
-            placeholder="••••••••••••"
-            disabled={isLoading}
-            className="w-full bg-transparent border-0 border-b border-border hover:border-border-hover focus:border-accent focus:ring-0 text-sm font-medium text-text-primary pl-8 py-2.5 placeholder:text-text-muted transition-all focus:shadow-[0_4px_12px_-4px_rgba(0,229,255,0.3)] tracking-widest disabled:opacity-50"
-            {...register("password")}
-          />
-        </div>
-        {errors.password && (
-          <div className="flex items-center gap-1.5 mt-1 text-danger">
-            <AlertCircle className="w-3.5 h-3.5" />
-            <span className="text-xs">{errors.password.message}</span>
-          </div>
-        )}
-      </div>
+              {/* Confirm Password */}
+              <div>
+                <label className="block text-text-primary text-sm font-medium mb-1.5">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <input
+                    {...register('confirmPassword')}
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="w-full border border-border rounded-lg h-11 px-4 pr-10 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder:text-text-muted bg-white"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-text-muted hover:text-text-primary transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-red-500 text-xs mt-1.5">{errors.confirmPassword.message}</p>
+                )}
+              </div>
 
-      {/* Confirm Password */}
-      <div className="flex flex-col gap-1.5 group">
-        <label className="text-[11px] font-bold tracking-[0.1em] text-text-secondary uppercase group-focus-within:text-accent transition-colors">
-          Verify Clearance Key
-        </label>
-        <div className="relative">
-          <LockKeyhole className="absolute left-0 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-secondary group-focus-within:text-accent transition-colors" />
-          <input
-            type="password"
-            placeholder="••••••••••••"
-            disabled={isLoading}
-            className="w-full bg-transparent border-0 border-b border-border hover:border-border-hover focus:border-accent focus:ring-0 text-sm font-medium text-text-primary pl-8 py-2.5 placeholder:text-text-muted transition-all focus:shadow-[0_4px_12px_-4px_rgba(0,229,255,0.3)] tracking-widest disabled:opacity-50"
-            {...register("confirmPassword")}
-          />
-        </div>
-        {errors.confirmPassword && (
-          <div className="flex items-center gap-1.5 mt-1 text-danger">
-            <AlertCircle className="w-3.5 h-3.5" />
-            <span className="text-xs">{errors.confirmPassword.message}</span>
-          </div>
-        )}
-      </div>
+              <button
+                type="button"
+                onClick={onNextStep}
+                className="bg-accent hover:bg-accent-hover text-white font-semibold rounded-lg h-11 w-full flex items-center justify-center transition-colors mt-6"
+              >
+                Continue Setup
+              </button>
+            </motion.div>
+          )}
 
-      {/* Submit Button */}
-      <div className="pt-4 mt-2">
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full relative group px-4 py-3 bg-transparent text-accent text-sm font-medium border border-accent/50 rounded-md hover:border-accent hover:bg-accent/5 transition-all duration-300 overflow-hidden flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <div className="absolute inset-0 bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity blur-md" />
-          <span className="relative z-10 flex items-center gap-2">
-            {isLoading ? (
-              <>
-                <Loader2 className="w-[18px] h-[18px] animate-spin" />
-                Processing...
-              </>
-            ) : (
-              <>
-                Complete Setup
-                <ArrowRight className="w-[18px] h-[18px] group-hover:translate-x-1 transition-transform" />
-              </>
-            )}
-          </span>
-        </button>
-      </div>
-    </form>
+          {currentStep === 2 && (
+            <motion.div
+              key="step2"
+              variants={stepVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.3 }}
+              className="space-y-6"
+            >
+              <div className="bg-page-bg border border-border rounded-xl p-6">
+                <h3 className="text-text-primary font-semibold mb-4 border-b border-border pb-3">Review Account Details</h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <span className="block text-text-muted text-xs uppercase tracking-wider mb-1">Full Name</span>
+                    <span className="text-text-primary text-sm font-medium">{formValues.fullName}</span>
+                  </div>
+                  
+                  {generatedId && (
+                    <div>
+                      <span className="block text-text-muted text-xs uppercase tracking-wider mb-1">Assigned ID</span>
+                      <span className="bg-accent-light border border-accent-border text-accent-text font-mono text-sm px-2 py-0.5 rounded inline-block">{generatedId}</span>
+                    </div>
+                  )}
+
+                  <div>
+                    <span className="block text-text-muted text-xs uppercase tracking-wider mb-1">Email Address</span>
+                    <span className="text-text-primary text-sm">{formValues.email}</span>
+                  </div>
+
+                  <div>
+                    <span className="block text-text-muted text-xs uppercase tracking-wider mb-1">Role</span>
+                    <span className="text-text-primary text-sm">{formValues.role}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep(1)}
+                  className="px-4 border border-border text-text-secondary hover:text-text-primary hover:bg-page-bg font-semibold rounded-lg h-11 transition-colors"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-accent hover:bg-accent-hover text-white font-semibold rounded-lg h-11 flex-1 flex items-center justify-center transition-colors"
+                >
+                  {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Complete Setup"}
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </form>
+    </div>
   );
-}
+};

@@ -1,44 +1,40 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import React, { useState, useEffect } from 'react';
 
 interface CountdownProps {
-  seconds: number;
+  initialSeconds: number;
   onComplete?: () => void;
-  className?: string;
 }
 
-export function Countdown({ seconds: initialSeconds, onComplete, className }: CountdownProps) {
-  const [timeLeft, setTimeLeft] = useState(initialSeconds);
+export const Countdown = ({ initialSeconds, onComplete }: CountdownProps) => {
+  const [seconds, setSeconds] = useState(initialSeconds);
 
   useEffect(() => {
-    if (timeLeft <= 0) {
+    if (seconds <= 0) {
       onComplete?.();
       return;
     }
 
     const timer = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
+      setSeconds((prev) => prev - 1);
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, onComplete]);
+  }, [seconds, onComplete]);
 
-  const minutes = Math.floor(timeLeft / 60);
-  const seconds = timeLeft % 60;
-  
-  const isWarning = timeLeft <= 10 && timeLeft > 0;
+  const formatTime = (totalSeconds: number) => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const remainingSeconds = totalSeconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  // Turn amber/warning color when less than 60 seconds remain
+  const isNearZero = seconds < 60;
 
   return (
-    <span 
-      className={cn(
-        "font-mono transition-colors",
-        isWarning ? "text-warning animate-pulse" : "text-accent",
-        className
-      )}
-    >
-      {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
+    <span className={`font-mono font-medium ${isNearZero ? 'text-warning' : 'text-text-secondary'}`}>
+      {formatTime(seconds)}
     </span>
   );
-}
+};

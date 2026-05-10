@@ -1,206 +1,151 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Mail, CheckCircle2, User, Send, RefreshCcw, Loader2 } from "lucide-react";
-import Link from "next/link";
-import { Countdown } from "@/components/ui/Countdown";
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Mail, ArrowLeft, CheckCircle2, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { Countdown } from '@/components/ui/Countdown';
 
-const resetSchema = z.object({
-  email: z.string().email("Invalid authorization email"),
+const forgotPasswordSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
 });
 
-type ResetFormInputs = z.infer<typeof resetSchema>;
+type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
 
-type ViewState = "idle" | "sent";
-
-export function ForgotPasswordCard() {
-  const [viewState, setViewState] = useState<ViewState>("idle");
-  const [isLoading, setIsLoading] = useState(false);
-  const [submittedEmail, setSubmittedEmail] = useState("");
-  const [canResend, setCanResend] = useState(false);
+export const ForgotPasswordCard = () => {
+  const [state, setState] = useState<'idle' | 'sent'>('idle');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState('');
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ResetFormInputs>({
-    resolver: zodResolver(resetSchema),
-    defaultValues: {
-      email: "",
-    },
+  } = useForm<ForgotPasswordValues>({
+    resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const onSubmit = async (data: ResetFormInputs) => {
-    setIsLoading(true);
-    // Mock authentication delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    // Generate a random 4 digit token for the mock
-    // eslint-disable-next-line react-hooks/purity
-    const randomToken = Math.floor(1000 + Math.random() * 9000);
-    console.log(`[AUTH] Password reset requested for ${data.email} — Token: RST-2605-${randomToken}`);
-    
-    setSubmittedEmail(data.email);
-    setViewState("sent");
-    setCanResend(false); // Start countdown
-    setIsLoading(false);
-  };
-
-  const handleReturnToStart = () => {
-    setViewState("idle");
-  };
-
-  const handleResend = async () => {
-    // Mock resend logic
-    setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setCanResend(false);
-    setIsLoading(false);
+  const onSubmit = async (data: ForgotPasswordValues) => {
+    setIsSubmitting(true);
+    try {
+      // Mock 1s delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const token = Math.random().toString(36).slice(2, 6).toUpperCase();
+      console.log(`[QB-AUTH] Reset token issued · RST-2605-${token} · ${new Date().toISOString()}`);
+      
+      setSubmittedEmail(data.email);
+      setState('sent');
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="w-full max-w-[420px] bg-bg-surface border border-border rounded-xl p-10 shadow-2xl relative overflow-hidden backdrop-blur-sm">
-      {/* Subtle top inner glow matching the design */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
-
+    <div className="bg-surface-white border border-border rounded-2xl shadow-sm p-10 w-full max-w-[440px] relative overflow-hidden">
       <AnimatePresence mode="wait">
-        {viewState === "idle" && (
+        {state === 'idle' ? (
           <motion.div
             key="idle"
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-            className="flex flex-col"
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}
           >
-            {/* Back Link */}
             <Link 
               href="/login" 
-              className="inline-flex items-center text-text-secondary hover:text-accent transition-colors duration-200 mb-8 font-mono text-xs uppercase"
+              className="absolute top-0 left-0 mt-8 ml-10 flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary transition-colors"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Login
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back</span>
             </Link>
 
-            <div className="flex items-center mb-4">
-              <div className="w-10 h-10 rounded-md bg-accent/10 flex items-center justify-center border border-accent/20 mr-4">
-                <Mail className="w-5 h-5 text-accent" />
+            <div className="flex flex-col items-center text-center mt-6">
+              <div className="bg-accent-light rounded-full p-4 mb-6">
+                <Mail className="w-10 h-10 text-accent" />
               </div>
-              <h2 className="text-2xl font-medium text-text-primary">Reset your access</h2>
-            </div>
-            
-            <p className="text-sm text-text-secondary mb-8">
-              Enter the email address associated with your Operations Control account to receive a secure reset link.
-            </p>
+              <h1 className="text-text-primary text-2xl font-bold mb-2">Reset your password</h1>
+              <p className="text-text-secondary text-sm mb-8">
+                Enter your email address and we'll send you a link to reset your password.
+              </p>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-              <div className="flex flex-col gap-1.5 group">
-                <label htmlFor="email" className="text-[11px] font-bold tracking-[0.1em] text-text-secondary uppercase">
-                  Authorization Email
-                </label>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-secondary group-focus-within:text-accent transition-colors" />
+              <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-5">
+                <div className="text-left">
+                  <label className="block text-text-primary text-sm font-medium mb-1.5">
+                    Email Address
+                  </label>
                   <input
-                    id="email"
+                    {...register('email')}
                     type="email"
-                    placeholder="operative@quantumblaze.co"
-                    disabled={isLoading}
-                    className="w-full bg-bg-card border-0 border-b border-border/50 focus:border-accent focus:ring-0 text-sm text-text-primary pl-10 pr-4 py-3 rounded-md placeholder:text-text-muted transition-all focus:shadow-[0_4px_12px_-4px_rgba(0,229,255,0.3)] disabled:opacity-50"
-                    {...register("email")}
+                    className="w-full border border-border rounded-lg h-11 px-4 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder:text-text-muted"
+                    placeholder="name@company.com"
                   />
-                </div>
-                {errors.email && (
-                  <span className="text-xs text-danger mt-1">{errors.email.message}</span>
-                )}
-              </div>
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full group relative px-4 py-3 bg-transparent text-accent text-[11px] font-bold tracking-[0.1em] uppercase border border-accent rounded-md hover:bg-accent/10 transition-all duration-300 overflow-hidden flex items-center justify-center gap-2 shadow-[0_0_12px_0_rgba(0,229,255,0.15)] hover:shadow-[0_0_16px_2px_rgba(0,229,255,0.25)] disabled:opacity-50 disabled:cursor-not-allowed mt-2"
-              >
-                <span className="relative z-10 flex items-center gap-2">
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      Send Reset Link
-                      <Send className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                    </>
+                  {errors.email && (
+                    <p className="text-red-500 text-xs mt-1.5">{errors.email.message}</p>
                   )}
-                </span>
-              </button>
-            </form>
-          </motion.div>
-        )}
+                </div>
 
-        {viewState === "sent" && (
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-accent hover:bg-accent-hover text-white font-semibold rounded-lg h-11 w-full flex items-center justify-center transition-colors"
+                >
+                  {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Send Reset Link"}
+                </button>
+              </form>
+            </div>
+          </motion.div>
+        ) : (
           <motion.div
             key="sent"
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-            className="flex flex-col items-center text-center py-6"
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}
+            className="flex flex-col items-center text-center"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-              className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center border border-accent/30 mb-6 shadow-[0_0_12px_0_rgba(0,229,255,0.15)]"
+              transition={{ type: "spring", stiffness: 200, damping: 15 }}
+              className="bg-accent-light rounded-full p-4 mb-6"
             >
-              <CheckCircle2 className="w-8 h-8 text-success drop-shadow-[0_0_8px_rgba(0,200,150,0.4)]" />
+              <CheckCircle2 className="w-10 h-10 text-accent" />
             </motion.div>
-            
-            <h2 className="text-2xl font-medium text-text-primary mb-3">Transmission Sent</h2>
-            
-            <p className="text-sm text-text-secondary mb-4">
-              We&apos;ve dispatched a secure reset link to:
+
+            <h1 className="text-text-primary text-2xl font-bold mb-2">Check your inbox</h1>
+            <p className="text-text-secondary text-sm mb-6">
+              We've sent a password reset link to <br/>
+              <span className="font-mono bg-accent-light text-accent-text px-2 py-0.5 rounded text-sm inline-block mt-2">
+                {submittedEmail}
+              </span>
             </p>
-            <div className="mb-8">
-               <code className="bg-accent/5 text-accent border border-accent/20 px-2 py-1 rounded text-sm font-mono tracking-wide">
-                 {submittedEmail}
-               </code>
+
+            <div className="space-y-4 mb-8">
+              <p className="text-text-muted text-xs">
+                Link expires in <Countdown initialSeconds={900} />
+              </p>
             </div>
 
-            <p className="text-sm text-text-secondary mb-8">
-              Check your inbox — link expires in <Countdown seconds={900} className="ml-1 font-bold" />.
-            </p>
-
-            <div className="flex flex-col items-center gap-4">
-               {canResend ? (
-                 <button 
-                   onClick={handleResend}
-                   disabled={isLoading}
-                   className="text-xs font-mono text-text-secondary hover:text-accent transition-colors underline flex items-center disabled:opacity-50"
-                 >
-                   {isLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
-                   Resend transmission
-                 </button>
-               ) : (
-                 <span className="text-xs font-mono text-text-secondary flex items-center">
-                   Resend available in <Countdown seconds={60} onComplete={() => setCanResend(true)} className="ml-1" />
-                 </span>
-               )}
-              
-               <button 
-                 onClick={handleReturnToStart}
-                 className="inline-flex items-center text-text-secondary hover:text-accent transition-colors duration-200 font-mono text-xs uppercase border-b border-transparent hover:border-accent pb-0.5 mt-2"
-               >
-                 <RefreshCcw className="w-4 h-4 mr-2" />
-                 Return to Start
-               </button>
+            <div className="pt-6 border-t border-divider w-full">
+              <p className="text-text-secondary text-sm">
+                Didn't receive the email?{' '}
+                <button 
+                  onClick={() => setState('idle')}
+                  className="text-accent hover:underline font-medium"
+                >
+                  Click to resend
+                </button>
+              </p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
-}
+};

@@ -6,9 +6,10 @@ interface AuthSplitLayoutProps {
   children: React.ReactNode;
   title: string;
   subtitle: string;
+  leftContent?: React.ReactNode;
 }
 
-export const AuthSplitLayout = ({ children, title, subtitle }: AuthSplitLayoutProps) => {
+export const AuthSplitLayout = ({ children, title, subtitle, leftContent }: AuthSplitLayoutProps) => {
   return (
     <div className="flex h-screen w-full overflow-hidden bg-surface-white">
       {/* Left Panel (Dark) */}
@@ -26,23 +27,27 @@ export const AuthSplitLayout = ({ children, title, subtitle }: AuthSplitLayoutPr
           <QBLogoMark />
         </div>
 
-        <div className="relative z-10 max-w-md">
-          <h1 className="text-white text-4xl lg:text-5xl font-bold leading-tight mb-8">
-            The Intelligence Layer for Your Business
-          </h1>
-          
-          <ul className="space-y-4">
-            {[
-              "Unified ERP workflows and automation",
-              "Real-time analytics and reporting",
-              "Enterprise-grade security and compliance"
-            ].map((feature, i) => (
-              <li key={i} className="flex items-center gap-3 text-sidebar-text text-sm">
-                <CheckCircle2 className="w-5 h-5 text-accent shrink-0" />
-                <span>{feature}</span>
-              </li>
-            ))}
-          </ul>
+        <div className="relative z-10 w-full h-full flex flex-col justify-center">
+          {leftContent || (
+            <div className="max-w-md">
+              <h1 className="text-white text-4xl lg:text-5xl font-bold leading-tight mb-8">
+                The Intelligence Layer for Your Business
+              </h1>
+              
+              <ul className="space-y-4">
+                {[
+                  "Unified ERP workflows and automation",
+                  "Real-time analytics and reporting",
+                  "Enterprise-grade security and compliance"
+                ].map((feature, i) => (
+                  <li key={i} className="flex items-center gap-3 text-sidebar-text text-sm">
+                    <CheckCircle2 className="w-5 h-5 text-accent shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
 
