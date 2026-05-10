@@ -25,8 +25,8 @@ function FolderItem({ node, depth = 0 }: { node: FolderNode; depth?: number }) {
     <div className="select-none">
       <div 
         className={cn(
-          "flex items-center gap-2 px-4 py-2 cursor-pointer transition-all hover:bg-white/5 group",
-          isSelected && "bg-accent/5 text-accent"
+          "flex items-center gap-2 px-4 py-2 cursor-pointer transition-all hover:bg-page-bg group",
+          isSelected && "bg-accent/10 text-accent"
         )}
         style={{ paddingLeft: `${depth * 16 + 16}px` }}
         onClick={() => {
@@ -57,7 +57,7 @@ function FolderItem({ node, depth = 0 }: { node: FolderNode; depth?: number }) {
 
 export function FolderTree({ tree }: { tree: FolderNode[] }) {
   return (
-    <div className="w-[260px] bg-[#0A0A0A] border-r border-border h-full overflow-y-auto py-6">
+    <div className="w-[260px] bg-white border-r border-divider h-full overflow-y-auto py-6 shadow-sm">
       <h3 className="px-6 text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] mb-6">Project Directories</h3>
       <div className="space-y-1">
         {tree.map(node => (

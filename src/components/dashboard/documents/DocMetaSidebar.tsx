@@ -21,7 +21,7 @@ export function DocMetaSidebar({ docId, prjId, author, stats }: DocMetaSidebarPr
   ];
 
   return (
-    <div className="w-[300px] bg-[#0A0A0A] border-l border-border h-full overflow-y-auto p-8 space-y-10">
+    <div className="w-[300px] bg-white border-l border-divider h-full overflow-y-auto p-8 space-y-10 shadow-sm">
       {/* Meta Card */}
       <div className="space-y-6">
         <div className="space-y-2">
@@ -32,7 +32,7 @@ export function DocMetaSidebar({ docId, prjId, author, stats }: DocMetaSidebarPr
            </div>
         </div>
 
-        <div className="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-border">
+        <div className="flex items-center gap-4 p-4 bg-page-bg rounded-xl border border-divider">
            <img src={author.avatar} className="w-10 h-10 rounded-lg object-cover" />
            <div>
               <p className="text-[13px] font-bold text-text-primary">{author.name}</p>
@@ -41,14 +41,14 @@ export function DocMetaSidebar({ docId, prjId, author, stats }: DocMetaSidebarPr
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-           <div className="bg-bg-card border border-border rounded-xl p-4 space-y-1">
+           <div className="bg-page-bg border border-divider rounded-xl p-4 space-y-1">
               <div className="flex items-center gap-2 text-text-muted">
                  <Calendar className="w-3 h-3" />
                  <span className="text-[10px] font-bold uppercase tracking-widest">Created</span>
               </div>
               <p className="text-[13px] font-bold text-text-primary font-mono">2024.10.24</p>
            </div>
-           <div className="bg-bg-card border border-border rounded-xl p-4 space-y-1">
+           <div className="bg-page-bg border border-divider rounded-xl p-4 space-y-1">
               <div className="flex items-center gap-2 text-text-muted">
                  <Hash className="w-3 h-3" />
                  <span className="text-[10px] font-bold uppercase tracking-widest">Words</span>
@@ -63,15 +63,15 @@ export function DocMetaSidebar({ docId, prjId, author, stats }: DocMetaSidebarPr
         <p className="text-[10px] font-bold text-text-muted uppercase tracking-[0.2em]">Approval Workflow</p>
         <div className="space-y-8 relative">
            {/* Timeline Line */}
-           <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-border/50" />
+           <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-divider" />
            
            {workflow.map((step, i) => (
              <div key={step.label} className="flex gap-4 relative group">
                 <div className={cn(
                   "w-6 h-6 rounded-full flex items-center justify-center border-2 z-10 transition-all",
-                  step.status === "complete" ? "bg-success border-success text-[#050505]" :
-                  step.status === "current" ? "bg-accent/10 border-accent text-accent shadow-[0_0_10px_rgba(0,229,255,0.3)]" :
-                  "bg-bg-card border-border text-text-muted"
+                  step.status === "complete" ? "bg-success border-success text-white" :
+                  step.status === "current" ? "bg-accent/10 border-accent text-accent shadow-sm" :
+                  "bg-white border-divider text-text-muted"
                 )}>
                   {step.status === "complete" ? <CheckCircle2 className="w-3.5 h-3.5" /> : 
                    step.status === "current" ? <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" /> :
@@ -85,7 +85,7 @@ export function DocMetaSidebar({ docId, prjId, author, stats }: DocMetaSidebarPr
                    <p className="text-[10px] text-text-muted mt-0.5">{step.date}</p>
                    {step.user && (
                      <div className="flex items-center gap-2 mt-2">
-                        <div className="w-5 h-5 rounded-full bg-white/10 border border-border flex items-center justify-center overflow-hidden">
+                        <div className="w-5 h-5 rounded-full bg-page-bg border border-divider flex items-center justify-center overflow-hidden">
                            <User className="w-3 h-3 text-text-muted" />
                         </div>
                         <span className="text-[10px] text-text-muted">{step.user}</span>
@@ -96,7 +96,7 @@ export function DocMetaSidebar({ docId, prjId, author, stats }: DocMetaSidebarPr
            ))}
         </div>
         
-        <button className="w-full py-3 mt-4 border border-border hover:border-accent hover:text-accent rounded-xl text-[12px] font-bold transition-all uppercase tracking-widest">
+        <button className="w-full py-3 mt-4 border border-divider hover:border-accent hover:text-accent rounded-xl text-[12px] font-bold transition-all uppercase tracking-widest bg-white shadow-sm">
            Advance to next step
         </button>
       </div>

@@ -20,11 +20,11 @@ export default function DocumentRepositoryPage() {
   );
 
   return (
-    <div className="h-screen flex flex-col bg-[#050505] overflow-hidden -m-8">
+    <div className="h-[calc(100vh-140px)] flex flex-col bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
       {/* Top Bar Actions */}
       <DocumentListActions />
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden bg-page-bg">
         {/* Left: Folder Tree */}
         <FolderTree tree={tree} />
 

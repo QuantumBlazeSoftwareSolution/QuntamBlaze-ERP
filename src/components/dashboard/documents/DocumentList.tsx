@@ -12,7 +12,7 @@ export function DocumentList({ documents }: { documents: Document[] }) {
   const { selectedDocumentId, setSelectedDocument } = useDocumentStore();
 
   return (
-    <div className="flex-1 bg-[#050505] overflow-y-auto">
+    <div className="flex-1 bg-page-bg overflow-y-auto custom-scrollbar">
       <div className="p-8 space-y-6">
         <div className="flex items-center justify-between mb-8">
            <h2 className="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em]">SRS Documents List</h2>
@@ -38,14 +38,14 @@ export function DocumentList({ documents }: { documents: Document[] }) {
                   layoutId={doc.id}
                   onClick={() => setSelectedDocument(doc.id)}
                   className={cn(
-                    "grid grid-cols-12 gap-4 px-6 py-5 items-center rounded-xl border border-transparent transition-all cursor-pointer group",
+                    "grid grid-cols-12 gap-4 px-6 py-5 items-center rounded-xl border transition-all cursor-pointer group",
                     selectedDocumentId === doc.id 
-                      ? "bg-accent/[0.03] border-accent/20" 
-                      : "hover:bg-white/[0.02] hover:border-border/50"
+                      ? "bg-white border-accent shadow-sm" 
+                      : "bg-white border-divider hover:border-accent/30 shadow-sm"
                   )}
                 >
                   <div className="col-span-5 flex items-center gap-4">
-                     <div className="w-10 h-10 rounded-lg bg-white/5 border border-border flex items-center justify-center">
+                     <div className="w-10 h-10 rounded-lg bg-page-bg border border-divider flex items-center justify-center">
                         <FileText className="w-5 h-5 text-text-muted group-hover:text-accent transition-colors" />
                      </div>
                      <span className="text-[14px] font-bold text-text-primary">{doc.name}</span>
