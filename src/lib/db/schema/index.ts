@@ -15,3 +15,4 @@ export * from "./hr/leave";
 export * from "./hr/leave_transactions";
 export * from "./hr/payroll_configs";
 export * from "./hr/payroll_runs";
+export * from "./hr/performance";

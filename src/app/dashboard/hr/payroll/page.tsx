@@ -7,6 +7,9 @@ import { SalaryStructureManager } from '@/components/hr/payroll/SalaryStructureM
 import { StatutoryRuleEditor } from '@/components/hr/payroll/StatutoryRuleEditor';
 import { PayrollBatchProcessor } from '@/components/hr/payroll/PayrollBatchProcessor';
 import { PayrollValidationWall } from '@/components/hr/payroll/PayrollValidationWall';
+import { PayslipGenerator } from '@/components/hr/payroll/PayslipGenerator';
+import { EmployeePayHistory } from '@/components/hr/payroll/EmployeePayHistory';
+import { TaxSummaryCard } from '@/components/hr/payroll/TaxSummaryCard';
 import { 
   CreditCard, 
   Settings, 
@@ -17,12 +20,13 @@ import {
   FileText,
   Calculator,
   ArrowUpRight,
-  Play
+  Play,
+  Archive
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function PayrollManagementPage() {
-  const [activeTab, setActiveTab] = React.useState<'structures' | 'statutory' | 'run'>('structures');
+  const [activeTab, setActiveTab] = React.useState<'structures' | 'statutory' | 'run' | 'archive'>('structures');
 
   return (
     <div className="flex-1 bg-[#F8FAFC] min-h-screen flex flex-col">
@@ -64,6 +68,11 @@ export default function PayrollManagementPage() {
              onClick={() => setActiveTab('run')} 
              label="Monthly Run" 
            />
+           <TabButton 
+             active={activeTab === 'archive'} 
+             onClick={() => setActiveTab('archive')} 
+             label="Payslip Archive" 
+           />
         </div>
 
         <div className="flex-1 grid grid-cols-1 xl:grid-cols-3 gap-8">
@@ -72,11 +81,15 @@ export default function PayrollManagementPage() {
               {activeTab === 'structures' && <SalaryStructureManager />}
               {activeTab === 'statutory' && <StatutoryRuleEditor />}
               {activeTab === 'run' && <PayrollBatchProcessor />}
+              {activeTab === 'archive' && <PayslipGenerator />}
            </div>
 
            {/* Stats & Compliance Sidebar */}
            <div className="xl:col-span-1 space-y-8">
-              {activeTab === 'run' ? <PayrollValidationWall /> : (
+              {activeTab === 'run' && <PayrollValidationWall />}
+              {activeTab === 'archive' && <TaxSummaryCard />}
+              
+              {(activeTab === 'structures' || activeTab === 'statutory') && (
                 <>
                   <div className="bg-white border border-[#E2E8F0] rounded-3xl p-8 shadow-sm">
                      <h4 className="text-sm font-black text-[#0F172A] uppercase tracking-widest mb-8 flex items-center justify-between">

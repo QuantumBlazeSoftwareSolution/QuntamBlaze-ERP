@@ -13,7 +13,8 @@ import {
   Box, 
   Target,
   Clock,
-  Sparkles
+  Sparkles,
+  History
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -24,12 +25,16 @@ import { EmploymentDetailsTab } from '@/components/hr/employees/EmploymentDetail
 import { BankPayrollTab } from '@/components/hr/employees/BankPayrollTab';
 import { AssetsTab } from '@/components/hr/employees/AssetsTab';
 import { PerformanceTab } from '@/components/hr/employees/PerformanceTab';
+import { EmployeePayHistory } from '@/components/hr/payroll/EmployeePayHistory';
+import { OKRWorkspace } from '@/components/hr/performance/OKRWorkspace';
+import { KpiMetricTracker } from '@/components/hr/performance/KpiMetricTracker';
 import { MOCK_EMPLOYEES } from '@/lib/mockData/hr';
 
 const TABS = [
   { id: 'personal', label: 'Personal', icon: User },
   { id: 'employment', label: 'Employment', icon: Briefcase },
-  { id: 'payroll', label: 'Payroll', icon: CreditCard },
+  { id: 'payroll', label: 'Compensation', icon: CreditCard },
+  { id: 'financials', label: 'Financials', icon: History },
   { id: 'assets', label: 'Assets', icon: Box },
   { id: 'documents', label: 'Documents', icon: FileText },
   { id: 'performance', label: 'Performance', icon: Target },
@@ -99,11 +104,21 @@ export default function EmployeeProfilePage() {
                  {activeTab === 'personal' && <PersonalInfoTab employee={employee} />}
                  {activeTab === 'employment' && <EmploymentDetailsTab employee={employee} />}
                  {activeTab === 'payroll' && <BankPayrollTab employee={employee} />}
+                 {activeTab === 'financials' && <EmployeePayHistory />}
                  {activeTab === 'assets' && <AssetsTab employee={employee} />}
-                 {activeTab === 'performance' && <PerformanceTab employee={employee} />}
+                 {activeTab === 'performance' && (
+                   <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                      <div className="xl:col-span-2">
+                         <OKRWorkspace />
+                      </div>
+                      <div className="xl:col-span-1">
+                         <KpiMetricTracker />
+                      </div>
+                   </div>
+                 )}
                  
                  {/* Placeholder for other tabs */}
-                 {!['personal', 'employment', 'payroll', 'assets', 'performance'].includes(activeTab) && (
+                 {!['personal', 'employment', 'payroll', 'assets', 'performance', 'financials'].includes(activeTab) && (
                    <div className="bg-white border border-[#E2E8F0] border-dashed rounded-3xl p-20 flex flex-col items-center justify-center text-center">
                       <div className="w-16 h-16 rounded-2xl bg-[#F8FAFC] flex items-center justify-center text-[#94A3B8] mb-4">
                          <FileText className="w-8 h-8" />
