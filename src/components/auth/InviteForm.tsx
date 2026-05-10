@@ -10,7 +10,7 @@ import { inviteSchema, InviteFormValues } from "@/lib/schemas/authSchema";
 import { useDebounce } from "@/hooks/useDebounce";
 import { generateUserId } from "@/lib/idEngine";
 import { StepIndicator } from "./StepIndicator";
-import { UserIDPreview } from "./UserIDPreview";
+import { UserIDPreview } from "./UserIdPreview";
 import { useRouter } from "next/navigation";
 
 const roleOptions = Object.values(UserRole);
