@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ProjectPageHeader } from '@/components/projects/ProjectPageHeader';
 import { ProjectTabs } from '@/components/projects/ProjectTabs';
 import { ProjectOverviewTab } from '@/components/projects/ProjectOverviewTab';
+import { TaskDetailPanel } from '@/components/tasks/TaskDetailPanel';
 import { MOCK_PROJECTS } from '@/lib/mockData/projects';
 import { ProjectDetail } from '@/types/project';
 
@@ -90,6 +91,8 @@ export default function ProjectDetailPage() {
           </motion.div>
         </AnimatePresence>
       </main>
+
+      <TaskDetailPanel />
     </div>
   );
 }

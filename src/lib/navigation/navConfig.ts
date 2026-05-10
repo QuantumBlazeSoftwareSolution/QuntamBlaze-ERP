@@ -61,7 +61,7 @@ export const NAV_CONFIG: NavSection[] = [
     label: "Workforce",
     items: [
       { 
-        label: "HR Management", 
+        label: "HR", 
         href: "/dashboard/hr", 
         icon: Users,
         badge: { count: 3, color: "bg-[#10B981]/20", textColor: "text-[#10B981]" }

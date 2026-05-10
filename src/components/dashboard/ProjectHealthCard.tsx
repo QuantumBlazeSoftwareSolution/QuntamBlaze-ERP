@@ -3,12 +3,14 @@
 import React from 'react';
 import { IDChip } from '@/components/ui/IDChip';
 import { ProjectHealth } from '@/lib/mockData/dashboard';
+import Link from 'next/link';
 
 export const ProjectHealthCard = ({ project }: { project: ProjectHealth }) => {
   const budgetPercentage = Math.min((project.budgetSpent / project.budgetTotal) * 100, 100);
   
   return (
-    <div className="bg-white border border-border rounded-xl p-5 shadow-sm hover:shadow-md hover:border-accent/30 transition-all cursor-pointer group">
+    <Link href={`/dashboard/projects/${project.id}`} className="block">
+      <div className="bg-white border border-border rounded-xl p-5 shadow-sm hover:shadow-md hover:border-accent/30 transition-all cursor-pointer group">
       <div className="flex justify-between items-start mb-4">
         <IDChip id={project.id} size="xs" />
         <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
@@ -56,6 +58,7 @@ export const ProjectHealthCard = ({ project }: { project: ProjectHealth }) => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </Link>
   );
 };

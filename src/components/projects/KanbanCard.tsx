@@ -13,6 +13,7 @@ import {
 import { IDChip } from '@/components/ui/IDChip';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { useTaskPanel } from '@/hooks/useTaskPanel';
 
 interface KanbanCardProps {
   task: KanbanTask;
@@ -27,6 +28,7 @@ const PRIORITY_STYLES: Record<Priority, string> = {
 };
 
 export function KanbanCard({ task, isOverlay }: KanbanCardProps) {
+  const { openTask } = useTaskPanel();
   const {
     attributes,
     listeners,
@@ -66,6 +68,7 @@ export function KanbanCard({ task, isOverlay }: KanbanCardProps) {
       style={style}
       {...attributes}
       {...listeners}
+      onClick={() => openTask(task.id)}
       className={cn(
         "bg-white border border-[#E2E8F0] rounded-xl p-4 shadow-sm hover:border-[#CBD5E1] transition-all cursor-grab active:cursor-grabbing group select-none",
         isOverlay && "cursor-grabbing shadow-2xl ring-2 ring-[#10B981]/20",

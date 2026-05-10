@@ -11,6 +11,7 @@ import {
   activityFeedData,
   statusDistribution
 } from "@/lib/mockData/dashboard";
+import Link from "next/link";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -52,9 +53,11 @@ export default function DashboardPage() {
           <div className="pb-6 space-y-6">
             <motion.div variants={itemVariants} className="flex items-center justify-between">
               <h2 className="text-2xl font-medium text-text-primary">Active Deployments</h2>
-              <button className="px-4 py-2 border border-accent/50 text-accent font-bold tracking-[0.1em] text-[11px] uppercase rounded hover:bg-accent/10 hover:shadow-sm transition-all">
-                View All
-              </button>
+              <Link href="/dashboard/projects">
+                <button className="px-4 py-2 border border-accent/50 text-accent font-bold tracking-[0.1em] text-[11px] uppercase rounded hover:bg-accent/10 hover:shadow-sm transition-all cursor-pointer">
+                  View All
+                </button>
+              </Link>
             </motion.div>
   
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

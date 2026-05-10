@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { MoreHorizontal, Eye, Edit, Archive } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 interface ProjectRowActionsProps {
   projectId: string;
@@ -11,6 +12,7 @@ interface ProjectRowActionsProps {
 export function ProjectRowActions({ projectId }: ProjectRowActionsProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -23,7 +25,7 @@ export function ProjectRowActions({ projectId }: ProjectRowActionsProps) {
   }, [open]);
 
   const actions = [
-    { icon: Eye, label: "View", onClick: () => console.log(`View ${projectId}`) },
+    { icon: Eye, label: "View", onClick: () => router.push(`/dashboard/projects/${projectId}`) },
     { icon: Edit, label: "Edit", onClick: () => console.log(`Edit ${projectId}`) },
     { icon: Archive, label: "Archive", onClick: () => console.log(`Archive ${projectId}`) },
   ];

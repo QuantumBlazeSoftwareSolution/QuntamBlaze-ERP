@@ -48,7 +48,9 @@ export function EmployeeListTable({ employees }: EmployeeListTableProps) {
                       )}
                     </div>
                     <div>
-                      <p className="text-sm font-black text-[#0F172A] group-hover:text-[#10B981] transition-colors">{employee.name}</p>
+                      <Link href={`/dashboard/hr/employees/${employee.id}`}>
+                        <p className="text-sm font-black text-[#0F172A] group-hover:text-[#10B981] transition-colors hover:underline cursor-pointer">{employee.name}</p>
+                      </Link>
                       <IDChip id={employee.id} size="xs" />
                     </div>
                   </div>

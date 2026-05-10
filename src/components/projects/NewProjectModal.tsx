@@ -35,7 +35,7 @@ export function NewProjectModal() {
     formState: { errors, isSubmitting },
     reset
   } = useForm<ProjectFormData>({
-    resolver: zodResolver(projectSchema),
+    resolver: zodResolver(projectSchema) as any,
     defaultValues: {
       type: 'Fixed Price',
       teamMembers: [],
@@ -117,9 +117,9 @@ export function NewProjectModal() {
             <AnimatePresence>
               {generatedId && (
                 <motion.div
-                  initial={{ opacity: 0, h: 0 }}
-                  animate={{ opacity: 1, h: 'auto' }}
-                  className="bg-[#ECFDF5] border border-[#A7F3D0] rounded-2xl p-4 flex items-center justify-between"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="bg-[#ECFDF5] border border-[#A7F3D0] rounded-2xl p-4 flex items-center justify-between overflow-hidden"
                 >
                    <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-[#10B981] flex items-center justify-center text-white shadow-lg shadow-[#10B981]/20">

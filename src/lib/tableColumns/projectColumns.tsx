@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { ChevronsUpDown, ChevronUp, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
+import Link from "next/link";
 import { Project } from "@/lib/mockData/projects";
 import { IDChip } from "@/components/ui/IDChip";
 import { ProjectStatusChip } from "@/components/projects/ProjectStatusChip";
@@ -39,7 +40,12 @@ export const projectColumns: ColumnDef<Project>[] = [
       </button>
     ),
     cell: ({ row }) => (
-      <span className="text-sm font-medium text-text-primary">{row.original.name}</span>
+      <Link 
+        href={`/dashboard/projects/${row.original.id}`}
+        className="text-sm font-bold text-text-primary hover:text-accent transition-colors"
+      >
+        {row.original.name}
+      </Link>
     ),
   },
   {
