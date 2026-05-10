@@ -17,7 +17,7 @@ export function GeneralSettingsForm() {
   return (
     <div className="space-y-8 max-w-4xl">
       {/* Company Identity */}
-      <div className="bg-bg-card border border-border rounded-2xl p-8 space-y-6">
+      <div className="bg-white border border-border rounded-2xl p-8 space-y-6 shadow-sm">
          <div className="flex items-center gap-3 mb-2">
             <Globe className="w-5 h-5 text-accent" />
             <h3 className="text-xl font-bold text-text-primary">Company Identity</h3>
@@ -28,12 +28,12 @@ export function GeneralSettingsForm() {
                <label className="text-[11px] font-bold text-text-muted uppercase tracking-widest">Company Name</label>
                <input 
                  {...register("companyName")}
-                 className="w-full bg-[#0A0A0A] border border-border rounded-xl px-4 py-4 text-[14px] text-text-primary focus:border-accent transition-all"
+                 className="w-full bg-white border border-border rounded-xl px-4 py-4 text-[14px] text-text-primary focus:border-accent transition-all focus:ring-1 focus:ring-accent outline-none"
                />
             </div>
             <div className="space-y-2">
                <label className="text-[11px] font-bold text-text-muted uppercase tracking-widest">Corporate Logomark</label>
-               <div className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center gap-2 hover:border-accent/50 cursor-pointer transition-all bg-[#0A0A0A]">
+               <div className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center gap-2 hover:border-accent/50 cursor-pointer transition-all bg-page-bg hover:bg-page-bg/80">
                   <Upload className="w-6 h-6 text-text-muted" />
                   <p className="text-[12px] text-text-muted text-center">Drag & Drop or <span className="text-accent underline">Browse</span></p>
                </div>
@@ -42,7 +42,7 @@ export function GeneralSettingsForm() {
       </div>
 
       {/* Localization */}
-      <div className="bg-bg-card border border-border rounded-2xl p-8 space-y-6">
+      <div className="bg-white border border-border rounded-2xl p-8 space-y-6 shadow-sm">
          <div className="flex items-center gap-3 mb-2">
             <Clock className="w-5 h-5 text-accent" />
             <h3 className="text-xl font-bold text-text-primary">Localization & Financials</h3>
@@ -53,7 +53,7 @@ export function GeneralSettingsForm() {
                <label className="text-[11px] font-bold text-text-muted uppercase tracking-widest">System Timezone</label>
                <select 
                  {...register("timezone")}
-                 className="w-full bg-[#0A0A0A] border border-border rounded-xl px-4 py-4 text-[13px] text-text-primary focus:border-accent"
+                 className="w-full bg-white border border-border rounded-xl px-4 py-4 text-[13px] text-text-primary focus:border-accent outline-none focus:ring-1 focus:ring-accent"
                >
                   <option>UTC (Coordinated Universal Time)</option>
                   <option>EST (Eastern Standard Time)</option>
@@ -63,7 +63,7 @@ export function GeneralSettingsForm() {
                <label className="text-[11px] font-bold text-text-muted uppercase tracking-widest">Base Currency</label>
                <select 
                  {...register("currency")}
-                 className="w-full bg-[#0A0A0A] border border-border rounded-xl px-4 py-4 text-[13px] text-text-primary focus:border-accent"
+                 className="w-full bg-white border border-border rounded-xl px-4 py-4 text-[13px] text-text-primary focus:border-accent outline-none focus:ring-1 focus:ring-accent"
                >
                   <option>USD ($) - US Dollar</option>
                   <option>EUR (€) - Euro</option>
@@ -76,7 +76,7 @@ export function GeneralSettingsForm() {
                   <input 
                     type="date"
                     {...register("fiscalYearStart")}
-                    className="w-full bg-[#0A0A0A] border border-border rounded-xl pl-10 pr-4 py-4 text-[13px] text-text-primary focus:border-accent"
+                    className="w-full bg-white border border-border rounded-xl pl-10 pr-4 py-4 text-[13px] text-text-primary focus:border-accent outline-none focus:ring-1 focus:ring-accent"
                   />
                   <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                </div>

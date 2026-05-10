@@ -26,15 +26,15 @@ export function IDSequenceRow({ config }: { config: IDEntityConfig }) {
   };
 
   return (
-    <tr className="border-b border-border/50 hover:bg-white/[0.01] transition-colors group">
+    <tr className="border-b border-divider hover:bg-page-bg transition-colors group">
       <td className="px-8 py-6">
          <span className="text-[14px] font-bold text-text-primary">{config.label}</span>
       </td>
-      <td className="px-8 py-6 font-mono text-[13px] text-[#8A8A8A]">
+      <td className="px-8 py-6 font-mono text-[13px] text-text-muted">
          {config.pattern}
       </td>
       <td className="px-8 py-6">
-         <div className="inline-flex items-center px-3 py-1.5 bg-[#00E5FF]/5 border border-[#00E5FF]/20 rounded-lg text-[#00E5FF] font-mono text-[13px] font-bold">
+         <div className="inline-flex items-center px-3 py-1.5 bg-accent/10 border border-accent/20 rounded-lg text-accent font-mono text-[13px] font-bold">
             {nextId}
          </div>
       </td>
@@ -43,14 +43,14 @@ export function IDSequenceRow({ config }: { config: IDEntityConfig }) {
            type="number"
            value={config.sequence}
            onChange={(e) => updateSequence(config.type, parseInt(e.target.value) || 0)}
-           className="w-[80px] bg-[#0A0A0A] border border-border rounded px-3 py-1.5 text-right text-[13px] font-mono focus:border-accent/50 outline-none"
+           className="w-[80px] bg-white border border-border rounded px-3 py-1.5 text-right text-[13px] font-mono focus:border-accent outline-none"
          />
       </td>
       <td className="px-8 py-6 text-right relative">
          {!showConfirm ? (
            <button 
              onClick={() => setShowConfirm(true)}
-             className="text-[11px] font-bold text-[#3A3A3A] hover:text-[#FF4444] transition-colors flex items-center gap-2 ml-auto"
+             className="text-[11px] font-bold text-text-muted hover:text-red-500 transition-colors flex items-center gap-2 ml-auto"
            >
               <RefreshCcw className="w-3.5 h-3.5" />
               RESET

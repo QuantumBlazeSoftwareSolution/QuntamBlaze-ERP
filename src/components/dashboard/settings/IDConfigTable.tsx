@@ -9,8 +9,8 @@ export function IDConfigTable() {
   const configList = Object.values(configs);
 
   return (
-    <div className="bg-bg-card border border-border rounded-2xl overflow-hidden shadow-2xl">
-      <div className="p-8 border-b border-border bg-white/[0.02]">
+    <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
+      <div className="p-8 border-b border-divider bg-page-bg">
          <div className="flex items-center gap-3">
             <Settings2 className="w-5 h-5 text-accent" />
             <h3 className="text-xl font-bold text-text-primary">Identity Configuration</h3>
@@ -21,7 +21,7 @@ export function IDConfigTable() {
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#0A0A0A] border-b border-border">
+            <tr className="bg-page-bg border-b border-divider">
               <th className="px-8 py-5 text-[10px] font-bold text-text-muted uppercase tracking-widest">Entity Type</th>
               <th className="px-8 py-5 text-[10px] font-bold text-text-muted uppercase tracking-widest">ID Pattern</th>
               <th className="px-8 py-5 text-[10px] font-bold text-text-muted uppercase tracking-widest">Next ID Preview</th>
