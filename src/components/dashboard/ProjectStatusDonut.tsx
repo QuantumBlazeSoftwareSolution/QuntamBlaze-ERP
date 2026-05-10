@@ -1,64 +1,58 @@
 "use client";
 
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { MOCK_DISTRIBUTION } from "@/lib/mockData/dashboard";
+import React from 'react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
-export function ProjectStatusDonut() {
-  const total = MOCK_DISTRIBUTION.reduce((sum, item) => sum + item.value, 0);
+interface StatusDistribution {
+  name: string;
+  value: number;
+  color: string;
+}
+
+export const ProjectStatusDonut = ({ data }: { data: StatusDistribution[] }) => {
+  const total = data.reduce((acc, item) => acc + item.value, 0);
 
   return (
-    <div className="bg-bg-card border border-border rounded-xl p-6">
-      <h3 className="text-[11px] font-bold tracking-[0.1em] text-text-secondary uppercase mb-6">
-        Project Distribution
-      </h3>
+    <div className="bg-white border border-border rounded-xl p-5 shadow-sm h-full flex flex-col">
+      <h3 className="text-text-primary font-bold text-sm uppercase tracking-wider mb-6">Project Status</h3>
       
-      <div className="relative w-full h-48 mx-auto flex items-center justify-center mb-6">
+      <div className="flex-1 relative min-h-[200px]">
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <span className="text-3xl font-bold text-text-primary">{total}</span>
+          <span className="text-[10px] text-text-muted uppercase font-bold tracking-widest">Total</span>
+        </div>
+        
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={MOCK_DISTRIBUTION}
+              data={data}
               innerRadius={60}
               outerRadius={80}
               paddingAngle={5}
               dataKey="value"
-              stroke="none"
-              isAnimationActive={true}
             >
-              {MOCK_DISTRIBUTION.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={entry.color} 
-                  style={{
-                    filter: `drop-shadow(0 0 8px ${entry.color}66)` // Add subtle glow
-                  }}
-                />
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
             <Tooltip 
-              contentStyle={{ backgroundColor: "#0A0A0A", borderColor: "#1A1A1A", borderRadius: "8px", fontSize: "13px" }}
-              itemStyle={{ color: "#F0F0F0" }}
+              contentStyle={{ borderRadius: '8px', border: '1px solid #E2E8F0', fontSize: '12px' }}
             />
           </PieChart>
         </ResponsiveContainer>
-        
-        {/* Center Text */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <div className="text-2xl font-bold text-text-primary">{total}</div>
-          <div className="text-[10px] font-bold tracking-[0.1em] text-text-secondary uppercase">Total</div>
-        </div>
       </div>
 
-      <div className="space-y-3 font-mono text-[13px]">
-        {MOCK_DISTRIBUTION.map((item) => (
-          <div key={item.name} className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+      <div className="grid grid-cols-3 gap-2 mt-4">
+        {data.map((item) => (
+          <div key={item.name} className="flex flex-col items-center">
+            <div className="flex items-center gap-1.5 mb-1">
               <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-              <span className="text-text-primary">{item.name}</span>
+              <span className="text-text-secondary text-[11px] font-medium">{item.name}</span>
             </div>
-            <span className="text-text-secondary">{Math.round((item.value / total) * 100)}%</span>
+            <span className="text-text-primary font-bold text-sm">{item.value}</span>
           </div>
         ))}
       </div>
     </div>
   );
-}
+};

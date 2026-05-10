@@ -24,7 +24,7 @@ export function ClientsTable({ data }: { data: Client[] }) {
     columnHelper.accessor("id", {
       header: "CLI-ID",
       cell: (info) => (
-        <IDChip id={info.getValue()} href={`/dashboard/clients/${info.getValue()}`} />
+        <IDChip id={info.getValue()} />
       ),
     }),
     columnHelper.accessor("name", {

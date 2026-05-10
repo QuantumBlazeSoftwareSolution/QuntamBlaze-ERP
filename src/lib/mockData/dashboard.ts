@@ -1,130 +1,137 @@
-export interface StatData {
-  label: string;
-  value: string;
-  trendText: string;
-  trendDirection: "up" | "down" | "neutral";
-  icon: string;
-  sparkline: { value: number }[];
+export interface SparklinePoint {
+  value: number;
 }
 
-export interface ProjectData {
+export interface ActivityItem {
+  id: string;
+  type: 'task' | 'invoice' | 'project' | 'client';
+  entityId: string;
+  userId: string;
+  action: string;
+  timestamp: string;
+}
+
+export interface ProjectHealth {
   id: string;
   name: string;
   clientId: string;
-  status: "ACTIVE" | "REVIEW" | "ON-HOLD";
   progress: number;
-  burnRateSpent: number;
-  burnRateTotal: number;
+  budgetSpent: number;
+  budgetTotal: number;
+  status: 'active' | 'on-hold' | 'completed';
 }
 
-export interface ActivityData {
-  id: string;
-  actionText: string;
-  timestamp: string; // ISO date string
-  avatarColor: string;
-  initials: string;
-}
-
-export const MOCK_STATS: StatData[] = [
+export const statsData = [
   {
-    label: "Total Active Projects",
-    value: "142",
-    trendText: "+12% vs last month",
-    trendDirection: "up",
-    icon: "domain",
-    sparkline: [{ value: 10 }, { value: 12 }, { value: 11 }, { value: 15 }, { value: 16 }, { value: 14 }, { value: 18 }],
+    label: "Total Revenue",
+    value: "$128,430",
+    trend: 12.5,
+    sparkline: [
+      { value: 40 }, { value: 35 }, { value: 50 }, { value: 45 }, { value: 60 }, { value: 55 }, { value: 70 }
+    ]
   },
   {
-    label: "Open Invoices",
-    value: "38",
-    trendText: "Action required on 5",
-    trendDirection: "neutral",
-    icon: "receipt_long",
-    sparkline: [{ value: 5 }, { value: 8 }, { value: 7 }, { value: 12 }, { value: 10 }, { value: 11 }, { value: 14 }],
+    label: "Active Projects",
+    value: "24",
+    trend: 8.2,
+    sparkline: [
+      { value: 20 }, { value: 22 }, { value: 21 }, { value: 24 }, { value: 23 }, { value: 25 }, { value: 24 }
+    ]
   },
   {
-    label: "Monthly Revenue",
-    value: "$1.2M",
-    trendText: "Trending up",
-    trendDirection: "up",
-    icon: "account_balance",
-    sparkline: [{ value: 100 }, { value: 105 }, { value: 102 }, { value: 110 }, { value: 115 }, { value: 112 }, { value: 120 }],
-  },
-  {
-    label: "Overdue Tasks",
+    label: "Outstanding Invoices",
     value: "14",
-    trendText: "Critical priority",
-    trendDirection: "down",
-    icon: "warning",
-    sparkline: [{ value: 20 }, { value: 18 }, { value: 19 }, { value: 15 }, { value: 16 }, { value: 14 }, { value: 14 }],
+    trend: -2.4,
+    sparkline: [
+      { value: 18 }, { value: 16 }, { value: 17 }, { value: 15 }, { value: 14 }, { value: 13 }, { value: 14 }
+    ]
   },
+  {
+    label: "Lead Conversion",
+    value: "18.5%",
+    trend: 4.1,
+    sparkline: [
+      { value: 15 }, { value: 16 }, { value: 15.5 }, { value: 17 }, { value: 18 }, { value: 17.5 }, { value: 18.5 }
+    ]
+  }
 ];
 
-export const MOCK_PROJECTS: ProjectData[] = [
+export const projectHealthData: ProjectHealth[] = [
   {
     id: "PRJ-GOOG-26-001",
-    name: "Alpha Core Migration",
-    clientId: "CLI-GOOG-26",
-    status: "ACTIVE",
-    progress: 78,
-    burnRateSpent: 45000,
-    burnRateTotal: 60000,
-  },
-  {
-    id: "PRJ-AMZN-26-003",
-    name: "Logistics Node Omega",
-    clientId: "CLI-AMZN-26",
-    status: "REVIEW",
-    progress: 92,
-    burnRateSpent: 112000,
-    burnRateTotal: 120000,
-  },
-  {
-    id: "PRJ-MSFT-26-002",
-    name: "Quantum Sync Protocol",
-    clientId: "CLI-MSFT-26",
-    status: "ACTIVE",
-    progress: 34,
-    burnRateSpent: 12000,
-    burnRateTotal: 150000,
+    name: "Cloud Infrastructure Migration",
+    clientId: "CLI-GOOG-26-001",
+    progress: 75,
+    budgetSpent: 45000,
+    budgetTotal: 60000,
+    status: 'active'
   },
   {
     id: "PRJ-META-26-004",
-    name: "Social Graph Integration",
-    clientId: "CLI-META-26",
-    status: "ON-HOLD",
-    progress: 45,
-    burnRateSpent: 20000,
-    burnRateTotal: 50000,
+    name: "VR Experience Design",
+    clientId: "CLI-META-26-012",
+    progress: 40,
+    budgetSpent: 12000,
+    budgetTotal: 40000,
+    status: 'active'
   },
+  {
+    id: "PRJ-MSFT-26-008",
+    name: "AI Copilot Integration",
+    clientId: "CLI-MSFT-26-003",
+    progress: 95,
+    budgetSpent: 28000,
+    budgetTotal: 30000,
+    status: 'active'
+  },
+  {
+    id: "PRJ-AMZN-26-002",
+    name: "Supply Chain Optimization",
+    clientId: "CLI-AMZN-26-005",
+    progress: 20,
+    budgetSpent: 8000,
+    budgetTotal: 50000,
+    status: 'on-hold'
+  }
 ];
 
-export const MOCK_DISTRIBUTION = [
-  { name: "Active", value: 65, color: "#00E5FF" },
-  { name: "On-Hold", value: 20, color: "#FFB800" },
-  { name: "Completed", value: 15, color: "#00C896" },
+export const activityFeedData: ActivityItem[] = [
+  {
+    id: "ACT-001",
+    type: 'task',
+    entityId: "TSK-PRJ-GOOG-26-005-12",
+    userId: "USR-JD-26-004",
+    action: "moved to Done",
+    timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString() // 15 mins ago
+  },
+  {
+    id: "ACT-002",
+    type: 'invoice',
+    entityId: "INV-2605-0042",
+    userId: "USR-AS-26-001",
+    action: "marked as Overdue",
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString() // 2 hours ago
+  },
+  {
+    id: "ACT-003",
+    type: 'project',
+    entityId: "PRJ-META-26-004",
+    userId: "USR-EM-26-009",
+    action: "updated budget allocation",
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString() // 5 hours ago
+  },
+  {
+    id: "ACT-004",
+    type: 'client',
+    entityId: "CLI-GOOG-26-001",
+    userId: "USR-JD-26-004",
+    action: "added new contact person",
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString() // 1 day ago
+  }
 ];
 
-export const MOCK_ACTIVITIES: ActivityData[] = [
-  {
-    id: "act-1",
-    actionText: "TSK-PRJ-GOOG-26-005-12 moved to QA by @Arjun",
-    timestamp: new Date(Date.now() - 4 * 60 * 1000).toISOString(),
-    avatarColor: "bg-accent/20 text-accent",
-    initials: "AJ",
-  },
-  {
-    id: "act-2",
-    actionText: "Invoice INV-2026-089 generated for Client CLI-MSFT-26",
-    timestamp: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
-    avatarColor: "bg-warning/20 text-warning",
-    initials: "SYS",
-  },
-  {
-    id: "act-3",
-    actionText: "Database backup completed on Node 4",
-    timestamp: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
-    avatarColor: "bg-success/20 text-success",
-    initials: "DB",
-  },
+export const statusDistribution = [
+  { name: 'Active', value: 14, color: '#10B981' },
+  { name: 'On-Hold', value: 4, color: '#F59E0B' },
+  { name: 'Completed', value: 6, color: '#3B82F6' },
 ];

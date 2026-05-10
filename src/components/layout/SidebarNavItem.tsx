@@ -19,18 +19,18 @@ export function SidebarNavItem({ item }: { item: NavItem }) {
       <div className={cn(
         "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 relative",
         isActive 
-          ? "bg-[#00E5FF0D] text-[#F0F0F0]" 
-          : "text-[#8A8A8A] hover:text-[#F0F0F0] hover:bg-white/[0.03]"
+          ? "bg-sidebar-item-active text-sidebar-text-active" 
+          : "text-sidebar-text hover:text-white hover:bg-white/[0.03]"
       )}>
         {/* Active Indicator */}
         {isActive && (
           <motion.div 
             layoutId="active-nav"
-            className="absolute left-0 top-2 bottom-2 w-0.5 bg-[#00E5FF] rounded-full"
+            className="absolute left-0 top-2 bottom-2 w-0.5 bg-sidebar-accent rounded-full"
           />
         )}
 
-        <Icon className={cn("w-[18px] h-[18px] shrink-0", isActive && "text-[#00E5FF]")} />
+        <Icon className={cn("w-[18px] h-[18px] shrink-0", isActive && "text-sidebar-accent")} />
         
         {!isCollapsed && (
           <motion.div 

@@ -23,12 +23,12 @@ export function Sidebar() {
       initial={false}
       animate={{ width: isCollapsed ? 72 : 260 }}
       transition={{ type: "spring", stiffness: 200, damping: 25 }}
-      className="h-screen bg-[#0A0A0A] border-r border-[#1A1A1A] flex flex-col relative z-50 shrink-0"
+      className="h-screen bg-sidebar-bg border-r border-sidebar-border flex flex-col relative z-50 shrink-0"
     >
       {/* Header / Logo */}
       <div className="h-20 flex items-center px-6 gap-3 overflow-hidden">
-        <div className="w-8 h-8 rounded-lg bg-[#00E5FF]/10 border border-[#00E5FF]/20 flex items-center justify-center shrink-0">
-          <div className="w-4 h-4 bg-[#00E5FF] rounded-sm rotate-45" />
+        <div className="w-8 h-8 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
+          <div className="w-4 h-4 bg-accent rounded-sm rotate-45" />
         </div>
         {!isCollapsed && (
           <motion.div
@@ -50,7 +50,7 @@ export function Sidebar() {
               <motion.h3
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="px-3 text-[10px] font-bold text-[#3A3A3A] uppercase tracking-[0.2em] mb-3"
+                className="px-3 text-[10px] font-bold text-sidebar-text uppercase tracking-[0.2em] mb-3"
               >
                 {section.label}
               </motion.h3>
@@ -65,9 +65,9 @@ export function Sidebar() {
       </div>
 
       {/* Footer Actions */}
-      <div className="p-3 border-t border-[#1A1A1A] space-y-2">
+      <div className="p-3 border-t border-sidebar-border space-y-2">
         <Link href="/dashboard/settings" className="block">
-           <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#8A8A8A] hover:text-[#F0F0F0] hover:bg-white/[0.03] transition-all">
+           <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:text-white hover:bg-white/[0.03] transition-all">
               <Settings className="w-[18px] h-[18px] shrink-0" />
               {!isCollapsed && <span className="text-[13px] font-medium">System Settings</span>}
            </div>

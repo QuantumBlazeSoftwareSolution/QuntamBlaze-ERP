@@ -80,7 +80,7 @@ export default function FinancePage() {
           >
             {/* We can't directly use StatTile because it expects StatData from dashboard mock, 
                 but our structure is close enough. We'll map it. */}
-            <StatTile stat={stat as any} />
+            <StatTile {...stat} trend={0} />
           </motion.div>
         ))}
       </div>

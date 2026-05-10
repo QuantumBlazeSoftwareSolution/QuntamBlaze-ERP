@@ -47,10 +47,10 @@ export function ProjectsPageClient() {
                 id: p.id,
                 name: p.name,
                 clientId: p.clientId,
-                status: p.status === "OnHold" ? "ON-HOLD" : p.status === "Review" ? "REVIEW" : p.status === "Active" ? "ACTIVE" : "ACTIVE",
+                status: p.status === "OnHold" ? "on-hold" : p.status === "Review" ? "completed" : p.status === "Active" ? "active" : "active",
                 progress: p.progress,
-                burnRateSpent: Math.round(p.budget * (p.progress / 100)),
-                burnRateTotal: p.budget,
+                budgetSpent: Math.round(p.budget * (p.progress / 100)),
+                budgetTotal: p.budget,
               }}
             />
           ))}

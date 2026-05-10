@@ -1,13 +1,18 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { StatTile } from "@/components/dashboard/StatTile";
 import { ProjectHealthCard } from "@/components/dashboard/ProjectHealthCard";
 import { ProjectStatusDonut } from "@/components/dashboard/ProjectStatusDonut";
 import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
-import { MOCK_STATS, MOCK_PROJECTS, MOCK_ACTIVITIES } from "@/lib/mockData/dashboard";
+import { 
+  statsData, 
+  projectHealthData, 
+  activityFeedData,
+  statusDistribution
+} from "@/lib/mockData/dashboard";
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -17,7 +22,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } },
 };
@@ -32,9 +37,9 @@ export default function DashboardPage() {
     >
       {/* Top Stats Row */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {MOCK_STATS.map((stat) => (
+        {statsData.map((stat) => (
           <motion.div key={stat.label} variants={itemVariants}>
-            <StatTile stat={stat} />
+            <StatTile {...stat} />
           </motion.div>
         ))}
       </section>
@@ -50,9 +55,9 @@ export default function DashboardPage() {
               View All
             </button>
           </motion.div>
-
+ 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {MOCK_PROJECTS.map((project) => (
+            {projectHealthData.map((project) => (
               <motion.div key={project.id} variants={itemVariants}>
                 <ProjectHealthCard project={project} />
               </motion.div>
@@ -63,11 +68,11 @@ export default function DashboardPage() {
         {/* Right Column: Activity & Charts */}
         <div className="space-y-6">
           <motion.div variants={itemVariants}>
-            <ProjectStatusDonut />
+            <ProjectStatusDonut data={statusDistribution} />
           </motion.div>
           
           <motion.div variants={itemVariants}>
-            <ActivityFeed activities={MOCK_ACTIVITIES} />
+            <ActivityFeed activities={activityFeedData} />
           </motion.div>
         </div>
 
