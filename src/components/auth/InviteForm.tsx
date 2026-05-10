@@ -11,6 +11,8 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { generateUserId } from '@/lib/idEngine';
 import { StepIndicator } from './StepIndicator';
 import { UserIDPreview } from './UserIDPreview';
+import { useRouter } from 'next/navigation';
+
 
 const roleOptions = Object.values(UserRole);
 
@@ -21,6 +23,7 @@ export const InviteForm = () => {
   const [isRoleOpen, setIsRoleOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generatedId, setGeneratedId] = useState<string | null>(null);
+  const router = useRouter();
 
   const {
     register,
@@ -60,7 +63,8 @@ export const InviteForm = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
       console.log(`[QB-AUTH] Invite accepted for ${data.email} as ${data.role}`);
-      // Redirect or success state logic here
+      // Redirect to dashboard after successful onboarding
+      router.push('/dashboard');
     } finally {
       setIsSubmitting(false);
     }

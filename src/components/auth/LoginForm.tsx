@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -31,6 +32,7 @@ const staggerVariants: Variants = {
 export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -44,14 +46,13 @@ export const LoginForm = () => {
     setIsSubmitting(true);
     
     try {
-      // Mock 1.5s delay
+      // Mock 1.5s authentication delay
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
       console.log(`[QB-AUTH] Session initiated · USR-JD-26-004 · ${new Date().toISOString()}`);
-      // Add logic to actually route or set session here if needed
+      // Redirect to dashboard after successful login
+      router.push('/dashboard');
     } catch (error) {
       console.error(error);
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -130,8 +131,8 @@ export const LoginForm = () => {
 
       <motion.div custom={3} initial="hidden" animate="visible" variants={staggerVariants} className="text-center mt-6">
         <p className="text-text-secondary text-sm">
-          Have an invite code?{' '}
-          <Link href="/invite" className="text-accent hover:underline font-medium">
+          Have an invite?{' '}
+          <Link href="/invite/demo-token-001" className="text-accent hover:underline font-medium">
             Accept Invite
           </Link>
         </p>

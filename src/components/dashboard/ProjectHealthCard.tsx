@@ -8,17 +8,17 @@ export const ProjectHealthCard = ({ project }: { project: ProjectHealth }) => {
   const budgetPercentage = Math.min((project.budgetSpent / project.budgetTotal) * 100, 100);
   
   return (
-    <div className="bg-white border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all">
+    <div className="bg-white border border-border rounded-xl p-5 shadow-sm hover:shadow-md hover:border-accent/30 transition-all cursor-pointer group">
       <div className="flex justify-between items-start mb-4">
         <IDChip id={project.id} size="xs" />
-        <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-          project.status === 'active' ? 'bg-success-bg text-success' : 'bg-warning-bg text-warning'
+        <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+          project.status === 'active' ? 'bg-success/10 text-success border-success/20' : 'bg-warning/10 text-warning border-warning/20'
         }`}>
           {project.status}
         </span>
       </div>
 
-      <h4 className="text-text-primary font-bold text-sm mb-1">{project.name}</h4>
+      <h4 className="text-text-primary font-bold text-sm mb-1 group-hover:text-accent transition-colors">{project.name}</h4>
       <div className="mb-5">
         <IDChip id={project.clientId} size="xs" variant="muted" />
       </div>

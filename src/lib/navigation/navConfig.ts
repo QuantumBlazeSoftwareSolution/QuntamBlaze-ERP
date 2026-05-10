@@ -28,7 +28,7 @@ export const NAV_CONFIG: NavSection[] = [
         label: "Leads", 
         href: "/dashboard/leads", 
         icon: MessageSquare,
-        badge: { count: 8, color: "bg-[#00E5FF]", textColor: "text-[#050505]" }
+        badge: { count: 8, color: "bg-accent/20", textColor: "text-accent" }
       },
       { label: "Clients", href: "/dashboard/clients", icon: Users },
     ],
@@ -40,7 +40,7 @@ export const NAV_CONFIG: NavSection[] = [
         label: "Projects", 
         href: "/dashboard/projects", 
         icon: Briefcase,
-        badge: { count: 12, color: "bg-white/10", textColor: "text-white" }
+        badge: { count: 12, color: "bg-sidebar-border", textColor: "text-white" }
       },
       { label: "Documents", href: "/dashboard/documents", icon: FileText },
     ],
@@ -52,7 +52,7 @@ export const NAV_CONFIG: NavSection[] = [
         label: "Finance", 
         href: "/dashboard/finance", 
         icon: CreditCard,
-        badge: { count: 4, color: "bg-[#FF4444]", textColor: "text-white" }
+        badge: { count: 4, color: "bg-danger", textColor: "text-white" }
       },
       { label: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
     ],

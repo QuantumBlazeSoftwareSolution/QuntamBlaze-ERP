@@ -22,8 +22,8 @@ export const StatTile = ({ label, value, trend, sparkline }: StatTileProps) => {
           <p className="text-text-secondary text-sm font-medium mb-1">{label}</p>
           <h3 className="text-text-primary text-2xl font-bold">{value}</h3>
         </div>
-        <div className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full ${
-          isPositive ? 'text-success bg-success-bg' : 'text-danger bg-danger-bg'
+        <div className={`flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full border ${
+          isPositive ? 'text-success bg-success/10 border-success/20' : 'text-danger bg-danger/10 border-danger/20'
         }`}>
           {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
           <span>{Math.abs(trend)}%</span>

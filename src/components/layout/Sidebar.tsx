@@ -81,7 +81,7 @@ export function Sidebar() {
            <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-accent/20 border border-accent/30 flex items-center justify-center text-[10px] font-bold text-accent shrink-0 relative">
                  AM
-                 <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#00E5FF] border-2 border-[#0A0A0A] rounded-full" />
+                 <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-accent border-2 border-sidebar-bg rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
               </div>
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">

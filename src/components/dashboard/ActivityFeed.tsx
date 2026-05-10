@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 export const ActivityFeed = ({ activities }: { activities: ActivityItem[] }) => {
   return (
     <div className="bg-white border border-border rounded-xl shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-divider bg-page-bg/50">
+      <div className="px-5 py-4 border-b border-divider bg-page-bg">
         <h3 className="text-text-primary font-bold text-sm uppercase tracking-wider">Recent Activity</h3>
       </div>
       
@@ -20,7 +20,7 @@ export const ActivityFeed = ({ activities }: { activities: ActivityItem[] }) => 
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="px-5 py-4 hover:bg-page-bg/30 transition-colors"
+            className="px-5 py-4 hover:bg-page-bg transition-colors"
           >
             <div className="flex justify-between items-start mb-1">
               <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
@@ -36,7 +36,7 @@ export const ActivityFeed = ({ activities }: { activities: ActivityItem[] }) => 
         ))}
       </div>
       
-      <button className="w-full py-3 text-center text-accent text-xs font-semibold hover:bg-accent-light transition-colors border-t border-divider">
+      <button className="w-full py-3 text-center text-accent text-xs font-semibold hover:bg-accent/10 transition-colors border-t border-divider">
         View Full Audit Log
       </button>
     </div>
