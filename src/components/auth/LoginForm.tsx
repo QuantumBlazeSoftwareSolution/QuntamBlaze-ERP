@@ -1,155 +1,141 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { motion } from "framer-motion";
-import { Mail, Lock, Loader2, AlertCircle, Eye, EyeOff, ArrowRight } from "lucide-react";
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { motion, Variants } from 'framer-motion';
+import Link from 'next/link';
 
-type LoginFormInputs = {
-  email: string;
-  password: string;
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
+const staggerVariants: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.08,
+      duration: 0.4,
+      ease: "easeOut"
+    }
+  })
 };
 
-export function LoginForm() {
-  const [isLoading, setIsLoading] = useState(false);
+export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormInputs>();
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const onSubmit = async (data: LoginFormInputs) => {
-    setIsLoading(true);
-    // Mock authentication delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+  const onSubmit = async (data: LoginFormValues) => {
+    setIsSubmitting(true);
     
-    // Log the requested message
-    console.log(`[AUTH] Session opened for ${data.email} at 2026-05-07T10:00:00Z`);
-    
-    setIsLoading(false);
-    // Redirect logic would go here (e.g., router.push('/dashboard'))
+    try {
+      // Mock 1.5s delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      console.log(`[QB-AUTH] Session initiated · USR-JD-26-004 · ${new Date().toISOString()}`);
+      // Add logic to actually route or set session here if needed
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 w-full">
-      {/* Email Field */}
-      <div className="flex flex-col gap-1.5 group">
-        <label
-          htmlFor="email"
-          className="text-[11px] font-bold tracking-[0.1em] text-text-secondary group-focus-within:text-accent transition-colors uppercase"
-        >
-          Identification (Email)
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 w-full">
+      <motion.div custom={0} initial="hidden" animate="visible" variants={staggerVariants}>
+        <label className="block text-text-primary text-sm font-medium mb-1.5">
+          Email
         </label>
         <div className="relative">
-          <Mail className="absolute left-0 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-secondary group-focus-within:text-accent transition-colors" />
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Mail className="h-5 w-5 text-text-muted" />
+          </div>
           <input
-            id="email"
+            {...register('email')}
             type="email"
-            placeholder="operator@quantumblaze.net"
-            disabled={isLoading}
-            className="w-full bg-transparent border-0 border-b border-border hover:border-border-hover focus:border-accent focus:ring-0 text-sm font-medium text-text-primary pl-8 py-2.5 placeholder:text-text-muted transition-all focus:shadow-[0_4px_12px_-4px_rgba(0,229,255,0.3)] disabled:opacity-50"
-            {...register("email", {
-              required: "Email is required",
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Invalid email format",
-              },
-            })}
+            className="w-full border border-border rounded-lg h-11 pl-10 pr-4 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder:text-text-muted bg-white"
+            placeholder="name@company.com"
           />
         </div>
         {errors.email && (
-          <div className="flex items-center gap-1.5 mt-1 text-danger">
-            <AlertCircle className="w-3.5 h-3.5" />
-            <span className="text-xs">{errors.email.message}</span>
-          </div>
+          <p className="text-red-500 text-xs mt-1.5">{errors.email.message}</p>
         )}
-      </div>
+      </motion.div>
 
-      {/* Password Field */}
-      <div className="flex flex-col gap-1.5 group mt-2">
-        <div className="flex justify-between items-center">
-          <label
-            htmlFor="password"
-            className="text-[11px] font-bold tracking-[0.1em] text-text-secondary group-focus-within:text-accent transition-colors uppercase"
-          >
-            Security Key
+      <motion.div custom={1} initial="hidden" animate="visible" variants={staggerVariants}>
+        <div className="flex justify-between items-center mb-1.5">
+          <label className="block text-text-primary text-sm font-medium">
+            Password
           </label>
-          <a
-            href="#"
-            className="text-[11px] font-bold tracking-[0.1em] text-text-secondary hover:text-accent hover:underline transition-colors uppercase"
-          >
-            Forgot Key?
-          </a>
+          <Link href="/forgot-password" className="text-accent text-sm hover:underline">
+            Forgot Password?
+          </Link>
         </div>
         <div className="relative">
-          <Lock className="absolute left-0 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-secondary group-focus-within:text-accent transition-colors" />
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Lock className="h-5 w-5 text-text-muted" />
+          </div>
           <input
-            id="password"
+            {...register('password')}
             type={showPassword ? "text" : "password"}
-            placeholder="••••••••••••"
-            disabled={isLoading}
-            className="w-full bg-transparent border-0 border-b border-border hover:border-border-hover focus:border-accent focus:ring-0 text-sm font-medium text-text-primary pl-8 pr-8 py-2.5 placeholder:text-text-muted transition-all focus:shadow-[0_4px_12px_-4px_rgba(0,229,255,0.3)] tracking-widest disabled:opacity-50"
-            {...register("password", {
-              required: "Security key is required",
-              minLength: {
-                value: 8,
-                message: "Key must be at least 8 characters",
-              },
-            })}
+            className="w-full border border-border rounded-lg h-11 pl-10 pr-10 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder:text-text-muted bg-white"
+            placeholder="••••••••"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            disabled={isLoading}
-            className="absolute right-0 top-1/2 -translate-y-1/2 text-text-secondary hover:text-accent transition-colors disabled:opacity-50"
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-text-muted hover:text-text-primary transition-colors"
           >
             {showPassword ? (
-              <EyeOff className="w-[18px] h-[18px]" />
+              <EyeOff className="h-5 w-5" />
             ) : (
-              <Eye className="w-[18px] h-[18px]" />
+              <Eye className="h-5 w-5" />
             )}
           </button>
         </div>
         {errors.password && (
-          <div className="flex items-center gap-1.5 mt-1 text-danger">
-            <AlertCircle className="w-3.5 h-3.5" />
-            <span className="text-xs">{errors.password.message}</span>
-          </div>
+          <p className="text-red-500 text-xs mt-1.5">{errors.password.message}</p>
         )}
-      </div>
+      </motion.div>
 
-      {/* Submit Button */}
-      <motion.button
-        type="submit"
-        disabled={isLoading}
-        whileHover={{ scale: 1.01, filter: "brightness(110%)" }}
-        whileTap={{ scale: 0.98 }}
-        className="mt-8 w-full py-3.5 rounded-lg border border-accent/50 text-bg-primary font-bold text-[11px] tracking-[0.15em] uppercase bg-accent shadow-[0_0_16px_rgba(0,229,255,0.15)] transition-colors flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed"
-      >
-        {isLoading ? (
-          <>
-            <Loader2 className="w-[16px] h-[16px] animate-spin" />
-            AUTHENTICATING...
-          </>
-        ) : (
-          <>
-            AUTHENTICATE
-            <ArrowRight className="w-[16px] h-[16px] group-hover:translate-x-1 transition-transform" />
-          </>
-        )}
-      </motion.button>
-      
-      {/* Secondary Actions */}
-      <div className="mt-6 text-center">
-        <a 
-          href="#" 
-          className="text-sm text-text-secondary hover:text-accent transition-colors flex items-center justify-center gap-1.5"
+      <motion.div custom={2} initial="hidden" animate="visible" variants={staggerVariants}>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="bg-accent hover:bg-accent-hover text-white font-semibold rounded-lg h-11 w-full flex items-center justify-center transition-colors mt-2"
         >
-          New Operator? <span className="text-accent border-b border-accent/30 pb-[1px] hover:border-accent">Accept Protocol Invite</span>
-        </a>
-      </div>
+          {isSubmitting ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            "Sign In"
+          )}
+        </button>
+      </motion.div>
+
+      <motion.div custom={3} initial="hidden" animate="visible" variants={staggerVariants} className="text-center mt-6">
+        <p className="text-text-secondary text-sm">
+          Have an invite code?{' '}
+          <Link href="/invite" className="text-accent hover:underline font-medium">
+            Accept Invite
+          </Link>
+        </p>
+      </motion.div>
     </form>
   );
-}
+};
