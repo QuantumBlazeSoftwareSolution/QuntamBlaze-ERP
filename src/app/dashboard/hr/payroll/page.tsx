@@ -5,6 +5,8 @@ import {
   HRNavbar } from '@/components/hr/HRNavbar';
 import { SalaryStructureManager } from '@/components/hr/payroll/SalaryStructureManager';
 import { StatutoryRuleEditor } from '@/components/hr/payroll/StatutoryRuleEditor';
+import { PayrollBatchProcessor } from '@/components/hr/payroll/PayrollBatchProcessor';
+import { PayrollValidationWall } from '@/components/hr/payroll/PayrollValidationWall';
 import { 
   CreditCard, 
   Settings, 
@@ -14,12 +16,13 @@ import {
   TrendingUp,
   FileText,
   Calculator,
-  ArrowUpRight
+  ArrowUpRight,
+  Play
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function PayrollManagementPage() {
-  const [activeTab, setActiveTab] = React.useState<'structures' | 'statutory' | 'allowances'>('structures');
+  const [activeTab, setActiveTab] = React.useState<'structures' | 'statutory' | 'run'>('structures');
 
   return (
     <div className="flex-1 bg-[#F8FAFC] min-h-screen flex flex-col">
@@ -57,9 +60,9 @@ export default function PayrollManagementPage() {
              label="Statutory Rules" 
            />
            <TabButton 
-             active={activeTab === 'allowances'} 
-             onClick={() => setActiveTab('allowances')} 
-             label="Allowance Templates" 
+             active={activeTab === 'run'} 
+             onClick={() => setActiveTab('run')} 
+             label="Monthly Run" 
            />
         </div>
 
@@ -68,47 +71,41 @@ export default function PayrollManagementPage() {
            <div className="xl:col-span-2">
               {activeTab === 'structures' && <SalaryStructureManager />}
               {activeTab === 'statutory' && <StatutoryRuleEditor />}
-              {activeTab === 'allowances' && (
-                <div className="bg-white border border-[#E2E8F0] border-dashed rounded-3xl p-20 flex flex-col items-center justify-center text-center">
-                   <div className="w-16 h-16 rounded-2xl bg-[#F8FAFC] flex items-center justify-center text-[#94A3B8] mb-4">
-                      <CreditCard className="w-8 h-8" />
-                   </div>
-                   <h3 className="text-lg font-bold text-[#0F172A]">Allowance Dictionary</h3>
-                   <p className="text-sm text-[#64748B] max-w-xs mt-2">
-                      Define recurring allowances (Housing, Transport, Meal) to be linked to Salary Structures.
-                   </p>
-                </div>
-              )}
+              {activeTab === 'run' && <PayrollBatchProcessor />}
            </div>
 
            {/* Stats & Compliance Sidebar */}
            <div className="xl:col-span-1 space-y-8">
-              <div className="bg-white border border-[#E2E8F0] rounded-3xl p-8 shadow-sm">
-                 <h4 className="text-sm font-black text-[#0F172A] uppercase tracking-widest mb-8 flex items-center justify-between">
-                    Payroll Health
-                    <TrendingUp className="w-4 h-4 text-[#10B981]" />
-                 </h4>
-                 <div className="space-y-8">
-                    <StatRow label="Total Monthly Outflow" value="4.2M" sub="LKR" trend="+2.4%" />
-                    <StatRow label="Statutory Liabilities" value="840K" sub="LKR" trend="Stable" />
-                    <StatRow label="Active Pay Structures" value="12" sub="Templates" />
-                 </div>
-              </div>
+              {activeTab === 'run' ? <PayrollValidationWall /> : (
+                <>
+                  <div className="bg-white border border-[#E2E8F0] rounded-3xl p-8 shadow-sm">
+                     <h4 className="text-sm font-black text-[#0F172A] uppercase tracking-widest mb-8 flex items-center justify-between">
+                        Payroll Health
+                        <TrendingUp className="w-4 h-4 text-[#10B981]" />
+                     </h4>
+                     <div className="space-y-8">
+                        <StatRow label="Total Monthly Outflow" value="4.2M" sub="LKR" trend="+2.4%" />
+                        <StatRow label="Statutory Liabilities" value="840K" sub="LKR" trend="Stable" />
+                        <StatRow label="Active Pay Structures" value="12" sub="Templates" />
+                     </div>
+                  </div>
 
-              <div className="bg-[#0F172A] rounded-3xl p-8 text-white relative overflow-hidden group cursor-pointer hover:scale-[1.02] transition-all shadow-xl">
-                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full group-hover:scale-110 transition-transform" />
-                 <h4 className="text-base font-black mb-2 flex items-center gap-2">
-                    <ShieldCheck className="w-5 h-5 text-[#10B981]" />
-                    Audit Readiness
-                 </h4>
-                 <p className="text-[11px] text-slate-400 leading-relaxed mb-6">
-                    Compensation structures are fully audited against EPF/ETF Act No. 15. Last validation: May 08.
-                 </p>
-                 <button className="text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-1 hover:underline">
-                    View Compliance Report
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                 </button>
-              </div>
+                  <div className="bg-[#0F172A] rounded-3xl p-8 text-white relative overflow-hidden group cursor-pointer hover:scale-[1.02] transition-all shadow-xl">
+                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full group-hover:scale-110 transition-transform" />
+                     <h4 className="text-base font-black mb-2 flex items-center gap-2">
+                        <ShieldCheck className="w-5 h-5 text-[#10B981]" />
+                        Audit Readiness
+                     </h4>
+                     <p className="text-[11px] text-slate-400 leading-relaxed mb-6">
+                        Compensation structures are fully audited against EPF/ETF Act No. 15. Last validation: May 08.
+                     </p>
+                     <button className="text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-1 hover:underline">
+                        View Compliance Report
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                     </button>
+                  </div>
+                </>
+              )}
            </div>
         </div>
       </div>
