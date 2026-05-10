@@ -19,6 +19,7 @@ import { getColorFromString, getInitials } from "@/lib/utils/colorHash";
 import { getIndustryColor } from "@/lib/industryColors";
 import { cn } from "@/lib/utils";
 import { TablePagination } from "@/components/ui/TablePagination";
+import { ClientDetailsSheet } from "./ClientDetailsSheet";
 
 import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
 
@@ -26,6 +27,7 @@ const columnHelper = createColumnHelper<Client>();
 
 export function ClientsTable({ data }: { data: Client[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [selectedClient, setSelectedClient] = React.useState<Client | null>(null);
   const columns = useMemo(() => [
     columnHelper.accessor("id", {
       header: "CLI-ID",
@@ -173,7 +175,8 @@ export function ClientsTable({ data }: { data: Client[] }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="group border-b border-divider hover:bg-page-bg transition-colors"
+                className="group border-b border-divider hover:bg-page-bg transition-colors cursor-pointer"
+                onClick={() => setSelectedClient(row.original)}
               >
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="px-6 py-5">
@@ -210,6 +213,11 @@ export function ClientsTable({ data }: { data: Client[] }) {
           </p>
         </div>
       </div>
+
+      <ClientDetailsSheet 
+        client={selectedClient} 
+        onClose={() => setSelectedClient(null)} 
+      />
     </div>
   );
 }
