@@ -76,7 +76,7 @@ export function ClientProfileHeader({ client }: ClientProfileHeaderProps) {
                 Account Manager
               </p>
               <p className="text-[14px] font-bold text-text-primary">
-                {client.accountManager.name}
+                {client.accountManager?.name || "Not Assigned"}
               </p>
             </div>
           </div>

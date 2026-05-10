@@ -11,8 +11,15 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
   }
 
   // Format data to match what the frontend expects
-  const formattedClient = {
+  const formattedClient: any = {
     ...clientData,
+    industry: clientData.industry || "Enterprise",
+    description: "Quantum Blaze strategic partner since " + new Date(clientData.joinedAt).getFullYear(),
+    website: "https://example.com",
+    billingAddress: clientData.billingAddress || "Not Provided",
+    accountManager: {
+      name: "Unassigned",
+    },
     activeProjects: clientData.projects?.length || 0,
     totalBilled: Number(clientData.totalBilled || 0),
     outstandingBalance: clientData.invoices
@@ -20,6 +27,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
       ?.reduce((acc: number, inv: any) => acc + Number(inv.amount), 0) || 0,
     projects: clientData.projects || [],
     invoices: clientData.invoices || [],
+    documents: [], // TODO: Wire to DB
   };
 
   return <ClientProfileClient client={formattedClient} />;
