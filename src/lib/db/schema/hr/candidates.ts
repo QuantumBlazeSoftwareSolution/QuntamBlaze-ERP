@@ -1,6 +1,6 @@
 import { pgTable, varchar, timestamp, text, integer, pgEnum } from 'drizzle-orm/pg-core';
 import { jobs } from './jobs';
-import { employees } from '../users';
+import { employees } from './employees';
 
 export const pipelineStageEnum = pgEnum('pipeline_stage', [
   'Applied', 'Screening', 'Technical', 'Final', 'Offer', 'Hired', 'Rejected', 'Withdrawn'

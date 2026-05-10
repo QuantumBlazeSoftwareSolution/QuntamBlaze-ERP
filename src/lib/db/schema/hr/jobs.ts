@@ -1,5 +1,5 @@
 import { pgTable, varchar, timestamp, text, integer, numeric, pgEnum } from 'drizzle-orm/pg-core';
-import { employees } from '../users';
+import { employees } from './employees';
 
 export const departmentEnum = pgEnum('department', [
   'Engineering', 'Finance', 'Design', 'Marketing', 'Operations', 'HR', 'Sales'

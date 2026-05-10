@@ -24,7 +24,7 @@ export function PayrollTrendLine() {
             <YAxis hide />
             <Tooltip 
               contentStyle={{ borderRadius: '8px', border: '1px solid #E2E8F0' }}
-              formatter={(value: number) => [`$${value.toLocaleString()}`, '']}
+              formatter={(value: any) => [`$${Number(value).toLocaleString()}`, '']}
             />
             <Legend verticalAlign="top" align="right" iconType="circle" />
             <Line 

@@ -1,4 +1,4 @@
-import { Employee, HRActivity, HRAlert, Job, Candidate } from "@/types/hr";
+import { Employee, HRActivity, HRAlert, Job, Candidate, HRStat } from "@/types/hr";
 
 export const MOCK_EMPLOYEES: Employee[] = [
   {
@@ -91,7 +91,7 @@ export const MOCK_CANDIDATES: Candidate[] = [
   }
 ];
 
-export const HR_DASHBOARD_STATS = [
+export const HR_DASHBOARD_STATS: HRStat[] = [
   { label: "Total Headcount", value: 124, trend: "↑ 3 this month", trendType: "up", icon: "Users", colorFamily: "teal" },
   { label: "Open Positions", value: 12, trend: "8 active JOB-IDs", trendType: "up", icon: "Briefcase", colorFamily: "blue" },
   { label: "In Pipeline", value: 47, trend: "active CND-IDs", trendType: "up", icon: "UserPlus", colorFamily: "violet" },

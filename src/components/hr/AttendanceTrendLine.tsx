@@ -26,7 +26,7 @@ export function AttendanceTrendLine() {
             <Tooltip 
               contentStyle={{ borderRadius: '8px', border: '1px solid #E2E8F0' }}
               labelFormatter={(day) => `Day ${day}`}
-              formatter={(value: number) => [`${value.toFixed(1)}%`, 'Attendance']}
+              formatter={(value: any) => [`${parseFloat(value).toFixed(1)}%`, 'Attendance']}
             />
             <Area 
               type="monotone" 
