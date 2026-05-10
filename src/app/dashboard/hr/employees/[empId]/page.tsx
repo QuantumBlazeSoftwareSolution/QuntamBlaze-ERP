@@ -23,6 +23,7 @@ import { PersonalInfoTab } from '@/components/hr/employees/PersonalInfoTab';
 import { EmploymentDetailsTab } from '@/components/hr/employees/EmploymentDetailsTab';
 import { BankPayrollTab } from '@/components/hr/employees/BankPayrollTab';
 import { AssetsTab } from '@/components/hr/employees/AssetsTab';
+import { PerformanceTab } from '@/components/hr/employees/PerformanceTab';
 import { MOCK_EMPLOYEES } from '@/lib/mockData/hr';
 
 const TABS = [
@@ -99,9 +100,10 @@ export default function EmployeeProfilePage() {
                  {activeTab === 'employment' && <EmploymentDetailsTab employee={employee} />}
                  {activeTab === 'payroll' && <BankPayrollTab employee={employee} />}
                  {activeTab === 'assets' && <AssetsTab employee={employee} />}
+                 {activeTab === 'performance' && <PerformanceTab employee={employee} />}
                  
                  {/* Placeholder for other tabs */}
-                 {!['personal', 'employment', 'payroll', 'assets'].includes(activeTab) && (
+                 {!['personal', 'employment', 'payroll', 'assets', 'performance'].includes(activeTab) && (
                    <div className="bg-white border border-[#E2E8F0] border-dashed rounded-3xl p-20 flex flex-col items-center justify-center text-center">
                       <div className="w-16 h-16 rounded-2xl bg-[#F8FAFC] flex items-center justify-center text-[#94A3B8] mb-4">
                          <FileText className="w-8 h-8" />
