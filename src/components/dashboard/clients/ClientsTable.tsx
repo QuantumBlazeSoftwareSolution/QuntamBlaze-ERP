@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -8,6 +8,8 @@ import {
   createColumnHelper,
   getPaginationRowModel,
   getFilteredRowModel,
+  getSortedRowModel,
+  SortingState,
 } from "@tanstack/react-table";
 import { motion, AnimatePresence } from "framer-motion";
 import { MoreVertical, ExternalLink, Edit2, UserMinus } from "lucide-react";
@@ -16,10 +18,14 @@ import { IDChip } from "@/components/ui/IDChip";
 import { getColorFromString, getInitials } from "@/lib/utils/colorHash";
 import { getIndustryColor } from "@/lib/industryColors";
 import { cn } from "@/lib/utils";
+import { TablePagination } from "@/components/ui/TablePagination";
+
+import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
 
 const columnHelper = createColumnHelper<Client>();
 
 export function ClientsTable({ data }: { data: Client[] }) {
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const columns = useMemo(() => [
     columnHelper.accessor("id", {
       header: "CLI-ID",
@@ -115,18 +121,45 @@ export function ClientsTable({ data }: { data: Client[] }) {
   const table = useReactTable({
     data,
     columns,
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
   });
 
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-border bg-bg-card/30">
+    <div className="w-full overflow-hidden rounded-xl border border-border bg-white shadow-sm">
       <table className="w-full border-collapse">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} className="border-b border-border bg-bg-surface/50">
+            <tr key={headerGroup.id} className="border-b border-divider bg-page-bg">
               {headerGroup.headers.map((header) => (
-                <th key={header.id} className="px-6 py-4 text-left text-[11px] font-bold text-text-secondary uppercase tracking-[0.15em]">
-                  {flexRender(header.column.columnDef.header, header.getContext())}
+                <th 
+                  key={header.id} 
+                  className="px-6 py-4 text-left text-[11px] font-bold text-text-secondary uppercase tracking-[0.15em] cursor-pointer select-none group"
+                  onClick={header.column.getToggleSortingHandler()}
+                >
+                  <div className="flex items-center gap-1">
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                    {header.column.getCanSort() && (
+                      <span className="text-text-muted group-hover:text-text-primary transition-colors">
+                        {{
+                          asc: <ChevronUp className="w-3 h-3" />,
+                          desc: <ChevronDown className="w-3 h-3" />,
+                        }[header.column.getIsSorted() as string] ?? (
+                          <ChevronsUpDown className="w-3 h-3 opacity-0 group-hover:opacity-100" />
+                        )}
+                      </span>
+                    )}
+                  </div>
                 </th>
               ))}
             </tr>
@@ -140,7 +173,7 @@ export function ClientsTable({ data }: { data: Client[] }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="group border-b border-border/50 hover:bg-white/[0.02] transition-colors"
+                className="group border-b border-divider hover:bg-page-bg transition-colors"
               >
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="px-6 py-5">
@@ -153,8 +186,10 @@ export function ClientsTable({ data }: { data: Client[] }) {
         </tbody>
       </table>
       
+      <TablePagination table={table} />
+
       {/* Summary Row */}
-      <div className="sticky bottom-0 w-full px-6 py-5 bg-bg-surface border-t border-border flex items-center justify-between z-10">
+      <div className="sticky bottom-0 w-full px-6 py-5 bg-white border-t border-divider flex items-center justify-between z-10">
         <div className="flex items-center gap-8">
           <div className="space-y-1">
             <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Total Clients</p>
