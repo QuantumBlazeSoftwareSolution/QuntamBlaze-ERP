@@ -67,10 +67,10 @@ export function ClientsTable({ data }: { data: Client[] }) {
       columnHelper.accessor("activeProjects", {
         header: "Active Projects",
         cell: (info) => {
-          const projects = info.getValue();
+          const projects = info.getValue() || [];
           return (
             <div className="flex items-center gap-2">
-              {projects.slice(0, 2).map((pid) => (
+              {projects.slice(0, 2).map((pid: string) => (
                 <IDChip key={pid} id={pid} className="bg-accent/5 border-accent/20 text-accent" />
               ))}
               {projects.length > 2 && (
@@ -210,7 +210,7 @@ export function ClientsTable({ data }: { data: Client[] }) {
               Active Projects
             </p>
             <p className="text-xl font-bold text-text-primary">
-              {data.reduce((acc, c) => acc + c.activeProjects.length, 0)}
+              {data.reduce((acc, c) => acc + (c.activeProjects?.length || 0), 0)}
             </p>
           </div>
         </div>

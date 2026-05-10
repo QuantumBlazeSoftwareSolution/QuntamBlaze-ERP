@@ -4,7 +4,14 @@ import { NewProjectModal } from "@/components/projects/NewProjectModal";
 import { projectsCrud } from "@/lib/db/crud/projects";
 
 export default async function ProjectsPage() {
-  const projects = await projectsCrud.getAll();
+  const allProjects = await projectsCrud.getAll();
+
+  const formattedProjects = allProjects.map((p: any) => ({
+    ...p,
+    startDate: p.startDate ? new Date(p.startDate).toLocaleDateString() : "-",
+    deadline: p.deadline ? new Date(p.deadline).toLocaleDateString() : "-",
+    budget: Number(p.budget || 0),
+  }));
 
   return (
     <div className="space-y-6">
@@ -20,7 +27,7 @@ export default async function ProjectsPage() {
       </div>
 
       {/* Client-side table + filter + toggle */}
-      <ProjectsPageClient initialProjects={projects} />
+      <ProjectsPageClient initialProjects={formattedProjects} />
 
       <NewProjectModal />
     </div>

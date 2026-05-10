@@ -1,5 +1,5 @@
-import { invoicesCrud } from "@/lib/db/crud/invoices";
 import FinancePageClient from "@/components/dashboard/finance/FinancePageClient";
+import { invoicesCrud } from "@/lib/db/crud/invoices";
 
 export default async function FinancePage() {
   const invoices = await invoicesCrud.getAll();
@@ -27,5 +27,13 @@ export default async function FinancePage() {
     revenueThisMonth,
   };
 
-  return <FinancePageClient invoices={invoices} financeStats={financeStats} />;
+  const formattedInvoices = invoices.map((inv: any) => ({
+    ...inv,
+    issueDate: inv.issueDate ? new Date(inv.issueDate).toLocaleDateString() : "-",
+    dueDate: inv.dueDate ? new Date(inv.dueDate).toLocaleDateString() : "-",
+    amount: Number(inv.amount || 0),
+    tax: Number(inv.tax || 0),
+  }));
+
+  return <FinancePageClient invoices={formattedInvoices} financeStats={financeStats} />;
 }

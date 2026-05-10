@@ -1,8 +1,15 @@
-import { leadsCrud } from "@/lib/db/crud/leads";
 import LeadsPageClient from "@/components/dashboard/leads/LeadsPageClient";
+import { leadsCrud } from "@/lib/db/crud/leads";
 
 export default async function LeadsPage() {
-  const leads = await leadsCrud.getAll();
+  const allLeads = await leadsCrud.getAll();
 
-  return <LeadsPageClient initialLeads={leads} />;
+  const formattedLeads = allLeads.map((l: any) => ({
+    ...l,
+    lastContactedAt: l.lastContactedAt ? new Date(l.lastContactedAt).toLocaleDateString() : "-",
+    createdAt: l.createdAt ? new Date(l.createdAt).toLocaleDateString() : "-",
+    estimatedValue: Number(l.estimatedValue || 0),
+  }));
+
+  return <LeadsPageClient initialLeads={formattedLeads} />;
 }
