@@ -15,35 +15,16 @@ import { cn } from '@/lib/utils';
 import { JobsTable } from '@/components/hr/recruitment/JobsTable';
 import { RecruitmentPipeline } from '@/components/hr/recruitment/RecruitmentPipeline';
 import { NewJobModal } from '@/components/hr/recruitment/NewJobModal';
+import { HRNavbar } from "@/components/hr/HRNavbar";
 import { MOCK_JOBS, MOCK_CANDIDATES } from '@/lib/mockData/hr';
-
-const TABS = ["Overview", "Recruitment", "Employees", "Attendance", "Leave", "Payroll"];
 
 export default function RecruitmentPage() {
   const [view, setView] = useState<'pipeline' | 'table'>('pipeline');
   const [isNewJobModalOpen, setIsNewJobModalOpen] = useState(false);
-  const activeTab = "Recruitment";
 
   return (
     <div className="flex-1 bg-[#F8FAFC] min-h-screen flex flex-col">
-      {/* Sub-navigation bar */}
-      <div className="bg-white border-b border-[#E2E8F0] px-8 flex items-center h-14 sticky top-0 z-30">
-        <div className="flex gap-8 h-full">
-          {TABS.map((tab) => (
-            <button
-              key={tab}
-              className={cn(
-                "h-full px-1 text-sm font-bold transition-all border-b-2 flex items-center",
-                activeTab === tab
-                  ? "border-[#10B981] text-[#10B981]"
-                  : "border-transparent text-[#94A3B8] hover:text-[#475569]"
-              )}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-      </div>
+      <HRNavbar />
 
       <div className="p-8 max-w-[1600px] mx-auto w-full flex-1">
         {/* Header Section */}

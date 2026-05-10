@@ -19,33 +19,14 @@ import { cn } from '@/lib/utils';
 import { OnboardingKanban } from '@/components/hr/onboarding/OnboardingKanban';
 import { OnboardingTasklist } from '@/components/hr/onboarding/OnboardingTasklist';
 import { WelcomeKitStatus } from '@/components/hr/onboarding/WelcomeKitStatus';
-
-const TABS = ["Overview", "Recruitment", "Employees", "Attendance", "Leave", "Payroll"];
+import { HRNavbar } from "@/components/hr/HRNavbar";
 
 export default function OnboardingPage() {
   const [view, setView] = useState<'kanban' | 'list'>('kanban');
-  const activeTab = "Employees"; // Onboarding is usually under Employee management
 
   return (
     <div className="flex-1 bg-[#F8FAFC] min-h-screen flex flex-col">
-      {/* Sub-navigation bar */}
-      <div className="bg-white border-b border-[#E2E8F0] px-8 flex items-center h-14 sticky top-0 z-30">
-        <div className="flex gap-8 h-full">
-          {TABS.map((tab) => (
-            <button
-              key={tab}
-              className={cn(
-                "h-full px-1 text-sm font-bold transition-all border-b-2 flex items-center",
-                activeTab === tab
-                  ? "border-[#10B981] text-[#10B981]"
-                  : "border-transparent text-[#94A3B8] hover:text-[#475569]"
-              )}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-      </div>
+      <HRNavbar />
 
       <div className="p-8 max-w-[1600px] mx-auto w-full flex-1">
         {/* Header Section */}

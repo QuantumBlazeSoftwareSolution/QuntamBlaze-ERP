@@ -9,6 +9,21 @@ export const MOCK_EMPLOYEES: Employee[] = [
     status: "Active",
     joinDate: "2023-01-15",
     avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100&auto=format&fit=crop",
+    email: "alex.mercer@quantumblaze.com",
+    phone: "+94 77 123 4567",
+    address: "123 Innovation Drive, Colombo 07",
+    nic: "199204500123",
+    bankDetails: {
+       bank: "Commercial Bank",
+       accountName: "A. Mercer",
+       accountNumber: "800****542",
+       branch: "Kollupitiya"
+    },
+    reportingTo: { id: "EMP-ENG-26-000", name: "Sarah Connor" },
+    profileHealth: 92,
+    assets: ["MBP-2023-042", "ID-26-001"],
+    birthDate: "1992-04-15",
+    probationEnd: "2023-04-15",
   },
   {
     id: "EMP-HR-26-004",
@@ -17,15 +32,9 @@ export const MOCK_EMPLOYEES: Employee[] = [
     department: "HR",
     status: "Active",
     joinDate: "2023-03-22",
+    email: "sarah.j@quantumblaze.com",
+    profileHealth: 100,
   },
-  {
-    id: "EMP-FIN-26-009",
-    name: "James Wilson",
-    role: "Financial Analyst",
-    department: "Finance",
-    status: "Probation",
-    joinDate: "2024-01-10",
-  }
 ];
 
 export const MOCK_JOBS: Job[] = [

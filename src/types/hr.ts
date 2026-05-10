@@ -76,7 +76,21 @@ export interface Employee {
   status: EmploymentStatus;
   joinDate: string;
   avatar?: string;
-  reportingTo?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  nic?: string;
+  bankDetails?: {
+    bank: string;
+    accountName: string;
+    accountNumber: string;
+    branch: string;
+  };
+  reportingTo?: { id: string, name: string };
+  profileHealth?: number;
+  assets?: string[];
+  birthDate?: string;
+  probationEnd?: string;
 }
 
 export interface HRStat {
