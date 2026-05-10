@@ -24,8 +24,49 @@ export type PipelineStage =
   | "Technical" 
   | "Final" 
   | "Offer" 
+  | "Hired"
   | "Rejected" 
   | "Withdrawn";
+
+export type SeniorityLevel = "Junior" | "Mid" | "Senior" | "Lead" | "Director";
+export type JobStatus = "Active" | "Paused" | "Closed" | "Draft";
+export type WorkLocationType = "Remote" | "Hybrid" | "On-Site";
+
+export interface Job {
+  id: string; // JOB-ENG-26-012
+  title: string;
+  department: Department;
+  employmentType: string;
+  seniorityLevel: SeniorityLevel;
+  locationType: WorkLocationType;
+  city?: string;
+  pipelineCount: number;
+  postedDate: string;
+  status: JobStatus;
+  hiringManager: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+}
+
+export interface Candidate {
+  id: string; // CND-26-089
+  jobId: string;
+  name: string;
+  email: string;
+  phone?: string;
+  source: string;
+  currentStage: PipelineStage;
+  score?: number;
+  nextInterviewDate?: string;
+  daysInStage: number;
+  assignee?: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+}
 
 export interface Employee {
   id: string;

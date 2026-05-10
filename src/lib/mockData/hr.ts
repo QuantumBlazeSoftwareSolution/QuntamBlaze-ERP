@@ -1,4 +1,4 @@
-import { Employee, HRActivity, HRAlert, Department } from "@/types/hr";
+import { Employee, HRActivity, HRAlert, Job, Candidate } from "@/types/hr";
 
 export const MOCK_EMPLOYEES: Employee[] = [
   {
@@ -25,6 +25,69 @@ export const MOCK_EMPLOYEES: Employee[] = [
     department: "Finance",
     status: "Probation",
     joinDate: "2024-01-10",
+  }
+];
+
+export const MOCK_JOBS: Job[] = [
+  {
+    id: "JOB-ENG-26-012",
+    title: "Senior Full Stack Developer",
+    department: "Engineering",
+    employmentType: "Full-Time",
+    seniorityLevel: "Senior",
+    locationType: "Remote",
+    pipelineCount: 18,
+    postedDate: "2024-04-15",
+    status: "Active",
+    hiringManager: { id: "EMP-ENG-26-001", name: "Alex Mercer" },
+  },
+  {
+    id: "JOB-DES-26-005",
+    title: "Lead UI/UX Designer",
+    department: "Design",
+    employmentType: "Full-Time",
+    seniorityLevel: "Lead",
+    locationType: "Hybrid",
+    city: "Colombo",
+    pipelineCount: 7,
+    postedDate: "2024-05-01",
+    status: "Active",
+    hiringManager: { id: "EMP-HR-26-004", name: "Sarah Jenkins" },
+  }
+];
+
+export const MOCK_CANDIDATES: Candidate[] = [
+  {
+    id: "CND-26-089",
+    jobId: "JOB-ENG-26-012",
+    name: "Samantha Reed",
+    email: "samantha.r@gmail.com",
+    source: "LinkedIn",
+    currentStage: "Technical",
+    score: 85,
+    nextInterviewDate: "2024-05-12",
+    daysInStage: 3,
+    assignee: { id: "EMP-ENG-26-001", name: "Alex Mercer" },
+  },
+  {
+    id: "CND-26-104",
+    jobId: "JOB-ENG-26-012",
+    name: "Marcus Thorne",
+    email: "m.thorne@outlook.com",
+    source: "Referral",
+    currentStage: "Applied",
+    daysInStage: 1,
+  },
+  {
+    id: "CND-26-092",
+    jobId: "JOB-DES-26-005",
+    name: "Elena Vance",
+    email: "elena.vance@blackmesa.com",
+    source: "Direct",
+    currentStage: "Screening",
+    score: 92,
+    nextInterviewDate: "2024-05-11",
+    daysInStage: 5,
   }
 ];
 
