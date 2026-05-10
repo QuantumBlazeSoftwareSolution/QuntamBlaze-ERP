@@ -15,16 +15,16 @@ export function ProjectsTable({ statusFilter, clientFilter }: ProjectsTableProps
   const { table } = useProjectsTable(statusFilter, clientFilter);
 
   return (
-    <div className="w-full overflow-x-auto rounded-xl border border-[#1A1A1A] bg-[#050505]">
+    <div className="w-full overflow-x-auto rounded-xl border border-divider bg-white shadow-sm">
       <table className="w-full min-w-[900px]">
         {/* Header */}
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} className="border-b border-[#1A1A1A] bg-[#0A0A0A]">
+            <tr key={headerGroup.id} className="border-b border-divider bg-page-bg">
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className="px-4 py-3.5 text-left whitespace-nowrap"
+                  className="px-4 py-3.5 text-left text-[11px] font-bold text-text-secondary uppercase tracking-[0.15em] whitespace-nowrap"
                 >
                   {flexRender(header.column.columnDef.header, header.getContext())}
                 </th>
@@ -41,7 +41,7 @@ export function ProjectsTable({ statusFilter, clientFilter }: ProjectsTableProps
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.03, duration: 0.2, ease: "easeOut" }}
-              className="border-b border-[#1A1A1A]/50 hover:bg-[#0F0F0F] transition-colors group"
+              className="border-b border-divider hover:bg-page-bg transition-colors group"
             >
               {row.getVisibleCells().map((cell) => (
                 <td key={cell.id} className="px-4 py-3.5 whitespace-nowrap">

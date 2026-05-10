@@ -20,11 +20,11 @@ export default function DashboardLayout({
 
   return (
     <SearchProvider>
-      <div className="min-h-screen bg-page-bg font-sans text-text-primary antialiased selection:bg-accent/20 selection:text-accent overflow-x-hidden flex">
+      <div className="h-screen bg-page-bg font-sans text-text-primary antialiased selection:bg-accent/20 selection:text-accent overflow-hidden flex">
         {/* New Sidebar */}
         <Sidebar />
 
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 relative">
           {/* TopAppBar */}
           <header className={cn(
             "fixed top-0 right-0 z-30 flex items-center justify-between px-8 h-16 bg-white/80 backdrop-blur-md border-b border-divider transition-all duration-300",
@@ -47,8 +47,8 @@ export default function DashboardLayout({
 
           {/* Main Content Stage */}
           <main className={cn(
-            "relative z-10 pt-24 pb-12 px-8 flex-1 transition-all duration-300",
-            isCollapsed ? "ml-0" : "ml-0" // Sidebar is flex, so no margin needed on parent if flex-1 works, but the header is fixed.
+            "relative z-10 pt-24 pb-12 px-8 flex-1 overflow-y-auto custom-scrollbar transition-all duration-300",
+            isCollapsed ? "ml-0" : "ml-0"
           )}>
             {children}
           </main>
