@@ -6,6 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ProjectPageHeader } from "@/components/projects/ProjectPageHeader";
 import { ProjectTabs } from "@/components/projects/ProjectTabs";
 import { ProjectOverviewTab } from "@/components/projects/ProjectOverviewTab";
+import { ProjectDocumentsTab } from "@/components/projects/ProjectDocumentsTab";
+import { ProjectFinancialsTab } from "@/components/projects/ProjectFinancialsTab";
+import { ProjectActivityTab } from "@/components/projects/ProjectActivityTab";
 import { TaskDetailPanel } from "@/components/tasks/TaskDetailPanel";
 import { MOCK_PROJECTS } from "@/lib/mockData/projects";
 import { ProjectDetail } from "@/types/project";
@@ -96,21 +99,9 @@ export default function ProjectDetailPage() {
               {activeTab === "overview" && <ProjectOverviewTab project={project} />}
               {activeTab === "tasks" && <KanbanBoard />}
               {activeTab === "timeline" && <GanttView />}
-
-              {["documents", "financials", "activity"].includes(activeTab) && (
-                <div className="bg-white border border-[#E2E8F0] border-dashed rounded-3xl p-20 flex flex-col items-center justify-center text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-[#F8FAFC] flex items-center justify-center text-[#94A3B8] mb-4">
-                    <Target className="w-8 h-8" />
-                  </div>
-                  <h3 className="text-lg font-bold text-[#0F172A] uppercase tracking-widest">
-                    {activeTab} Workspace
-                  </h3>
-                  <p className="text-sm text-[#64748B] max-w-xs mt-2">
-                    The {activeTab} orchestration layer for {project.id} is currently being
-                    calibrated by the Ops team.
-                  </p>
-                </div>
-              )}
+              {activeTab === "documents" && <ProjectDocumentsTab />}
+              {activeTab === "financials" && <ProjectFinancialsTab />}
+              {activeTab === "activity" && <ProjectActivityTab />}
             </Suspense>
           </motion.div>
         </AnimatePresence>
