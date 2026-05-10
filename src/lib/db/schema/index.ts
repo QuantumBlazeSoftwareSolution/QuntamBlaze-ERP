@@ -9,3 +9,4 @@ export * from "./hr/candidates";
 export * from "./hr/interviews";
 export * from "./hr/onboarding";
 export * from "./hr/skills";
+export * from "./hr/attendance";
