@@ -36,8 +36,32 @@ export const MOCK_RESOURCE_ALLOCATION: ResourceAllocation[] = [
 ];
 
 export const MOCK_OPERATION_ALERTS: OperationAlert[] = [
-  { id: "ALT-001", type: "critical", message: "Storage Node A approaching capacity limit (94%)", timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(), resolved: false },
-  { id: "ALT-002", type: "warning", message: "High latency detected on API Gateway Europe region", timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), resolved: true },
-  { id: "ALT-003", type: "info", message: "Database cluster weekly backup completed successfully", timestamp: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(), resolved: true },
-  { id: "ALT-004", type: "warning", message: "Unusual traffic spike detected from unauthorized IP ranges", timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), resolved: false },
+  {
+    id: "ALT-001",
+    type: "critical",
+    message: "Storage Node A approaching capacity limit (94%)",
+    timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+    resolved: false,
+  },
+  {
+    id: "ALT-002",
+    type: "warning",
+    message: "High latency detected on API Gateway Europe region",
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+    resolved: true,
+  },
+  {
+    id: "ALT-003",
+    type: "info",
+    message: "Database cluster weekly backup completed successfully",
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
+    resolved: true,
+  },
+  {
+    id: "ALT-004",
+    type: "warning",
+    message: "Unusual traffic spike detected from unauthorized IP ranges",
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    resolved: false,
+  },
 ];

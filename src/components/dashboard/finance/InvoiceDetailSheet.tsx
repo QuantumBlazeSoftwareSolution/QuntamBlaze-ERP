@@ -27,10 +27,7 @@ interface InvoiceDetailSheetProps {
 
 type TabType = "summary" | "line-items";
 
-export const InvoiceDetailSheet = ({
-  invoice,
-  onClose,
-}: InvoiceDetailSheetProps) => {
+export const InvoiceDetailSheet = ({ invoice, onClose }: InvoiceDetailSheetProps) => {
   const [activeTab, setActiveTab] = useState<TabType>("summary");
 
   const total = invoice ? invoice.amount + invoice.tax : 0;
@@ -68,9 +65,7 @@ export const InvoiceDetailSheet = ({
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <IDChip id={invoice.id} />
-                  {invoice.receiptId && (
-                    <IDChip id={invoice.receiptId} variant="muted" size="xs" />
-                  )}
+                  {invoice.receiptId && <IDChip id={invoice.receiptId} variant="muted" size="xs" />}
                 </div>
                 <button
                   onClick={onClose}
@@ -184,16 +179,16 @@ export const InvoiceDetailSheet = ({
                       <div className="p-4 rounded-xl bg-page-bg border border-divider">
                         <div className="flex items-center gap-1.5 text-text-muted mb-2">
                           <Calendar className="w-3.5 h-3.5" />
-                          <p className="text-[10px] font-bold uppercase tracking-wider">Issue Date</p>
+                          <p className="text-[10px] font-bold uppercase tracking-wider">
+                            Issue Date
+                          </p>
                         </div>
                         <p className="text-sm font-bold text-text-primary">{invoice.issueDate}</p>
                       </div>
                       <div
                         className={cn(
                           "p-4 rounded-xl border",
-                          isOverdue
-                            ? "bg-red-50 border-red-200"
-                            : "bg-page-bg border-divider"
+                          isOverdue ? "bg-red-50 border-red-200" : "bg-page-bg border-divider"
                         )}
                       >
                         <div className="flex items-center gap-1.5 text-text-muted mb-2">
@@ -250,19 +245,33 @@ export const InvoiceDetailSheet = ({
                       <table className="w-full text-sm">
                         <thead className="bg-page-bg border-b border-divider">
                           <tr>
-                            <th className="px-4 py-3 text-left text-[10px] font-bold text-text-muted uppercase tracking-wider">Description</th>
-                            <th className="px-4 py-3 text-right text-[10px] font-bold text-text-muted uppercase tracking-wider">Qty</th>
-                            <th className="px-4 py-3 text-right text-[10px] font-bold text-text-muted uppercase tracking-wider">Rate</th>
-                            <th className="px-4 py-3 text-right text-[10px] font-bold text-text-muted uppercase tracking-wider">Amount</th>
+                            <th className="px-4 py-3 text-left text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                              Description
+                            </th>
+                            <th className="px-4 py-3 text-right text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                              Qty
+                            </th>
+                            <th className="px-4 py-3 text-right text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                              Rate
+                            </th>
+                            <th className="px-4 py-3 text-right text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                              Amount
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
                           {invoice.lineItems.map((item) => (
                             <tr key={item.id} className="border-b border-divider hover:bg-page-bg">
                               <td className="px-4 py-3 text-text-primary">{item.description}</td>
-                              <td className="px-4 py-3 text-right text-text-secondary font-mono">{item.qty}</td>
-                              <td className="px-4 py-3 text-right text-text-secondary font-mono">{formatCurrency(item.rate)}</td>
-                              <td className="px-4 py-3 text-right font-bold font-mono text-text-primary">{formatCurrency(item.amount)}</td>
+                              <td className="px-4 py-3 text-right text-text-secondary font-mono">
+                                {item.qty}
+                              </td>
+                              <td className="px-4 py-3 text-right text-text-secondary font-mono">
+                                {formatCurrency(item.rate)}
+                              </td>
+                              <td className="px-4 py-3 text-right font-bold font-mono text-text-primary">
+                                {formatCurrency(item.amount)}
+                              </td>
                             </tr>
                           ))}
                         </tbody>
@@ -273,8 +282,12 @@ export const InvoiceDetailSheet = ({
                       <div className="w-12 h-12 rounded-full bg-page-bg flex items-center justify-center text-text-muted mx-auto mb-3">
                         <FileText className="w-5 h-5" />
                       </div>
-                      <p className="text-sm font-medium text-text-secondary">No line items added yet.</p>
-                      <p className="text-[12px] text-text-muted mt-1">Line items will appear here once added.</p>
+                      <p className="text-sm font-medium text-text-secondary">
+                        No line items added yet.
+                      </p>
+                      <p className="text-[12px] text-text-muted mt-1">
+                        Line items will appear here once added.
+                      </p>
                     </div>
                   )}
                 </div>

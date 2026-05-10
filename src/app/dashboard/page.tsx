@@ -5,11 +5,11 @@ import { StatTile } from "@/components/dashboard/StatTile";
 import { ProjectHealthCard } from "@/components/dashboard/ProjectHealthCard";
 import { ProjectStatusDonut } from "@/components/dashboard/ProjectStatusDonut";
 import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
-import { 
-  statsData, 
-  projectHealthData, 
+import {
+  statsData,
+  projectHealthData,
   activityFeedData,
-  statusDistribution
+  statusDistribution,
 } from "@/lib/mockData/dashboard";
 import Link from "next/link";
 
@@ -47,7 +47,6 @@ export default function DashboardPage() {
 
       {/* Bento Grid Content (Scrollable Columns) */}
       <section className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
-        
         {/* Project Health Grid (Takes up 2 columns) */}
         <div className="lg:col-span-2 overflow-y-auto pr-4 custom-scrollbar">
           <div className="pb-6 space-y-6">
@@ -59,7 +58,7 @@ export default function DashboardPage() {
                 </button>
               </Link>
             </motion.div>
-  
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {projectHealthData.map((project) => (
                 <motion.div key={project.id} variants={itemVariants}>
@@ -76,13 +75,12 @@ export default function DashboardPage() {
             <motion.div variants={itemVariants}>
               <ProjectStatusDonut data={statusDistribution} />
             </motion.div>
-            
+
             <motion.div variants={itemVariants}>
               <ActivityFeed activities={activityFeedData} />
             </motion.div>
           </div>
         </div>
-
       </section>
     </motion.div>
   );

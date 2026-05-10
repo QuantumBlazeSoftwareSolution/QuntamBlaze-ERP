@@ -40,7 +40,7 @@ export const projectColumns: ColumnDef<Project>[] = [
       </button>
     ),
     cell: ({ row }) => (
-      <Link 
+      <Link
         href={`/dashboard/projects/${row.original.id}`}
         className="text-sm font-bold text-text-primary hover:text-accent transition-colors"
       >

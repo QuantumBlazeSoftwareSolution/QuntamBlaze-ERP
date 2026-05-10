@@ -21,7 +21,9 @@ export default function HRDashboard() {
         <header className="mb-8">
           <h1 className="text-[#0F172A] text-2xl font-bold">HR Command Center</h1>
           <div className="flex items-center justify-between mt-1">
-            <p className="text-[#475569] text-sm">Strategic workforce intelligence and talent orchestration.</p>
+            <p className="text-[#475569] text-sm">
+              Strategic workforce intelligence and talent orchestration.
+            </p>
             <span className="text-[#94A3B8] text-sm font-medium">May 2026</span>
           </div>
         </header>
@@ -49,10 +51,12 @@ export default function HRDashboard() {
           {/* Activity & Alerts Column */}
           <div className="space-y-6">
             <div className="flex flex-col">
-              <span className="text-[#94A3B8] text-[11px] font-semibold uppercase tracking-widest mb-4 px-2">Critical Alerts</span>
+              <span className="text-[#94A3B8] text-[11px] font-semibold uppercase tracking-widest mb-4 px-2">
+                Critical Alerts
+              </span>
               <HRAlerts />
             </div>
-            
+
             <div className="flex flex-col">
               <HRActivityFeed />
             </div>

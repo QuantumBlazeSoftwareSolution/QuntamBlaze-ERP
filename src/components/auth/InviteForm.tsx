@@ -1,18 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Eye, EyeOff, Loader2, ChevronDown, Check } from 'lucide-react';
-import { UserRole } from '@/types/auth';
-import { inviteSchema, InviteFormValues } from '@/lib/schemas/authSchema';
-import { useDebounce } from '@/hooks/useDebounce';
-import { generateUserId } from '@/lib/idEngine';
-import { StepIndicator } from './StepIndicator';
-import { UserIDPreview } from './UserIDPreview';
-import { useRouter } from 'next/navigation';
-
+import React, { useState, useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { motion, AnimatePresence } from "framer-motion";
+import { Lock, Eye, EyeOff, Loader2, ChevronDown, Check } from "lucide-react";
+import { UserRole } from "@/types/auth";
+import { inviteSchema, InviteFormValues } from "@/lib/schemas/authSchema";
+import { useDebounce } from "@/hooks/useDebounce";
+import { generateUserId } from "@/lib/idEngine";
+import { StepIndicator } from "./StepIndicator";
+import { UserIDPreview } from "./UserIDPreview";
+import { useRouter } from "next/navigation";
 
 const roleOptions = Object.values(UserRole);
 
@@ -37,10 +36,10 @@ export const InviteForm = () => {
     defaultValues: {
       email: "jane.doe@example.com", // Pre-filled mock
       role: UserRole.Client, // Default
-    }
+    },
   });
 
-  const fullNameValue = watch('fullName');
+  const fullNameValue = watch("fullName");
   const debouncedFullName = useDebounce(fullNameValue, 600);
 
   useEffect(() => {
@@ -61,10 +60,10 @@ export const InviteForm = () => {
   const onSubmit = async (data: InviteFormValues) => {
     setIsSubmitting(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       console.log(`[QB-AUTH] Invite accepted for ${data.email} as ${data.role}`);
       // Redirect to dashboard after successful onboarding
-      router.push('/dashboard');
+      router.push("/dashboard");
     } finally {
       setIsSubmitting(false);
     }
@@ -75,13 +74,13 @@ export const InviteForm = () => {
   const stepVariants = {
     enter: { x: 24, opacity: 0 },
     center: { x: 0, opacity: 1 },
-    exit: { x: -24, opacity: 0 }
+    exit: { x: -24, opacity: 0 },
   };
 
   return (
     <div className="w-full">
       <StepIndicator currentStep={currentStep} />
-      
+
       <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
         <AnimatePresence mode="wait">
           {currentStep === 1 && (
@@ -100,7 +99,7 @@ export const InviteForm = () => {
                   Full Name
                 </label>
                 <input
-                  {...register('fullName')}
+                  {...register("fullName")}
                   type="text"
                   className="w-full border border-border rounded-lg h-11 px-4 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder:text-text-muted bg-white"
                   placeholder="Jane Doe"
@@ -118,7 +117,7 @@ export const InviteForm = () => {
                 </label>
                 <div className="relative">
                   <input
-                    {...register('email')}
+                    {...register("email")}
                     type="email"
                     readOnly
                     className="w-full border border-border rounded-lg h-11 pl-4 pr-10 text-sm text-text-muted bg-page-bg cursor-not-allowed focus:outline-none"
@@ -139,11 +138,13 @@ export const InviteForm = () => {
                   control={control}
                   render={({ field }) => (
                     <>
-                      <div 
+                      <div
                         className="w-full border border-border rounded-lg h-11 px-4 flex items-center justify-between cursor-pointer bg-white"
                         onClick={() => setIsRoleOpen(!isRoleOpen)}
                       >
-                        <span className="text-sm text-text-primary">{field.value || "Select Role"}</span>
+                        <span className="text-sm text-text-primary">
+                          {field.value || "Select Role"}
+                        </span>
                         <ChevronDown className="w-4 h-4 text-text-muted" />
                       </div>
                       <AnimatePresence>
@@ -158,7 +159,7 @@ export const InviteForm = () => {
                               <div
                                 key={role}
                                 className={`px-4 py-2.5 text-sm cursor-pointer flex items-center justify-between
-                                  ${field.value === role ? 'bg-accent-light text-accent-text' : 'text-text-primary hover:bg-accent-light hover:text-accent-text'}
+                                  ${field.value === role ? "bg-accent-light text-accent-text" : "text-text-primary hover:bg-accent-light hover:text-accent-text"}
                                 `}
                                 onClick={() => {
                                   field.onChange(role);
@@ -187,7 +188,7 @@ export const InviteForm = () => {
                 </label>
                 <div className="relative">
                   <input
-                    {...register('password')}
+                    {...register("password")}
                     type={showPassword ? "text" : "password"}
                     className="w-full border border-border rounded-lg h-11 px-4 pr-10 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder:text-text-muted bg-white"
                     placeholder="••••••••"
@@ -212,7 +213,7 @@ export const InviteForm = () => {
                 </label>
                 <div className="relative">
                   <input
-                    {...register('confirmPassword')}
+                    {...register("confirmPassword")}
                     type={showConfirmPassword ? "text" : "password"}
                     className="w-full border border-border rounded-lg h-11 px-4 pr-10 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder:text-text-muted bg-white"
                     placeholder="••••••••"
@@ -222,7 +223,11 @@ export const InviteForm = () => {
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-text-muted hover:text-text-primary transition-colors"
                   >
-                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
                   </button>
                 </div>
                 {errors.confirmPassword && (
@@ -251,28 +256,42 @@ export const InviteForm = () => {
               className="space-y-6"
             >
               <div className="bg-page-bg border border-border rounded-xl p-6">
-                <h3 className="text-text-primary font-semibold mb-4 border-b border-border pb-3">Review Account Details</h3>
-                
+                <h3 className="text-text-primary font-semibold mb-4 border-b border-border pb-3">
+                  Review Account Details
+                </h3>
+
                 <div className="space-y-4">
                   <div>
-                    <span className="block text-text-muted text-xs uppercase tracking-wider mb-1">Full Name</span>
-                    <span className="text-text-primary text-sm font-medium">{formValues.fullName}</span>
+                    <span className="block text-text-muted text-xs uppercase tracking-wider mb-1">
+                      Full Name
+                    </span>
+                    <span className="text-text-primary text-sm font-medium">
+                      {formValues.fullName}
+                    </span>
                   </div>
-                  
+
                   {generatedId && (
                     <div>
-                      <span className="block text-text-muted text-xs uppercase tracking-wider mb-1">Assigned ID</span>
-                      <span className="bg-accent-light border border-accent-border text-accent-text font-mono text-sm px-2 py-0.5 rounded inline-block">{generatedId}</span>
+                      <span className="block text-text-muted text-xs uppercase tracking-wider mb-1">
+                        Assigned ID
+                      </span>
+                      <span className="bg-accent-light border border-accent-border text-accent-text font-mono text-sm px-2 py-0.5 rounded inline-block">
+                        {generatedId}
+                      </span>
                     </div>
                   )}
 
                   <div>
-                    <span className="block text-text-muted text-xs uppercase tracking-wider mb-1">Email Address</span>
+                    <span className="block text-text-muted text-xs uppercase tracking-wider mb-1">
+                      Email Address
+                    </span>
                     <span className="text-text-primary text-sm">{formValues.email}</span>
                   </div>
 
                   <div>
-                    <span className="block text-text-muted text-xs uppercase tracking-wider mb-1">Role</span>
+                    <span className="block text-text-muted text-xs uppercase tracking-wider mb-1">
+                      Role
+                    </span>
                     <span className="text-text-primary text-sm">{formValues.role}</span>
                   </div>
                 </div>

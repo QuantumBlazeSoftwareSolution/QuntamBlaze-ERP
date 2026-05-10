@@ -28,10 +28,14 @@ function renderNotificationText(text: string) {
 
 function getIconAndColor(type: AppNotification["type"]) {
   switch (type) {
-    case "invoice":  return { Icon: Receipt,    color: "text-red-500",    bg: "bg-red-50 border-red-100"    };
-    case "task":     return { Icon: CheckSquare, color: "text-success",    bg: "bg-success/10 border-success/20" };
-    case "proposal": return { Icon: FileText,    color: "text-accent",     bg: "bg-accent/10 border-accent/20"  };
-    case "lead":     return { Icon: UserPlus,    color: "text-warning",    bg: "bg-warning/10 border-warning/20" };
+    case "invoice":
+      return { Icon: Receipt, color: "text-red-500", bg: "bg-red-50 border-red-100" };
+    case "task":
+      return { Icon: CheckSquare, color: "text-success", bg: "bg-success/10 border-success/20" };
+    case "proposal":
+      return { Icon: FileText, color: "text-accent", bg: "bg-accent/10 border-accent/20" };
+    case "lead":
+      return { Icon: UserPlus, color: "text-warning", bg: "bg-warning/10 border-warning/20" };
   }
 }
 
@@ -53,7 +57,12 @@ export function NotificationItem({ notification }: NotificationItemProps) {
     >
       <div className="flex gap-3.5">
         {/* Icon */}
-        <div className={cn("mt-0.5 w-8 h-8 rounded-full border flex items-center justify-center shrink-0", bg)}>
+        <div
+          className={cn(
+            "mt-0.5 w-8 h-8 rounded-full border flex items-center justify-center shrink-0",
+            bg
+          )}
+        >
           <Icon className={cn("w-4 h-4", color)} />
         </div>
 

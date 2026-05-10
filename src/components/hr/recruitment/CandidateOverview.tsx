@@ -1,24 +1,24 @@
 "use client";
 
-import React from 'react';
-import { Candidate } from '@/types/hr';
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Building2, 
-  Briefcase, 
-  Clock, 
-  DollarSign, 
+import React from "react";
+import { Candidate } from "@/types/hr";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Building2,
+  Briefcase,
+  Clock,
+  DollarSign,
   FileText,
   ChevronRight,
   History,
-  Globe
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-import { IDChip } from '@/components/ui/IDChip';
-import { cn } from '@/lib/utils';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+  Globe,
+} from "lucide-react";
+import { motion } from "framer-motion";
+import { IDChip } from "@/components/ui/IDChip";
+import { cn } from "@/lib/utils";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 interface CandidateOverviewProps {
   candidate: Candidate;
@@ -26,10 +26,11 @@ interface CandidateOverviewProps {
 
 export function CandidateOverview({ candidate }: CandidateOverviewProps) {
   const scoreData = [
-    { name: 'Score', value: candidate.score || 0 },
-    { name: 'Gap', value: 100 - (candidate.score || 0) },
+    { name: "Score", value: candidate.score || 0 },
+    { name: "Gap", value: 100 - (candidate.score || 0) },
   ];
-  const SCORE_COLOR = (candidate.score || 0) > 80 ? '#10B981' : (candidate.score || 0) > 60 ? '#F59E0B' : '#EF4444';
+  const SCORE_COLOR =
+    (candidate.score || 0) > 80 ? "#10B981" : (candidate.score || 0) > 60 ? "#F59E0B" : "#EF4444";
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -40,11 +41,20 @@ export function CandidateOverview({ candidate }: CandidateOverviewProps) {
             <div className="w-1.5 h-4 bg-[#10B981] rounded-full" />
             Personal Details
           </h3>
-          
+
           <div className="space-y-5">
             <DetailItem icon={Mail} label="Email Address" value={candidate.email} />
-            <DetailItem icon={Phone} label="Phone Number" value={candidate.phone || "Not provided"} />
-            <DetailItem icon={Globe} label="LinkedIn Profile" value="linkedin.com/in/sreed" isLink />
+            <DetailItem
+              icon={Phone}
+              label="Phone Number"
+              value={candidate.phone || "Not provided"}
+            />
+            <DetailItem
+              icon={Globe}
+              label="LinkedIn Profile"
+              value="linkedin.com/in/sreed"
+              isLink
+            />
             <DetailItem icon={MapPin} label="Location" value="Colombo, Sri Lanka" />
             <DetailItem icon={Building2} label="Current Company" value="TechNova Solutions" />
             <DetailItem icon={Briefcase} label="Current Role" value="Full Stack Developer" />
@@ -96,30 +106,34 @@ export function CandidateOverview({ candidate }: CandidateOverviewProps) {
               <span className="text-xs text-[#64748B] font-medium">Assigned Recruiter</span>
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-full bg-slate-200 border border-white" />
-                <span className="text-xs font-bold text-[#0F172A]">{candidate.assignee?.name || "Unassigned"}</span>
+                <span className="text-xs font-bold text-[#0F172A]">
+                  {candidate.assignee?.name || "Unassigned"}
+                </span>
               </div>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-xs text-[#64748B] font-medium">Days in Stage</span>
-              <span className={cn(
-                "text-xs font-bold",
-                candidate.daysInStage > 5 ? "text-amber-500" : "text-[#10B981]"
-              )}>
+              <span
+                className={cn(
+                  "text-xs font-bold",
+                  candidate.daysInStage > 5 ? "text-amber-500" : "text-[#10B981]"
+                )}
+              >
                 {candidate.daysInStage} Days
               </span>
             </div>
           </div>
 
           <div className="mt-10 pt-6 border-t border-[#F1F5F9]">
-             <h4 className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest mb-4 flex items-center gap-2">
-               <History className="w-3 h-3" />
-               Stage History
-             </h4>
-             <div className="space-y-4">
-                <HistoryItem stage="Technical" date="May 08" actor="Alex Mercer" isLast />
-                <HistoryItem stage="Screening" date="May 02" actor="Sarah Jenkins" />
-                <HistoryItem stage="Applied" date="Apr 28" actor="System" />
-             </div>
+            <h4 className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest mb-4 flex items-center gap-2">
+              <History className="w-3 h-3" />
+              Stage History
+            </h4>
+            <div className="space-y-4">
+              <HistoryItem stage="Technical" date="May 08" actor="Alex Mercer" isLast />
+              <HistoryItem stage="Screening" date="May 02" actor="Sarah Jenkins" />
+              <HistoryItem stage="Applied" date="Apr 28" actor="System" />
+            </div>
           </div>
         </div>
       </div>
@@ -153,21 +167,25 @@ export function CandidateOverview({ candidate }: CandidateOverviewProps) {
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
               <span className="text-3xl font-black text-[#0F172A]">{candidate.score}%</span>
-              <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest">Overall</span>
+              <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest">
+                Overall
+              </span>
             </div>
           </div>
 
           <div className="w-full space-y-5">
-             <ScoreBar label="Technical Competency" score={88} color="#3B82F6" />
-             <ScoreBar label="Behavioral & Culture" score={72} color="#8B5CF6" />
-             <ScoreBar label="Role-Specific Skills" score={95} color="#10B981" />
+            <ScoreBar label="Technical Competency" score={88} color="#3B82F6" />
+            <ScoreBar label="Behavioral & Culture" score={72} color="#8B5CF6" />
+            <ScoreBar label="Role-Specific Skills" score={95} color="#10B981" />
           </div>
 
           <div className="mt-8 pt-6 border-t border-[#F1F5F9] w-full">
-            <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest mb-3">Recommendation</p>
+            <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest mb-3">
+              Recommendation
+            </p>
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#ECFDF5] border border-[#A7F3D0]">
-               <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
-               <span className="text-xs font-bold text-[#065F46]">Strong Hire</span>
+              <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
+              <span className="text-xs font-bold text-[#065F46]">Strong Hire</span>
             </div>
           </div>
         </div>
@@ -183,11 +201,15 @@ function DetailItem({ icon: Icon, label, value, isLink }: any) {
         <Icon className="w-4 h-4" />
       </div>
       <div>
-        <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider leading-none mb-1">{label}</p>
-        <p className={cn(
-          "text-sm font-semibold",
-          isLink ? "text-[#3B82F6] hover:underline cursor-pointer" : "text-[#0F172A]"
-        )}>
+        <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider leading-none mb-1">
+          {label}
+        </p>
+        <p
+          className={cn(
+            "text-sm font-semibold",
+            isLink ? "text-[#3B82F6] hover:underline cursor-pointer" : "text-[#0F172A]"
+          )}
+        >
           {value}
         </p>
       </div>
@@ -219,7 +241,7 @@ function ScoreBar({ label, score, color }: any) {
         <span className="text-[10px] font-bold text-[#0F172A]">{score}%</span>
       </div>
       <div className="h-1.5 bg-[#F1F5F9] rounded-full overflow-hidden">
-        <motion.div 
+        <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${score}%` }}
           className="h-full rounded-full"
@@ -232,16 +254,16 @@ function ScoreBar({ label, score, color }: any) {
 
 function CheckCircle2({ className }: { className?: string }) {
   return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       className={className}
     >
       <circle cx="12" cy="12" r="10" />

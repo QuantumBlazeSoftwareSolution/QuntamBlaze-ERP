@@ -30,9 +30,7 @@ const columnHelper = createColumnHelper<Invoice>();
 
 export function InvoiceTable({ data }: { data: Invoice[] }) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [selectedInvoice, setSelectedInvoice] = React.useState<Invoice | null>(
-    null,
-  );
+  const [selectedInvoice, setSelectedInvoice] = React.useState<Invoice | null>(null);
 
   const columns = useMemo(
     () => [
@@ -50,19 +48,13 @@ export function InvoiceTable({ data }: { data: Invoice[] }) {
       columnHelper.accessor("projectId", {
         header: "PRJ-ID",
         cell: (info) => (
-          <IDChip
-            id={info.getValue()}
-            className="bg-page-bg border-border text-text-muted"
-          />
+          <IDChip id={info.getValue()} className="bg-page-bg border-border text-text-muted" />
         ),
       }),
       columnHelper.accessor("clientId", {
         header: "CLIENT",
         cell: (info) => (
-          <IDChip
-            id={info.getValue()}
-            className="bg-accent/5 border-accent/20 text-accent"
-          />
+          <IDChip id={info.getValue()} className="bg-accent/5 border-accent/20 text-accent" />
         ),
       }),
       columnHelper.accessor("issueDate", {
@@ -74,11 +66,7 @@ export function InvoiceTable({ data }: { data: Invoice[] }) {
             ISSUE DATE <ArrowUpDown className="w-3 h-3" />
           </button>
         ),
-        cell: (info) => (
-          <span className="text-[13px] text-text-secondary">
-            {info.getValue()}
-          </span>
-        ),
+        cell: (info) => <span className="text-[13px] text-text-secondary">{info.getValue()}</span>,
       }),
       columnHelper.accessor("dueDate", {
         header: ({ column }) => (
@@ -93,9 +81,7 @@ export function InvoiceTable({ data }: { data: Invoice[] }) {
           <span
             className={cn(
               "text-[13px] font-medium",
-              info.row.original.status === "Overdue"
-                ? "text-danger"
-                : "text-text-secondary",
+              info.row.original.status === "Overdue" ? "text-danger" : "text-text-secondary"
             )}
           >
             {info.getValue()}
@@ -138,7 +124,7 @@ export function InvoiceTable({ data }: { data: Invoice[] }) {
         ),
       }),
     ],
-    [],
+    []
   );
 
   const table = useReactTable({
@@ -154,9 +140,7 @@ export function InvoiceTable({ data }: { data: Invoice[] }) {
     <>
       <div className="w-full bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
         <div className="p-6 border-b border-divider flex items-center justify-between bg-page-bg">
-          <h2 className="text-[14px] font-bold text-text-primary tracking-tight">
-            Invoice Ledger
-          </h2>
+          <h2 className="text-[14px] font-bold text-text-primary tracking-tight">Invoice Ledger</h2>
           <div className="flex items-center gap-4">
             <button className="p-2 text-text-muted hover:text-accent transition-colors">
               <ArrowUpDown className="w-4 h-4" />
@@ -171,19 +155,13 @@ export function InvoiceTable({ data }: { data: Invoice[] }) {
           <table className="w-full border-collapse">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr
-                  key={headerGroup.id}
-                  className="border-b border-divider bg-page-bg"
-                >
+                <tr key={headerGroup.id} className="border-b border-divider bg-page-bg">
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
                       className="px-6 py-4 text-left text-[10px] font-bold text-text-muted uppercase tracking-[0.2em]"
                     >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
+                      {flexRender(header.column.columnDef.header, header.getContext())}
                     </th>
                   ))}
                 </tr>
@@ -200,16 +178,13 @@ export function InvoiceTable({ data }: { data: Invoice[] }) {
                     exit={{ opacity: 0 }}
                     className={cn(
                       "group border-b border-divider hover:bg-page-bg transition-all cursor-pointer",
-                      row.original.status === "Overdue" && "bg-red-50/40",
+                      row.original.status === "Overdue" && "bg-red-50/40"
                     )}
                     onClick={() => setSelectedInvoice(row.original)}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id} className="px-6 py-5">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
                   </motion.tr>
@@ -222,9 +197,7 @@ export function InvoiceTable({ data }: { data: Invoice[] }) {
         {/* Pagination Footer */}
         <div className="px-6 py-4 border-t border-divider bg-page-bg flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <span className="text-[12px] text-text-muted">
-              Showing 1 to 10 of {data.length}
-            </span>
+            <span className="text-[12px] text-text-muted">Showing 1 to 10 of {data.length}</span>
             <select className="bg-white border border-border rounded px-2 py-1 text-[11px] text-text-secondary focus:outline-none">
               <option>10 / page</option>
               <option>25 / page</option>
@@ -245,10 +218,7 @@ export function InvoiceTable({ data }: { data: Invoice[] }) {
         </div>
       </div>
 
-      <InvoiceDetailSheet
-        invoice={selectedInvoice}
-        onClose={() => setSelectedInvoice(null)}
-      />
+      <InvoiceDetailSheet invoice={selectedInvoice} onClose={() => setSelectedInvoice(null)} />
     </>
   );
 }

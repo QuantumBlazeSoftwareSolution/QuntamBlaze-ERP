@@ -2,23 +2,9 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  ChevronDown,
-  Users,
-  Shield,
-  ShieldCheck,
-  ShieldX,
-  Plus,
-  Lock,
-} from "lucide-react";
+import { ChevronDown, Users, Shield, ShieldCheck, ShieldX, Plus, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  MOCK_ROLES,
-  MODULES,
-  ALL_PERMISSIONS,
-  Role,
-  Permission,
-} from "@/lib/mockData/roles";
+import { MOCK_ROLES, MODULES, ALL_PERMISSIONS, Role, Permission } from "@/lib/mockData/roles";
 
 const PERMISSION_LABELS: Record<Permission, { label: string; color: string }> = {
   read: { label: "Read", color: "bg-blue-100 text-blue-700 border-blue-200" },
@@ -111,7 +97,9 @@ function RoleCard({ role }: { role: Role }) {
               <span className="text-[12px] font-medium">{role.memberCount}</span>
             </div>
             <div className="text-right">
-              <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Access Level</p>
+              <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                Access Level
+              </p>
               <p className="text-[12px] font-bold text-text-primary mt-0.5">
                 {totalPerms}/{totalPossible} perms
               </p>
@@ -164,7 +152,9 @@ function RoleCard({ role }: { role: Role }) {
 
               {/* Header Row */}
               <div className="grid grid-cols-[1fr_repeat(4,_64px)] gap-x-2 px-6 py-3 bg-page-bg border-b border-divider">
-                <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Module</span>
+                <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                  Module
+                </span>
                 {ALL_PERMISSIONS.map((p) => (
                   <span
                     key={p}
@@ -232,7 +222,8 @@ export function RolesTab() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-[13px] text-text-muted">
-            {roles.length} roles configured · {roles.reduce((acc, r) => acc + r.memberCount, 0)} total members
+            {roles.length} roles configured · {roles.reduce((acc, r) => acc + r.memberCount, 0)}{" "}
+            total members
           </p>
         </div>
         <button className="flex items-center gap-2 px-5 py-2.5 bg-accent text-white text-[13px] font-bold rounded-xl hover:bg-accent/90 transition-all shadow-sm shadow-accent/20">

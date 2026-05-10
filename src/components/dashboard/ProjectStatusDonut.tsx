@@ -1,7 +1,7 @@
 "use client";
 
-import React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import React from "react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 interface StatusDistribution {
   name: string;
@@ -14,29 +14,27 @@ export const ProjectStatusDonut = ({ data }: { data: StatusDistribution[] }) => 
 
   return (
     <div className="bg-white border border-border rounded-xl p-5 shadow-sm flex flex-col">
-      <h3 className="text-text-primary font-bold text-xs uppercase tracking-wider mb-4">Project Status</h3>
-      
+      <h3 className="text-text-primary font-bold text-xs uppercase tracking-wider mb-4">
+        Project Status
+      </h3>
+
       <div className="relative h-48 w-full mx-auto">
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           <span className="text-2xl font-bold text-text-primary">{total}</span>
-          <span className="text-[9px] text-text-muted uppercase font-bold tracking-widest">Total</span>
+          <span className="text-[9px] text-text-muted uppercase font-bold tracking-widest">
+            Total
+          </span>
         </div>
-        
+
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie
-              data={data}
-              innerRadius={60}
-              outerRadius={80}
-              paddingAngle={5}
-              dataKey="value"
-            >
+            <Pie data={data} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip 
-              contentStyle={{ borderRadius: '8px', border: '1px solid #E2E8F0', fontSize: '12px' }}
+            <Tooltip
+              contentStyle={{ borderRadius: "8px", border: "1px solid #E2E8F0", fontSize: "12px" }}
             />
           </PieChart>
         </ResponsiveContainer>

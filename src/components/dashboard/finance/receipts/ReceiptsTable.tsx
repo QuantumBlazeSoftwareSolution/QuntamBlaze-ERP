@@ -28,7 +28,10 @@ const columns = [
     header: "INV-ID / Client",
     cell: (info) => (
       <div className="flex flex-col gap-0.5">
-        <IDChip id={info.getValue()} className="bg-transparent border-none p-0 text-accent hover:underline cursor-pointer" />
+        <IDChip
+          id={info.getValue()}
+          className="bg-transparent border-none p-0 text-accent hover:underline cursor-pointer"
+        />
         <span className="text-[10px] text-text-muted font-bold uppercase tracking-tight">
           {info.row.original.clientId} • {info.row.original.clientName}
         </span>
@@ -41,14 +44,18 @@ const columns = [
   }),
   columnHelper.accessor("amount", {
     header: "Amount",
-    cell: (info) => <span className="text-text-primary font-bold">{formatCurrency(info.getValue())}</span>,
+    cell: (info) => (
+      <span className="text-text-primary font-bold">{formatCurrency(info.getValue())}</span>
+    ),
   }),
   columnHelper.accessor("paymentMethod", {
     header: "Method / Ref",
     cell: (info) => (
       <div className="flex items-center gap-3">
         <PaymentMethodChip method={info.getValue()} />
-        <span className="text-[11px] text-text-muted font-mono">{info.row.original.referenceNumber}</span>
+        <span className="text-[11px] text-text-muted font-mono">
+          {info.row.original.referenceNumber}
+        </span>
       </div>
     ),
   }),
@@ -61,7 +68,11 @@ const columns = [
             <img src={info.getValue().avatar} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-accent/20 text-accent text-[8px] font-bold">
-              {info.getValue().name.split(' ').map(n => n[0]).join('')}
+              {info
+                .getValue()
+                .name.split(" ")
+                .map((n) => n[0])
+                .join("")}
             </div>
           )}
         </div>

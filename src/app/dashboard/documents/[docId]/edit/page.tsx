@@ -36,9 +36,9 @@ export default function DocumentEditorPage() {
         <div className="flex-1 overflow-y-auto bg-grid-slate-900/[0.04] p-12 custom-scrollbar relative">
           {/* Float Comment Marker */}
           <div className="absolute left-12 top-48">
-             <button className="w-8 h-8 rounded-full bg-accent flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-                <MessageSquare className="w-4 h-4 text-[#050505]" />
-             </button>
+            <button className="w-8 h-8 rounded-full bg-accent flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+              <MessageSquare className="w-4 h-4 text-[#050505]" />
+            </button>
           </div>
 
           <motion.div
@@ -51,13 +51,14 @@ export default function DocumentEditorPage() {
         </div>
 
         {/* Right Sidebar */}
-        <DocMetaSidebar 
+        <DocMetaSidebar
           docId={docId as string}
           prjId="PRJ-GOOG-26-001"
-          author={{ 
-            name: "Dr. Aris Thorne", 
-            avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&auto=format&fit=crop",
-            role: "Lead Architect"
+          author={{
+            name: "Dr. Aris Thorne",
+            avatar:
+              "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&auto=format&fit=crop",
+            role: "Lead Architect",
           }}
           stats={{ words: wordCount, chars: charCount }}
         />

@@ -22,7 +22,7 @@ export function LogoMark() {
       >
         {/* Subtle inner highlight */}
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
-        
+
         {/* QB Typographic Logo */}
         <div className="flex items-center justify-center">
           <span className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-accent to-accent/60 drop-shadow-[0_0_8px_rgba(0,229,255,0.8)] tracking-tighter">

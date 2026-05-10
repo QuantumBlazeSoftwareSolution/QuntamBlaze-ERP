@@ -10,7 +10,7 @@ export const IDEngine = {
   format: (prefix: string, sequence: number) => {
     return `${prefix}${sequence.toString().padStart(4, "0")}`;
   },
-  
+
   prefixes: {
     CLIENT: "CLI-",
     PROJECT: "PRJ-",
@@ -30,17 +30,17 @@ export type IDEnginePrefix = keyof typeof IDEngine.prefixes;
 /**
  * Generates a unique User ID based on the provided full name.
  * Pattern: USR-[Initials]-[YY]-[Seq]
- * 
+ *
  * @param fullName The user's full name
  * @param sequence The sequence number (e.g., from DB)
  * @returns Formatted ID string (e.g., USR-JD-26-004)
  */
 export function generateUserId(fullName: string, sequence: number): string {
   if (!fullName || fullName.trim() === "") return "";
-  
+
   const words = fullName.trim().split(/\s+/);
   let initials = "";
-  
+
   // Extract up to 2 initials
   if (words.length >= 2) {
     initials = `${words[0][0]}${words[1][0]}`;
@@ -49,12 +49,12 @@ export function generateUserId(fullName: string, sequence: number): string {
   } else if (words.length === 1 && words[0].length === 1) {
     initials = `${words[0][0]}X`;
   }
-  
+
   initials = initials.toUpperCase();
-  
+
   const yy = new Date().getFullYear().toString().slice(-2);
   const seq = sequence.toString().padStart(3, "0");
-  
+
   return `USR-${initials}-${yy}-${seq}`;
 }
 
@@ -132,7 +132,11 @@ export function generateReceiptId(seq: number): string {
   return `RCT-${yy}${mm}-${seq.toString().padStart(4, "0")}`;
 }
 
-export function generateNextId(type: string, seq: number, context?: { comp?: string, prjId?: string }): string {
+export function generateNextId(
+  type: string,
+  seq: number,
+  context?: { comp?: string; prjId?: string }
+): string {
   const now = new Date();
   const yy = now.getFullYear().toString().slice(-2);
   const mm = (now.getMonth() + 1).toString().padStart(2, "0");
@@ -141,17 +145,27 @@ export function generateNextId(type: string, seq: number, context?: { comp?: str
   const prjId = context?.prjId || "PRJ-XXXX";
 
   switch (type) {
-    case "CLI": return `CLI-${comp}-${yy}-${seqStr}`;
-    case "PRJ": return `PRJ-${comp}-${yy}-${seqStr}`;
-    case "PRO": return `PRO-${prjId}-${seqStr}`;
-    case "INV": return `INV-${yy}${mm}-${seqStr}`;
-    case "TSK": return `TSK-${prjId}-${seqStr}`;
-    case "LED": return `LED-${yy}-${seqStr}`;
-    case "QTO": return `QTO-${yy}${mm}-${seqStr}`;
-    case "RCT": return `RCT-${yy}${mm}-${seqStr}`;
-    case "AGR": return `AGR-${prjId}-V${seq}`;
-    case "SRS": return `SRS-${prjId}`;
-    default: return `${type}-${seqStr}`;
+    case "CLI":
+      return `CLI-${comp}-${yy}-${seqStr}`;
+    case "PRJ":
+      return `PRJ-${comp}-${yy}-${seqStr}`;
+    case "PRO":
+      return `PRO-${prjId}-${seqStr}`;
+    case "INV":
+      return `INV-${yy}${mm}-${seqStr}`;
+    case "TSK":
+      return `TSK-${prjId}-${seqStr}`;
+    case "LED":
+      return `LED-${yy}-${seqStr}`;
+    case "QTO":
+      return `QTO-${yy}${mm}-${seqStr}`;
+    case "RCT":
+      return `RCT-${yy}${mm}-${seqStr}`;
+    case "AGR":
+      return `AGR-${prjId}-V${seq}`;
+    case "SRS":
+      return `SRS-${prjId}`;
+    default:
+      return `${type}-${seqStr}`;
   }
 }
-

@@ -12,8 +12,8 @@ export function IDSequenceRow({ config }: { config: IDEntityConfig }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [resetInput, setResetInput] = useState("");
 
-  const nextId = useMemo(() => 
-    generateNextId(config.type, config.sequence), 
+  const nextId = useMemo(
+    () => generateNextId(config.type, config.sequence),
     [config.type, config.sequence]
   );
 
@@ -28,54 +28,55 @@ export function IDSequenceRow({ config }: { config: IDEntityConfig }) {
   return (
     <tr className="border-b border-divider hover:bg-page-bg transition-colors group">
       <td className="px-8 py-6">
-         <span className="text-[14px] font-bold text-text-primary">{config.label}</span>
+        <span className="text-[14px] font-bold text-text-primary">{config.label}</span>
       </td>
-      <td className="px-8 py-6 font-mono text-[13px] text-text-muted">
-         {config.pattern}
-      </td>
+      <td className="px-8 py-6 font-mono text-[13px] text-text-muted">{config.pattern}</td>
       <td className="px-8 py-6">
-         <div className="inline-flex items-center px-3 py-1.5 bg-accent/10 border border-accent/20 rounded-lg text-accent font-mono text-[13px] font-bold">
-            {nextId}
-         </div>
+        <div className="inline-flex items-center px-3 py-1.5 bg-accent/10 border border-accent/20 rounded-lg text-accent font-mono text-[13px] font-bold">
+          {nextId}
+        </div>
       </td>
       <td className="px-8 py-6 text-right">
-         <input 
-           type="number"
-           value={config.sequence}
-           onChange={(e) => updateSequence(config.type, parseInt(e.target.value) || 0)}
-           className="w-[80px] bg-white border border-border rounded px-3 py-1.5 text-right text-[13px] font-mono focus:border-accent outline-none"
-         />
+        <input
+          type="number"
+          value={config.sequence}
+          onChange={(e) => updateSequence(config.type, parseInt(e.target.value) || 0)}
+          className="w-[80px] bg-white border border-border rounded px-3 py-1.5 text-right text-[13px] font-mono focus:border-accent outline-none"
+        />
       </td>
       <td className="px-8 py-6 text-right relative">
-         {!showConfirm ? (
-           <button 
-             onClick={() => setShowConfirm(true)}
-             className="text-[11px] font-bold text-text-muted hover:text-red-500 transition-colors flex items-center gap-2 ml-auto"
-           >
-              <RefreshCcw className="w-3.5 h-3.5" />
-              RESET
-           </button>
-         ) : (
-           <motion.div 
-             initial={{ opacity: 0, x: 20 }}
-             animate={{ opacity: 1, x: 0 }}
-             className="flex items-center gap-3 justify-end"
-           >
-              <input 
-                autoFocus
-                placeholder="Type RESET"
-                value={resetInput}
-                onChange={(e) => setResetInput(e.target.value)}
-                className="w-[100px] bg-white border border-danger/40 rounded px-3 py-1.5 text-[11px] text-text-primary focus:border-danger outline-none placeholder:text-text-muted"
-              />
-              <button onClick={handleReset} className="p-1.5 text-danger hover:bg-danger/10 rounded">
-                <Check className="w-4 h-4" />
-              </button>
-              <button onClick={() => setShowConfirm(false)} className="p-1.5 text-text-muted hover:bg-page-bg rounded">
-                <X className="w-4 h-4" />
-              </button>
-           </motion.div>
-         )}
+        {!showConfirm ? (
+          <button
+            onClick={() => setShowConfirm(true)}
+            className="text-[11px] font-bold text-text-muted hover:text-red-500 transition-colors flex items-center gap-2 ml-auto"
+          >
+            <RefreshCcw className="w-3.5 h-3.5" />
+            RESET
+          </button>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-3 justify-end"
+          >
+            <input
+              autoFocus
+              placeholder="Type RESET"
+              value={resetInput}
+              onChange={(e) => setResetInput(e.target.value)}
+              className="w-[100px] bg-white border border-danger/40 rounded px-3 py-1.5 text-[11px] text-text-primary focus:border-danger outline-none placeholder:text-text-muted"
+            />
+            <button onClick={handleReset} className="p-1.5 text-danger hover:bg-danger/10 rounded">
+              <Check className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setShowConfirm(false)}
+              className="p-1.5 text-text-muted hover:bg-page-bg rounded"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </motion.div>
+        )}
       </td>
     </tr>
   );

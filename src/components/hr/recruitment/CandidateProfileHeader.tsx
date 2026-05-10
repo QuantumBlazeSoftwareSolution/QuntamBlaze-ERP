@@ -1,20 +1,20 @@
 "use client";
 
-import React from 'react';
-import { Candidate, PipelineStage } from '@/types/hr';
-import { IDChip } from '@/components/ui/IDChip';
-import { motion } from 'framer-motion';
-import { 
-  Calendar, 
-  CheckCircle2, 
-  XCircle, 
-  ChevronRight, 
+import React from "react";
+import { Candidate, PipelineStage } from "@/types/hr";
+import { IDChip } from "@/components/ui/IDChip";
+import { motion } from "framer-motion";
+import {
+  Calendar,
+  CheckCircle2,
+  XCircle,
+  ChevronRight,
   MoreHorizontal,
   Mail,
   Phone,
-  Globe
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  Globe,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface CandidateProfileHeaderProps {
   candidate: Candidate;
@@ -40,9 +40,12 @@ export function CandidateProfileHeader({ candidate }: CandidateProfileHeaderProp
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="flex items-start gap-5">
             <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 border border-[#E2E8F0] flex items-center justify-center text-slate-400 font-bold text-2xl shadow-inner">
-              {candidate.name.split(' ').map(n => n[0]).join('')}
+              {candidate.name
+                .split(" ")
+                .map((n) => n[0])
+                .join("")}
             </div>
-            
+
             <div>
               <div className="flex items-center gap-3 mb-1.5">
                 <h1 className="text-2xl font-bold text-[#0F172A]">{candidate.name}</h1>
@@ -51,7 +54,7 @@ export function CandidateProfileHeader({ candidate }: CandidateProfileHeaderProp
                   <IDChip id={candidate.jobId} size="xs" />
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-4 text-[#64748B] text-sm">
                 <div className="flex items-center gap-1.5">
                   <Mail className="w-3.5 h-3.5" />
@@ -94,9 +97,9 @@ export function CandidateProfileHeader({ candidate }: CandidateProfileHeaderProp
         {/* Pipeline Progress Track */}
         <div className="mt-10 relative">
           <div className="absolute top-1/2 left-0 w-full h-1 bg-[#F1F5F9] -translate-y-1/2 rounded-full" />
-          
+
           <div className="relative flex justify-between">
-            {STAGES.filter(s => s !== "Rejected" || isRejected).map((stage, idx) => {
+            {STAGES.filter((s) => s !== "Rejected" || isRejected).map((stage, idx) => {
               const isPast = idx < currentStageIndex;
               const isCurrent = idx === currentStageIndex;
               const isRejectedStage = stage === "Rejected" && isRejected;
@@ -106,8 +109,15 @@ export function CandidateProfileHeader({ candidate }: CandidateProfileHeaderProp
                   <motion.div
                     initial={false}
                     animate={{
-                      backgroundColor: isCurrent ? (isRejectedStage ? '#EF4444' : '#10B981') : (isPast ? '#10B981' : '#FFFFFF'),
-                      borderColor: (isPast || isCurrent) ? (isRejectedStage ? '#EF4444' : '#10B981') : '#E2E8F0',
+                      backgroundColor: isCurrent
+                        ? isRejectedStage
+                          ? "#EF4444"
+                          : "#10B981"
+                        : isPast
+                          ? "#10B981"
+                          : "#FFFFFF",
+                      borderColor:
+                        isPast || isCurrent ? (isRejectedStage ? "#EF4444" : "#10B981") : "#E2E8F0",
                     }}
                     className={cn(
                       "w-4 h-4 rounded-full border-2 transition-colors flex items-center justify-center",
@@ -116,10 +126,18 @@ export function CandidateProfileHeader({ candidate }: CandidateProfileHeaderProp
                   >
                     {isPast && <CheckCircle2 className="w-3 h-3 text-white fill-[#10B981]" />}
                   </motion.div>
-                  <span className={cn(
-                    "text-[10px] font-bold uppercase tracking-wider mt-2 transition-colors",
-                    isCurrent ? (isRejectedStage ? 'text-[#EF4444]' : 'text-[#10B981]') : (isPast ? 'text-[#475569]' : 'text-[#94A3B8]')
-                  )}>
+                  <span
+                    className={cn(
+                      "text-[10px] font-bold uppercase tracking-wider mt-2 transition-colors",
+                      isCurrent
+                        ? isRejectedStage
+                          ? "text-[#EF4444]"
+                          : "text-[#10B981]"
+                        : isPast
+                          ? "text-[#475569]"
+                          : "text-[#94A3B8]"
+                    )}
+                  >
                     {stage}
                   </span>
                 </div>

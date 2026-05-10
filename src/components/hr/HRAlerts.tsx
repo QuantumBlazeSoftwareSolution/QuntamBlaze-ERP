@@ -16,7 +16,7 @@ export function HRAlerts() {
   return (
     <div className="space-y-3 mb-6">
       {MOCK_HR_ALERTS.map((alert) => (
-        <div 
+        <div
           key={alert.id}
           className={cn(
             "border-l-4 rounded-r-xl p-4 flex items-start gap-3 shadow-sm",
@@ -26,13 +26,15 @@ export function HRAlerts() {
           <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
           <div className="flex-1">
             <p className="text-sm font-medium leading-relaxed">
-              {alert.message.split(" ").map((word, i) => (
-                word === alert.entityId ? (
-                  <IDChip key={i} id={word} size="xs" variant="accent" className="mx-1" />
-                ) : (
-                  word + " "
-                )
-              ))}
+              {alert.message
+                .split(" ")
+                .map((word, i) =>
+                  word === alert.entityId ? (
+                    <IDChip key={i} id={word} size="xs" variant="accent" className="mx-1" />
+                  ) : (
+                    word + " "
+                  )
+                )}
             </p>
           </div>
         </div>

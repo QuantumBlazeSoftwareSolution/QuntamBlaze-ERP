@@ -1,25 +1,25 @@
 "use client";
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  PlusCircle, 
-  UserPlus, 
-  LayoutGrid, 
-  Table as TableIcon, 
-  Search, 
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  PlusCircle,
+  UserPlus,
+  LayoutGrid,
+  Table as TableIcon,
+  Search,
   Filter,
-  ChevronDown
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { JobsTable } from '@/components/hr/recruitment/JobsTable';
-import { RecruitmentPipeline } from '@/components/hr/recruitment/RecruitmentPipeline';
-import { NewJobModal } from '@/components/hr/recruitment/NewJobModal';
+  ChevronDown,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { JobsTable } from "@/components/hr/recruitment/JobsTable";
+import { RecruitmentPipeline } from "@/components/hr/recruitment/RecruitmentPipeline";
+import { NewJobModal } from "@/components/hr/recruitment/NewJobModal";
 import { HRNavbar } from "@/components/hr/HRNavbar";
-import { MOCK_JOBS, MOCK_CANDIDATES } from '@/lib/mockData/hr';
+import { MOCK_JOBS, MOCK_CANDIDATES } from "@/lib/mockData/hr";
 
 export default function RecruitmentPage() {
-  const [view, setView] = useState<'pipeline' | 'table'>('pipeline');
+  const [view, setView] = useState<"pipeline" | "table">("pipeline");
   const [isNewJobModalOpen, setIsNewJobModalOpen] = useState(false);
 
   return (
@@ -31,7 +31,9 @@ export default function RecruitmentPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div>
             <h1 className="text-[#0F172A] text-2xl font-bold">Recruitment</h1>
-            <p className="text-[#475569] text-sm mt-1">Manage job openings and track candidate progress across the pipeline.</p>
+            <p className="text-[#475569] text-sm mt-1">
+              Manage job openings and track candidate progress across the pipeline.
+            </p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -39,7 +41,7 @@ export default function RecruitmentPage() {
               <UserPlus className="w-4 h-4" />
               <span>Add Candidate</span>
             </button>
-            <button 
+            <button
               onClick={() => setIsNewJobModalOpen(true)}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#10B981] text-white text-sm font-bold shadow-lg shadow-[#10B981]/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
@@ -53,20 +55,24 @@ export default function RecruitmentPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-[#E2E8F0] shadow-sm w-fit">
             <button
-              onClick={() => setView('pipeline')}
+              onClick={() => setView("pipeline")}
               className={cn(
                 "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all",
-                view === 'pipeline' ? "bg-[#10B981] text-white shadow-md shadow-[#10B981]/20" : "text-[#64748B] hover:bg-[#F8FAFC]"
+                view === "pipeline"
+                  ? "bg-[#10B981] text-white shadow-md shadow-[#10B981]/20"
+                  : "text-[#64748B] hover:bg-[#F8FAFC]"
               )}
             >
               <LayoutGrid className="w-4 h-4" />
               <span>Pipeline</span>
             </button>
             <button
-              onClick={() => setView('table')}
+              onClick={() => setView("table")}
               className={cn(
                 "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all",
-                view === 'table' ? "bg-[#10B981] text-white shadow-md shadow-[#10B981]/20" : "text-[#64748B] hover:bg-[#F8FAFC]"
+                view === "table"
+                  ? "bg-[#10B981] text-white shadow-md shadow-[#10B981]/20"
+                  : "text-[#64748B] hover:bg-[#F8FAFC]"
               )}
             >
               <TableIcon className="w-4 h-4" />
@@ -77,8 +83,8 @@ export default function RecruitmentPage() {
           <div className="flex items-center gap-3">
             <div className="relative group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8] group-focus-within:text-[#10B981] transition-colors" />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="Search candidates or jobs..."
                 className="pl-10 pr-4 py-2.5 rounded-xl border border-[#E2E8F0] bg-white text-sm w-64 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition-all"
               />
@@ -98,7 +104,7 @@ export default function RecruitmentPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2 }}
         >
-          {view === 'pipeline' ? (
+          {view === "pipeline" ? (
             <RecruitmentPipeline candidates={MOCK_CANDIDATES} />
           ) : (
             <JobsTable data={MOCK_JOBS} />
@@ -106,10 +112,7 @@ export default function RecruitmentPage() {
         </motion.div>
       </div>
 
-      <NewJobModal 
-        isOpen={isNewJobModalOpen} 
-        onClose={() => setIsNewJobModalOpen(false)} 
-      />
+      <NewJobModal isOpen={isNewJobModalOpen} onClose={() => setIsNewJobModalOpen(false)} />
     </div>
   );
 }

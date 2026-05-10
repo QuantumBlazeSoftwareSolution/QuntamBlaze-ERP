@@ -13,10 +13,12 @@ const ROLE_CONFIG: Record<Role, string> = {
 
 export function RoleBadge({ role }: { role: Role }) {
   return (
-    <div className={cn(
-      "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-[0.06em] text-[#050505] leading-none",
-      ROLE_CONFIG[role]
-    )}>
+    <div
+      className={cn(
+        "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-[0.06em] text-[#050505] leading-none",
+        ROLE_CONFIG[role]
+      )}
+    >
       {role}
     </div>
   );

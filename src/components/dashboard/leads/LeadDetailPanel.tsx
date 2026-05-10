@@ -26,7 +26,9 @@ export function LeadDetailPanel({ lead, onConvert }: LeadDetailPanelProps) {
           <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto border border-white/10">
             <User className="w-8 h-8 text-text-muted" />
           </div>
-          <p className="text-text-secondary text-[14px]">Select a lead to view intelligence dashboard</p>
+          <p className="text-text-secondary text-[14px]">
+            Select a lead to view intelligence dashboard
+          </p>
         </div>
       </div>
     );
@@ -52,7 +54,9 @@ export function LeadDetailPanel({ lead, onConvert }: LeadDetailPanelProps) {
                 </span>
                 <span className="text-text-muted text-[13px] font-mono">{lead.id}</span>
               </div>
-              <h1 className="text-4xl font-bold text-text-primary tracking-tight">{lead.companyName}</h1>
+              <h1 className="text-4xl font-bold text-text-primary tracking-tight">
+                {lead.companyName}
+              </h1>
               <p className="text-text-secondary text-lg font-medium">{lead.description}</p>
             </div>
 
@@ -60,7 +64,7 @@ export function LeadDetailPanel({ lead, onConvert }: LeadDetailPanelProps) {
               <button className="px-6 py-3 rounded-lg border border-border text-text-primary font-bold text-[13px] hover:bg-white/5 transition-all flex items-center gap-2">
                 Draft Proposal
               </button>
-              <button 
+              <button
                 onClick={onConvert}
                 className="px-6 py-3 rounded-lg bg-accent text-[#050505] font-bold text-[13px] shadow-[0_0_20px_rgba(0,229,255,0.2)] hover:shadow-[0_0_30px_rgba(0,229,255,0.4)] transition-all flex items-center gap-2"
               >
@@ -78,7 +82,9 @@ export function LeadDetailPanel({ lead, onConvert }: LeadDetailPanelProps) {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-text-primary">{lead.contactName}</h3>
-                  <p className="text-[13px] text-text-secondary uppercase tracking-widest">{lead.contactTitle}</p>
+                  <p className="text-[13px] text-text-secondary uppercase tracking-widest">
+                    {lead.contactTitle}
+                  </p>
                 </div>
               </div>
 
@@ -97,7 +103,9 @@ export function LeadDetailPanel({ lead, onConvert }: LeadDetailPanelProps) {
             {/* Acquisition Data Card */}
             <div className="bg-bg-card border border-border rounded-2xl p-8 space-y-6">
               <div className="space-y-4">
-                <p className="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em]">Acquisition Data</p>
+                <p className="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em]">
+                  Acquisition Data
+                </p>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
                     {SOURCE_ICONS[lead.source]}
@@ -111,12 +119,14 @@ export function LeadDetailPanel({ lead, onConvert }: LeadDetailPanelProps) {
 
               {lead.linkedProposalId && (
                 <div className="space-y-4 pt-4 border-t border-border/50">
-                   <p className="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em]">Linked Proposal</p>
-                   <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-border text-text-primary hover:border-accent/50 transition-all cursor-pointer group">
-                     <FileText className="w-4 h-4 text-text-secondary group-hover:text-accent" />
-                     <span className="text-[13px] font-mono">{lead.linkedProposalId}</span>
-                     <ArrowUpRight className="w-3 h-3 text-text-muted" />
-                   </div>
+                  <p className="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em]">
+                    Linked Proposal
+                  </p>
+                  <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-border text-text-primary hover:border-accent/50 transition-all cursor-pointer group">
+                    <FileText className="w-4 h-4 text-text-secondary group-hover:text-accent" />
+                    <span className="text-[13px] font-mono">{lead.linkedProposalId}</span>
+                    <ArrowUpRight className="w-3 h-3 text-text-muted" />
+                  </div>
                 </div>
               )}
             </div>

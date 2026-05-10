@@ -25,7 +25,9 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="space-y-1">
         <h1 className="text-4xl font-bold text-text-primary tracking-tight">System Settings</h1>
-        <p className="text-text-secondary text-lg">Configure global enterprise parameters, integration points, and audit protocols.</p>
+        <p className="text-text-secondary text-lg">
+          Configure global enterprise parameters, integration points, and audit protocols.
+        </p>
       </div>
 
       {/* Tabs */}
@@ -41,7 +43,7 @@ export default function SettingsPage() {
           >
             {tab.label}
             {activeTab === tab.id && (
-              <motion.div 
+              <motion.div
                 layoutId="activeTab"
                 className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent"
               />

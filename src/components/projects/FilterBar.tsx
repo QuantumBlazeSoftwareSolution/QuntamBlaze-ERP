@@ -18,7 +18,12 @@ interface FilterBarProps {
   activeClient: string;
 }
 
-export function FilterBar({ onStatusChange, onClientChange, activeStatus, activeClient }: FilterBarProps) {
+export function FilterBar({
+  onStatusChange,
+  onClientChange,
+  activeStatus,
+  activeClient,
+}: FilterBarProps) {
   return (
     <div className="flex items-center gap-3 flex-wrap">
       {/* Status Filter */}
@@ -30,7 +35,9 @@ export function FilterBar({ onStatusChange, onClientChange, activeStatus, active
         >
           <option value="">Status</option>
           {STATUS_OPTIONS.map((s) => (
-            <option key={s} value={s}>{s === "OnHold" ? "On-Hold" : s}</option>
+            <option key={s} value={s}>
+              {s === "OnHold" ? "On-Hold" : s}
+            </option>
           ))}
         </select>
         <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-secondary pointer-events-none" />
@@ -45,7 +52,9 @@ export function FilterBar({ onStatusChange, onClientChange, activeStatus, active
         >
           <option value="">Client</option>
           {CLIENT_OPTIONS.map((c) => (
-            <option key={c.id} value={c.id}>{c.label}</option>
+            <option key={c.id} value={c.id}>
+              {c.label}
+            </option>
           ))}
         </select>
         <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-secondary pointer-events-none" />

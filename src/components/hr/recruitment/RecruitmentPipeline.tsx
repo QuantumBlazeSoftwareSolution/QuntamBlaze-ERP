@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -13,16 +13,16 @@ import {
   DragOverEvent,
   DragEndEvent,
   defaultDropAnimationSideEffects,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { Candidate, PipelineStage } from '@/types/hr';
-import { CandidateCard } from './CandidateCard';
-import { cn } from '@/lib/utils';
+} from "@dnd-kit/sortable";
+import { Candidate, PipelineStage } from "@/types/hr";
+import { CandidateCard } from "./CandidateCard";
+import { cn } from "@/lib/utils";
 
 interface RecruitmentPipelineProps {
   candidates: Candidate[];
@@ -71,27 +71,27 @@ export function RecruitmentPipeline({ candidates: initialCandidates }: Recruitme
     const { active, over } = event;
     if (!over) return;
 
-    const activeCandidate = candidates.find(c => c.id === active.id);
+    const activeCandidate = candidates.find((c) => c.id === active.id);
     if (!activeCandidate) return;
 
     // Find if we are dragging over a stage (column) or another card
     const overId = over.id as string;
     const isStage = STAGES.includes(overId as PipelineStage);
-    
+
     let newStage: PipelineStage;
-    
+
     if (isStage) {
       newStage = overId as PipelineStage;
     } else {
-      const overCandidate = candidates.find(c => c.id === overId);
+      const overCandidate = candidates.find((c) => c.id === overId);
       if (!overCandidate) return;
       newStage = overCandidate.currentStage;
     }
 
     if (activeCandidate.currentStage !== newStage) {
-      setCandidates(prev => prev.map(c => 
-        c.id === active.id ? { ...c, currentStage: newStage } : c
-      ));
+      setCandidates((prev) =>
+        prev.map((c) => (c.id === active.id ? { ...c, currentStage: newStage } : c))
+      );
     }
   };
 
@@ -102,18 +102,22 @@ export function RecruitmentPipeline({ candidates: initialCandidates }: Recruitme
     if (!over) return;
 
     if (active.id !== over.id) {
-      const activeCandidate = candidates.find(c => c.id === active.id);
-      const overCandidate = candidates.find(c => c.id === over.id);
+      const activeCandidate = candidates.find((c) => c.id === active.id);
+      const overCandidate = candidates.find((c) => c.id === over.id);
 
-      if (activeCandidate && overCandidate && activeCandidate.currentStage === overCandidate.currentStage) {
-        const oldIndex = candidates.findIndex(c => c.id === active.id);
-        const newIndex = candidates.findIndex(c => c.id === over.id);
+      if (
+        activeCandidate &&
+        overCandidate &&
+        activeCandidate.currentStage === overCandidate.currentStage
+      ) {
+        const oldIndex = candidates.findIndex((c) => c.id === active.id);
+        const newIndex = candidates.findIndex((c) => c.id === over.id);
         setCandidates(arrayMove(candidates, oldIndex, newIndex));
       }
     }
   };
 
-  const activeCandidate = activeId ? candidates.find(c => c.id === activeId) : null;
+  const activeCandidate = activeId ? candidates.find((c) => c.id === activeId) : null;
 
   return (
     <DndContext
@@ -125,7 +129,7 @@ export function RecruitmentPipeline({ candidates: initialCandidates }: Recruitme
     >
       <div className="flex gap-6 overflow-x-auto pb-8 h-[calc(100vh-250px)] min-h-[600px] scrollbar-hide">
         {STAGES.map((stage) => {
-          const stageCandidates = candidates.filter(c => c.currentStage === stage);
+          const stageCandidates = candidates.filter((c) => c.currentStage === stage);
 
           return (
             <div key={stage} className="flex flex-col min-w-[280px] max-w-[280px] h-full">
@@ -141,7 +145,7 @@ export function RecruitmentPipeline({ candidates: initialCandidates }: Recruitme
               </div>
 
               {/* Column Content */}
-              <div 
+              <div
                 className={cn(
                   "flex-1 bg-white/50 border border-[#E2E8F0] rounded-xl p-3 space-y-3 overflow-y-auto scrollbar-hide transition-colors",
                   stage === "Hired" && "bg-emerald-50/30 border-emerald-100",
@@ -150,14 +154,14 @@ export function RecruitmentPipeline({ candidates: initialCandidates }: Recruitme
               >
                 <SortableContext
                   id={stage}
-                  items={stageCandidates.map(c => c.id)}
+                  items={stageCandidates.map((c) => c.id)}
                   strategy={verticalListSortingStrategy}
                 >
                   {stageCandidates.map((candidate) => (
                     <CandidateCard key={candidate.id} candidate={candidate} />
                   ))}
                 </SortableContext>
-                
+
                 {stageCandidates.length === 0 && (
                   <div className="h-24 flex flex-col items-center justify-center border-2 border-dashed border-[#E2E8F0] rounded-xl text-[#94A3B8]">
                     <span className="text-[11px] font-medium">Drop here</span>
@@ -169,15 +173,17 @@ export function RecruitmentPipeline({ candidates: initialCandidates }: Recruitme
         })}
       </div>
 
-      <DragOverlay dropAnimation={{
-        sideEffects: defaultDropAnimationSideEffects({
-          styles: {
-            active: {
-              opacity: '0.5',
+      <DragOverlay
+        dropAnimation={{
+          sideEffects: defaultDropAnimationSideEffects({
+            styles: {
+              active: {
+                opacity: "0.5",
+              },
             },
-          },
-        }),
-      }}>
+          }),
+        }}
+      >
         {activeCandidate ? <CandidateCard candidate={activeCandidate} /> : null}
       </DragOverlay>
     </DndContext>

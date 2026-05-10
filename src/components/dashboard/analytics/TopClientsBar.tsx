@@ -45,7 +45,9 @@ export function TopClientsBar({ data }: TopClientsBarProps) {
     <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
       <div className="mb-6">
         <h3 className="text-sm font-bold text-text-primary">Top Clients by Revenue</h3>
-        <p className="text-[12px] text-text-muted mt-0.5">Cumulative billing across all active engagements</p>
+        <p className="text-[12px] text-text-muted mt-0.5">
+          Cumulative billing across all active engagements
+        </p>
       </div>
 
       <ResponsiveContainer width="100%" height={220}>

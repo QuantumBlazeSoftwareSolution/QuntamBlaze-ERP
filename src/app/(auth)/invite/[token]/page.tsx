@@ -23,8 +23,8 @@ export default function InvitePage() {
   );
 
   return (
-    <AuthSplitLayout 
-      title="Join your team" 
+    <AuthSplitLayout
+      title="Join your team"
       subtitle="Complete your account setup to access Quantum Blaze."
       leftContent={onboardingIllustration}
     >

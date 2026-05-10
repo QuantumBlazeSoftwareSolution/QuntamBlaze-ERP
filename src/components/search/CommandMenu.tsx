@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useEffect } from 'react';
-import { Command } from 'cmdk';
-import { motion } from 'framer-motion';
-import { IDChip } from '@/components/ui/IDChip';
-import { Search, Folder, Users, Receipt } from 'lucide-react';
-import { projectHealthData } from '@/lib/mockData/dashboard';
+import React, { useEffect } from "react";
+import { Command } from "cmdk";
+import { motion } from "framer-motion";
+import { IDChip } from "@/components/ui/IDChip";
+import { Search, Folder, Users, Receipt } from "lucide-react";
+import { projectHealthData } from "@/lib/mockData/dashboard";
 
 // Import CSS for cmdk if necessary or use Tailwind
-import './cmdk.css';
+import "./cmdk.css";
 
 interface CommandMenuProps {
   onClose: () => void;
@@ -32,13 +32,15 @@ export const CommandMenu = ({ onClose }: CommandMenuProps) => {
       <Command label="Global Command Menu" className="flex flex-col w-full h-full bg-transparent">
         <div className="flex items-center px-4 border-b border-divider">
           <Search className="w-5 h-5 text-text-muted shrink-0" />
-          <Command.Input 
+          <Command.Input
             autoFocus
             placeholder="Search any ID — PRJ, CLI, INV, TSK..."
             className="flex-1 h-14 bg-transparent px-3 text-text-primary placeholder:text-text-muted focus:outline-none border-none text-base w-full"
           />
           <div className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 bg-page-bg rounded text-[10px] font-mono border border-border text-text-secondary">ESC</kbd>
+            <kbd className="px-1.5 py-0.5 bg-page-bg rounded text-[10px] font-mono border border-border text-text-secondary">
+              ESC
+            </kbd>
             <span className="text-[10px] text-text-muted ml-1">to close</span>
           </div>
         </div>
@@ -48,11 +50,14 @@ export const CommandMenu = ({ onClose }: CommandMenuProps) => {
             No results found.
           </Command.Empty>
 
-          <Command.Group heading="Projects" className="text-text-muted text-xs uppercase tracking-wider px-2 py-1.5 font-semibold">
-            {projectHealthData.map(p => (
+          <Command.Group
+            heading="Projects"
+            className="text-text-muted text-xs uppercase tracking-wider px-2 py-1.5 font-semibold"
+          >
+            {projectHealthData.map((p) => (
               <Command.Item
                 key={p.id}
-                value={p.id + ' ' + p.name}
+                value={p.id + " " + p.name}
                 onSelect={() => {
                   console.log(`[CMD+K] Navigating to ${p.id}`);
                   onClose();
@@ -68,14 +73,20 @@ export const CommandMenu = ({ onClose }: CommandMenuProps) => {
                     <span className="text-sm font-medium text-text-primary">{p.name}</span>
                   </div>
                   <span className="text-[10px] text-text-muted opacity-0 group-aria-selected:opacity-100 transition-opacity">
-                    <kbd className="px-1 bg-white border border-border rounded font-mono shadow-sm">↵</kbd> to select
+                    <kbd className="px-1 bg-white border border-border rounded font-mono shadow-sm">
+                      ↵
+                    </kbd>{" "}
+                    to select
                   </span>
                 </div>
               </Command.Item>
             ))}
           </Command.Group>
 
-          <Command.Group heading="Clients" className="text-text-muted text-xs uppercase tracking-wider px-2 py-1.5 font-semibold mt-2">
+          <Command.Group
+            heading="Clients"
+            className="text-text-muted text-xs uppercase tracking-wider px-2 py-1.5 font-semibold mt-2"
+          >
             <Command.Item
               value="CLI-GOOG-26-001 Google"
               onSelect={onClose}
@@ -90,7 +101,10 @@ export const CommandMenu = ({ onClose }: CommandMenuProps) => {
                   <span className="text-sm font-medium text-text-primary">Google</span>
                 </div>
                 <span className="text-[10px] text-text-muted opacity-0 group-aria-selected:opacity-100 transition-opacity">
-                  <kbd className="px-1 bg-white border border-border rounded font-mono shadow-sm">↵</kbd> to select
+                  <kbd className="px-1 bg-white border border-border rounded font-mono shadow-sm">
+                    ↵
+                  </kbd>{" "}
+                  to select
                 </span>
               </div>
             </Command.Item>
@@ -108,13 +122,19 @@ export const CommandMenu = ({ onClose }: CommandMenuProps) => {
                   <span className="text-sm font-medium text-text-primary">Meta</span>
                 </div>
                 <span className="text-[10px] text-text-muted opacity-0 group-aria-selected:opacity-100 transition-opacity">
-                  <kbd className="px-1 bg-white border border-border rounded font-mono shadow-sm">↵</kbd> to select
+                  <kbd className="px-1 bg-white border border-border rounded font-mono shadow-sm">
+                    ↵
+                  </kbd>{" "}
+                  to select
                 </span>
               </div>
             </Command.Item>
           </Command.Group>
 
-          <Command.Group heading="Recent Invoices" className="text-text-muted text-xs uppercase tracking-wider px-2 py-1.5 font-semibold mt-2">
+          <Command.Group
+            heading="Recent Invoices"
+            className="text-text-muted text-xs uppercase tracking-wider px-2 py-1.5 font-semibold mt-2"
+          >
             <Command.Item
               value="INV-2605-0042 INV-2605-0042"
               onSelect={onClose}
@@ -126,10 +146,15 @@ export const CommandMenu = ({ onClose }: CommandMenuProps) => {
               <div className="flex-1 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <IDChip id="INV-2605-0042" size="xs" />
-                  <span className="text-[10px] font-semibold text-warning bg-warning-bg px-1.5 py-0.5 rounded uppercase">Overdue</span>
+                  <span className="text-[10px] font-semibold text-warning bg-warning-bg px-1.5 py-0.5 rounded uppercase">
+                    Overdue
+                  </span>
                 </div>
                 <span className="text-[10px] text-text-muted opacity-0 group-aria-selected:opacity-100 transition-opacity">
-                  <kbd className="px-1 bg-white border border-border rounded font-mono shadow-sm">↵</kbd> to select
+                  <kbd className="px-1 bg-white border border-border rounded font-mono shadow-sm">
+                    ↵
+                  </kbd>{" "}
+                  to select
                 </span>
               </div>
             </Command.Item>

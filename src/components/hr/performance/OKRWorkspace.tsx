@@ -65,9 +65,7 @@ export function OKRWorkspace() {
     <div className="bg-white border border-[#E2E8F0] rounded-3xl p-8 shadow-sm h-full flex flex-col">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <div>
-          <h3 className="text-[#0F172A] font-bold">
-            Objectives & Key Results (OKRs)
-          </h3>
+          <h3 className="text-[#0F172A] font-bold">Objectives & Key Results (OKRs)</h3>
           <p className="text-[10px] text-[#94A3B8] font-bold uppercase tracking-widest mt-1">
             Strategic Alignment — FY 2024
           </p>
@@ -94,14 +92,10 @@ export function OKRWorkspace() {
                     Weight: {Math.round(goal.weight * 100)}%
                   </span>
                 </div>
-                <h4 className="text-lg font-black text-[#0F172A] tracking-tight">
-                  {goal.title}
-                </h4>
+                <h4 className="text-lg font-black text-[#0F172A] tracking-tight">{goal.title}</h4>
               </div>
               <div className="flex flex-col items-end">
-                <span className="text-2xl font-black text-[#0F172A]">
-                  {goal.progress}%
-                </span>
+                <span className="text-2xl font-black text-[#0F172A]">{goal.progress}%</span>
                 <span className="text-[9px] font-black text-[#94A3B8] uppercase tracking-widest">
                   Total Progress
                 </span>
@@ -125,9 +119,7 @@ export function OKRWorkspace() {
                   className="p-4 rounded-2xl bg-white border border-[#F1F5F9] group-hover:border-blue-100 transition-all"
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold text-[#475569]">
-                      {kr.title}
-                    </span>
+                    <span className="text-xs font-bold text-[#475569]">{kr.title}</span>
                     <span className="text-[10px] font-black text-[#0F172A]">
                       {kr.current} / {kr.target}{" "}
                       <span className="text-[#94A3B8] ml-1">{kr.unit}</span>

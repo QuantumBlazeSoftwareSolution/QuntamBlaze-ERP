@@ -1,4 +1,4 @@
-export type ProposalSectionType = 
+export type ProposalSectionType =
   | "executive_summary"
   | "scope"
   | "deliverables"

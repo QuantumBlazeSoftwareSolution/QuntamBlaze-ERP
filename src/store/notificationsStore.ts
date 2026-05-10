@@ -59,14 +59,11 @@ export const useNotificationsStore = create<NotificationsState>((set) => ({
   togglePanel: () => set((state) => ({ isPanelOpen: !state.isPanelOpen })),
   markRead: (id) =>
     set((state) => ({
-      notifications: state.notifications.map((n) =>
-        n.id === id ? { ...n, read: true } : n
-      ),
+      notifications: state.notifications.map((n) => (n.id === id ? { ...n, read: true } : n)),
     })),
   markAllRead: () =>
     set((state) => ({
       notifications: state.notifications.map((n) => ({ ...n, read: true })),
     })),
-  addNotification: (n) =>
-    set((state) => ({ notifications: [n, ...state.notifications] })),
+  addNotification: (n) => set((state) => ({ notifications: [n, ...state.notifications] })),
 }));

@@ -1,9 +1,9 @@
 export enum UserRole {
-  Admin = 'Admin',
-  PM = 'PM',
-  Developer = 'Developer',
-  Finance = 'Finance',
-  Client = 'Client'
+  Admin = "Admin",
+  PM = "PM",
+  Developer = "Developer",
+  Finance = "Finance",
+  Client = "Client",
 }
 
 export interface User {
@@ -11,5 +11,5 @@ export interface User {
   fullName: string;
   email: string;
   role: UserRole;
-  status: 'Active' | 'Inactive' | 'Invited';
+  status: "Active" | "Inactive" | "Invited";
 }

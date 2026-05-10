@@ -48,9 +48,11 @@ export function ProjectsPageClient() {
         <aside className="overflow-y-auto pr-2 custom-scrollbar">
           <div className="pb-6 space-y-6">
             <ProjectStatusDonut data={statusDistribution} />
-            
+
             <div className="bg-white border border-border rounded-xl p-6 shadow-sm">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-text-muted mb-6">Top Active Projects</h3>
+              <h3 className="text-xs font-bold uppercase tracking-widest text-text-muted mb-6">
+                Top Active Projects
+              </h3>
               <div className="space-y-4">
                 {filteredProjects.slice(0, 3).map((p) => (
                   <ProjectHealthCard
@@ -59,7 +61,14 @@ export function ProjectsPageClient() {
                       id: p.id,
                       name: p.name,
                       clientId: p.clientId,
-                      status: p.status === "OnHold" ? "on-hold" : p.status === "Review" ? "completed" : p.status === "Active" ? "active" : "active",
+                      status:
+                        p.status === "OnHold"
+                          ? "on-hold"
+                          : p.status === "Review"
+                            ? "completed"
+                            : p.status === "Active"
+                              ? "active"
+                              : "active",
                       progress: p.progress,
                       budgetSpent: Math.round(p.budget * (p.progress / 100)),
                       budgetTotal: p.budget,
@@ -73,9 +82,12 @@ export function ProjectsPageClient() {
             </div>
 
             <div className="p-6 rounded-xl bg-accent/5 border border-accent/10">
-              <h4 className="text-xs font-bold text-accent uppercase tracking-widest mb-2">Pro Tip</h4>
+              <h4 className="text-xs font-bold text-accent uppercase tracking-widest mb-2">
+                Pro Tip
+              </h4>
               <p className="text-[11px] text-text-secondary leading-relaxed">
-                Use <kbd className="px-1.5 py-0.5 rounded bg-white border border-border">CMD+K</kbd> to quickly jump between projects or clients from anywhere in the app.
+                Use <kbd className="px-1.5 py-0.5 rounded bg-white border border-border">CMD+K</kbd>{" "}
+                to quickly jump between projects or clients from anywhere in the app.
               </p>
             </div>
           </div>

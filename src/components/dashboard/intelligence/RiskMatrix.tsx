@@ -14,16 +14,16 @@ export function RiskMatrix() {
           Algorithmic Risk Assessment
         </h3>
       </div>
-      
+
       <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-4">
         {MOCK_RISK_FACTORS.map((risk, index) => {
           // Calculate overall risk score (Probability * Impact)
           const riskScore = (risk.probability * risk.impact) / 100;
-          
+
           let severityColor = "text-info";
           let severityBg = "bg-info/10";
           let severityBorder = "border-info/20";
-          
+
           if (riskScore > 60) {
             severityColor = "text-danger";
             severityBg = "bg-danger/10";
@@ -35,7 +35,7 @@ export function RiskMatrix() {
           }
 
           return (
-            <motion.div 
+            <motion.div
               key={risk.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -44,10 +44,21 @@ export function RiskMatrix() {
             >
               <div className="flex justify-between items-start mb-3">
                 <div>
-                  <span className="text-[9px] font-bold text-text-muted uppercase tracking-widest">{risk.id} • {risk.category}</span>
-                  <h4 className="text-sm font-bold text-text-primary mt-1 group-hover:text-accent transition-colors">{risk.name}</h4>
+                  <span className="text-[9px] font-bold text-text-muted uppercase tracking-widest">
+                    {risk.id} • {risk.category}
+                  </span>
+                  <h4 className="text-sm font-bold text-text-primary mt-1 group-hover:text-accent transition-colors">
+                    {risk.name}
+                  </h4>
                 </div>
-                <div className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold tracking-widest", severityBg, severityColor, severityBorder)}>
+                <div
+                  className={cn(
+                    "flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold tracking-widest",
+                    severityBg,
+                    severityColor,
+                    severityBorder
+                  )}
+                >
                   <AlertTriangle className="w-3 h-3" />
                   {Math.round(riskScore)}/100
                 </div>
@@ -60,7 +71,10 @@ export function RiskMatrix() {
                     <span>{risk.probability}%</span>
                   </div>
                   <div className="h-1.5 w-full bg-divider rounded-full overflow-hidden">
-                    <div className="h-full bg-text-muted transition-all" style={{ width: `${risk.probability}%` }} />
+                    <div
+                      className="h-full bg-text-muted transition-all"
+                      style={{ width: `${risk.probability}%` }}
+                    />
                   </div>
                 </div>
                 <div>
@@ -69,7 +83,10 @@ export function RiskMatrix() {
                     <span>{risk.impact}%</span>
                   </div>
                   <div className="h-1.5 w-full bg-divider rounded-full overflow-hidden">
-                    <div className="h-full bg-text-secondary transition-all" style={{ width: `${risk.impact}%` }} />
+                    <div
+                      className="h-full bg-text-secondary transition-all"
+                      style={{ width: `${risk.impact}%` }}
+                    />
                   </div>
                 </div>
               </div>

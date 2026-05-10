@@ -7,17 +7,17 @@ export interface GanttAssignee {
 }
 
 export interface GanttTask {
-  id: string;           // TSK-PRJ-GOOG-26-001-01
+  id: string; // TSK-PRJ-GOOG-26-001-01
   name: string;
-  start: string;        // ISO date
-  end: string;          // ISO date
+  start: string; // ISO date
+  end: string; // ISO date
   status: GanttStatus;
   assignee?: GanttAssignee;
-  dependsOn?: string;   // Task ID this depends on
+  dependsOn?: string; // Task ID this depends on
 }
 
 export interface GanttMilestoneType {
-  id: string;           // MST-PRJ-GOOG-26-001-01
+  id: string; // MST-PRJ-GOOG-26-001-01
   label: string;
-  date: string;         // ISO date
+  date: string; // ISO date
 }

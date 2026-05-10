@@ -1,47 +1,47 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  User, 
-  Calendar, 
-  FileText, 
-  ClipboardCheck, 
+import React, { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  User,
+  Calendar,
+  FileText,
+  ClipboardCheck,
   History,
   ChevronLeft,
   Settings,
-  MoreVertical
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { CandidateProfileHeader } from '@/components/hr/recruitment/CandidateProfileHeader';
-import { CandidateOverview } from '@/components/hr/recruitment/CandidateOverview';
-import { CandidateInterviewsTab } from '@/components/hr/recruitment/CandidateInterviewsTab';
-import { InterviewScorecard } from '@/components/hr/recruitment/InterviewScorecard';
-import { MOCK_CANDIDATES } from '@/lib/mockData/hr';
+  MoreVertical,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { CandidateProfileHeader } from "@/components/hr/recruitment/CandidateProfileHeader";
+import { CandidateOverview } from "@/components/hr/recruitment/CandidateOverview";
+import { CandidateInterviewsTab } from "@/components/hr/recruitment/CandidateInterviewsTab";
+import { InterviewScorecard } from "@/components/hr/recruitment/InterviewScorecard";
+import { MOCK_CANDIDATES } from "@/lib/mockData/hr";
 
 const TABS = [
-  { id: 'overview', label: 'Overview', icon: User },
-  { id: 'interviews', label: 'Interviews', icon: Calendar },
-  { id: 'scorecard', label: 'Scorecard', icon: ClipboardCheck },
-  { id: 'documents', label: 'Documents', icon: FileText },
-  { id: 'activity', label: 'Activity Log', icon: History },
+  { id: "overview", label: "Overview", icon: User },
+  { id: "interviews", label: "Interviews", icon: Calendar },
+  { id: "scorecard", label: "Scorecard", icon: ClipboardCheck },
+  { id: "documents", label: "Documents", icon: FileText },
+  { id: "activity", label: "Activity Log", icon: History },
 ];
 
 export default function CandidateProfilePage() {
   const params = useParams();
   const router = useRouter();
   const cndId = params.cndId as string;
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
-  const candidate = MOCK_CANDIDATES.find(c => c.id === cndId) || MOCK_CANDIDATES[0];
+  const candidate = MOCK_CANDIDATES.find((c) => c.id === cndId) || MOCK_CANDIDATES[0];
 
   return (
     <div className="flex-1 bg-[#F8FAFC] min-h-screen flex flex-col">
       {/* Action Bar */}
       <div className="bg-white px-8 h-14 border-b border-[#E2E8F0] flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={() => router.back()}
             className="p-2 hover:bg-[#F1F5F9] rounded-lg transition-all text-[#64748B]"
           >
@@ -57,10 +57,10 @@ export default function CandidateProfilePage() {
 
         <div className="flex items-center gap-2">
           <button className="p-2 hover:bg-[#F1F5F9] rounded-lg transition-all text-[#94A3B8]">
-             <Settings className="w-5 h-5" />
+            <Settings className="w-5 h-5" />
           </button>
           <button className="p-2 hover:bg-[#F1F5F9] rounded-lg transition-all text-[#94A3B8]">
-             <MoreVertical className="w-5 h-5" />
+            <MoreVertical className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -85,9 +85,9 @@ export default function CandidateProfilePage() {
                 <Icon className={cn("w-4 h-4", isActive ? "text-[#10B981]" : "text-[#94A3B8]")} />
                 {tab.label}
                 {isActive && (
-                  <motion.div 
-                    layoutId="activeTab" 
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#10B981] rounded-full" 
+                  <motion.div
+                    layoutId="activeTab"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#10B981] rounded-full"
                   />
                 )}
               </button>
@@ -106,21 +106,25 @@ export default function CandidateProfilePage() {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
           >
-            {activeTab === 'overview' && <CandidateOverview candidate={candidate} />}
-            {activeTab === 'interviews' && <CandidateInterviewsTab />}
-            {activeTab === 'scorecard' && <InterviewScorecard />}
-            {activeTab === 'documents' && (
+            {activeTab === "overview" && <CandidateOverview candidate={candidate} />}
+            {activeTab === "interviews" && <CandidateInterviewsTab />}
+            {activeTab === "scorecard" && <InterviewScorecard />}
+            {activeTab === "documents" && (
               <div className="bg-white border border-[#E2E8F0] rounded-xl p-20 flex flex-col items-center text-center">
                 <FileText className="w-12 h-12 text-[#E2E8F0] mb-4" />
                 <h3 className="text-lg font-bold text-[#0F172A]">Document Management</h3>
-                <p className="text-[#94A3B8] text-sm mt-1 max-w-sm">Manage candidate resumes, portfolios, and offer letters in a secure environment.</p>
+                <p className="text-[#94A3B8] text-sm mt-1 max-w-sm">
+                  Manage candidate resumes, portfolios, and offer letters in a secure environment.
+                </p>
               </div>
             )}
-            {activeTab === 'activity' && (
+            {activeTab === "activity" && (
               <div className="bg-white border border-[#E2E8F0] rounded-xl p-20 flex flex-col items-center text-center">
                 <History className="w-12 h-12 text-[#E2E8F0] mb-4" />
                 <h3 className="text-lg font-bold text-[#0F172A]">Candidate Activity</h3>
-                <p className="text-[#94A3B8] text-sm mt-1 max-w-sm">Audit log of all changes, stage transitions, and interviewer comments.</p>
+                <p className="text-[#94A3B8] text-sm mt-1 max-w-sm">
+                  Audit log of all changes, stage transitions, and interviewer comments.
+                </p>
               </div>
             )}
           </motion.div>

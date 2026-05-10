@@ -43,7 +43,13 @@ export function LeadCard({ lead, isSelected, onClick }: LeadCardProps) {
         <span className="text-[10px] font-bold tracking-widest text-text-secondary uppercase">
           {lead.id}
         </span>
-        <div className={cn("flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-current/20", temp.color, temp.bg)}>
+        <div
+          className={cn(
+            "flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-current/20",
+            temp.color,
+            temp.bg
+          )}
+        >
           <div className={cn("w-1.5 h-1.5 rounded-full shadow-[0_0_8px_currentColor]", temp.dot)} />
           <span className="text-[9px] font-bold uppercase tracking-wider">{lead.temperature}</span>
         </div>

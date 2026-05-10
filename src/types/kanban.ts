@@ -7,11 +7,11 @@ export interface TaskAssignee {
 }
 
 export interface KanbanTask {
-  id: string;           // TSK-PRJ-GOOG-26-001-01
+  id: string; // TSK-PRJ-GOOG-26-001-01
   title: string;
   priority: Priority;
   assignees: TaskAssignee[];
-  dueDate: string;      // ISO
+  dueDate: string; // ISO
   subTasksDone: number;
   subTasksTotal: number;
   columnId: string;

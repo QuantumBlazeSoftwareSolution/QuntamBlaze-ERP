@@ -29,14 +29,18 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white border border-border rounded-xl p-4 shadow-lg min-w-[160px]">
-        <p className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-2">{label}</p>
+        <p className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-2">
+          {label}
+        </p>
         {payload.map((entry: any) => (
           <div key={entry.name} className="flex items-center justify-between gap-4 mb-1">
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
               <span className="text-[12px] text-text-secondary capitalize">{entry.name}</span>
             </div>
-            <span className="text-[12px] font-bold font-mono text-text-primary">{formatK(entry.value)}</span>
+            <span className="text-[12px] font-bold font-mono text-text-primary">
+              {formatK(entry.value)}
+            </span>
           </div>
         ))}
       </div>
@@ -61,12 +65,17 @@ export function RevenueAreaChart({ data }: RevenueAreaChartProps) {
         </div>
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">12M Total</p>
+            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">
+              12M Total
+            </p>
             <p className="text-lg font-bold text-text-primary">{formatK(totalRevenue)}</p>
           </div>
-          <div className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold ${isPositive ? "bg-success/10 text-success" : "bg-danger/10 text-danger"}`}>
+          <div
+            className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold ${isPositive ? "bg-success/10 text-success" : "bg-danger/10 text-danger"}`}
+          >
             <TrendingUp className="w-3 h-3" />
-            {isPositive ? "+" : ""}{growth}%
+            {isPositive ? "+" : ""}
+            {growth}%
           </div>
         </div>
       </div>

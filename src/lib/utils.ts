@@ -13,7 +13,7 @@ export const IDEngine = {
   format: (prefix: string, sequence: number) => {
     return `${prefix}${sequence.toString().padStart(4, "0")}`;
   },
-  
+
   prefixes: {
     CLIENT: "CLI-",
     PROJECT: "PRJ-",

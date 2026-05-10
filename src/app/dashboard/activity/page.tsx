@@ -3,38 +3,41 @@
 import { useState } from "react";
 import { motion, Variants } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
-import {
-  Plus, Edit3, Trash2, DollarSign,
-  Lock, Cpu, Filter,
-} from "lucide-react";
+import { Plus, Edit3, Trash2, DollarSign, Lock, Cpu, Filter } from "lucide-react";
 import { IDChip } from "@/components/ui/IDChip";
 import { cn } from "@/lib/utils";
-import {
-  MOCK_ACTIVITY,
-  ActivityEvent,
-  ActivityEventType,
-} from "@/lib/mockData/activity";
+import { MOCK_ACTIVITY, ActivityEvent, ActivityEventType } from "@/lib/mockData/activity";
 
 const TYPE_CONFIG: Record<
   ActivityEventType,
   { label: string; icon: typeof Plus; bg: string; dot: string }
 > = {
-  created: { label: "Created", icon: Plus,       bg: "bg-success/10 border-success/20", dot: "bg-success"  },
-  updated: { label: "Updated", icon: Edit3,      bg: "bg-accent/10 border-accent/20",   dot: "bg-accent"   },
-  deleted: { label: "Deleted", icon: Trash2,     bg: "bg-red-50 border-red-200",        dot: "bg-red-500"  },
-  finance: { label: "Finance", icon: DollarSign, bg: "bg-amber-50 border-amber-200",    dot: "bg-warning"  },
-  auth:    { label: "Auth",    icon: Lock,       bg: "bg-purple-50 border-purple-200",  dot: "bg-purple-500"},
-  system:  { label: "System",  icon: Cpu,        bg: "bg-page-bg border-divider",       dot: "bg-text-muted"},
+  created: {
+    label: "Created",
+    icon: Plus,
+    bg: "bg-success/10 border-success/20",
+    dot: "bg-success",
+  },
+  updated: { label: "Updated", icon: Edit3, bg: "bg-accent/10 border-accent/20", dot: "bg-accent" },
+  deleted: { label: "Deleted", icon: Trash2, bg: "bg-red-50 border-red-200", dot: "bg-red-500" },
+  finance: {
+    label: "Finance",
+    icon: DollarSign,
+    bg: "bg-amber-50 border-amber-200",
+    dot: "bg-warning",
+  },
+  auth: { label: "Auth", icon: Lock, bg: "bg-purple-50 border-purple-200", dot: "bg-purple-500" },
+  system: { label: "System", icon: Cpu, bg: "bg-page-bg border-divider", dot: "bg-text-muted" },
 };
 
 const FILTERS: { id: ActivityEventType | "all"; label: string }[] = [
-  { id: "all",     label: "All Events" },
-  { id: "created", label: "Created"    },
-  { id: "updated", label: "Updated"    },
-  { id: "deleted", label: "Deleted"    },
-  { id: "finance", label: "Finance"    },
-  { id: "auth",    label: "Auth"       },
-  { id: "system",  label: "System"     },
+  { id: "all", label: "All Events" },
+  { id: "created", label: "Created" },
+  { id: "updated", label: "Updated" },
+  { id: "deleted", label: "Deleted" },
+  { id: "finance", label: "Finance" },
+  { id: "auth", label: "Auth" },
+  { id: "system", label: "System" },
 ];
 
 const containerVariants: Variants = {
@@ -94,11 +97,15 @@ function TimelineEvent({ event }: { event: ActivityEvent }) {
               className={cn(
                 "text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border",
                 config.bg,
-                config.dot === "bg-success" ? "text-success" :
-                config.dot === "bg-accent"  ? "text-accent"  :
-                config.dot === "bg-red-500" ? "text-red-500" :
-                config.dot === "bg-warning" ? "text-warning" :
-                "text-text-muted"
+                config.dot === "bg-success"
+                  ? "text-success"
+                  : config.dot === "bg-accent"
+                    ? "text-accent"
+                    : config.dot === "bg-red-500"
+                      ? "text-red-500"
+                      : config.dot === "bg-warning"
+                        ? "text-warning"
+                        : "text-text-muted"
               )}
             >
               {config.label}
@@ -114,9 +121,7 @@ export default function ActivityPage() {
   const [activeFilter, setActiveFilter] = useState<ActivityEventType | "all">("all");
 
   const filtered =
-    activeFilter === "all"
-      ? MOCK_ACTIVITY
-      : MOCK_ACTIVITY.filter((e) => e.type === activeFilter);
+    activeFilter === "all" ? MOCK_ACTIVITY : MOCK_ACTIVITY.filter((e) => e.type === activeFilter);
 
   return (
     <div className="space-y-8 pb-16">
@@ -127,9 +132,7 @@ export default function ActivityPage() {
         className="flex items-start justify-between"
       >
         <div>
-          <h1 className="text-3xl font-bold text-text-primary tracking-tight">
-            Activity Timeline
-          </h1>
+          <h1 className="text-3xl font-bold text-text-primary tracking-tight">Activity Timeline</h1>
           <p className="text-text-secondary mt-1">
             Global audit log of all system events and entity changes.
           </p>

@@ -8,7 +8,7 @@ export function NotificationBell() {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <button 
+    <button
       onClick={openPanel}
       className="text-text-secondary hover:bg-page-bg transition-colors duration-200 p-2 rounded-full relative"
     >

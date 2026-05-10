@@ -11,8 +11,7 @@ export function TablePagination<TData>({ table }: TablePaginationProps<TData>) {
   return (
     <div className="flex items-center justify-between px-6 py-4 bg-page-bg border-t border-divider text-sm text-text-secondary">
       <div className="flex-1">
-        Page {table.getState().pagination.pageIndex + 1} of{" "}
-        {table.getPageCount()}
+        Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
       </div>
       <div className="flex items-center space-x-2">
         <button

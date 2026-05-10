@@ -4,13 +4,12 @@ export function performSearch(query: string): SearchEntity[] {
   if (!query || query.trim() === "") {
     return [];
   }
-  
+
   const lowerQuery = query.toLowerCase();
-  
+
   return SEARCH_INDEX.filter((entity) => {
     return (
-      entity.id.toLowerCase().includes(lowerQuery) ||
-      entity.name.toLowerCase().includes(lowerQuery)
+      entity.id.toLowerCase().includes(lowerQuery) || entity.name.toLowerCase().includes(lowerQuery)
     );
   });
 }
@@ -41,12 +40,12 @@ export function groupResults(results: SearchEntity[]): GroupedResults {
 export function flattenGroupedResults(grouped: GroupedResults): SearchEntity[] {
   const flat: SearchEntity[] = [];
   const order: EntityType[] = ["PROJECTS", "CLIENTS", "INVOICES", "TASKS", "LEADS"];
-  
+
   for (const type of order) {
     if (grouped[type]) {
       flat.push(...grouped[type]);
     }
   }
-  
+
   return flat;
 }

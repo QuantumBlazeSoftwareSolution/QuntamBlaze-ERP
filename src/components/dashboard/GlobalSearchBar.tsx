@@ -21,9 +21,13 @@ export function GlobalSearchBar() {
         readOnly // Makes it act more like a button until we build the full combobox
       />
       <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-50 pointer-events-none">
-        <kbd className="px-1.5 py-0.5 bg-divider rounded text-[10px] font-mono border border-border">Ctrl</kbd>
+        <kbd className="px-1.5 py-0.5 bg-divider rounded text-[10px] font-mono border border-border">
+          Ctrl
+        </kbd>
         <span className="text-xs">+</span>
-        <kbd className="px-1.5 py-0.5 bg-divider rounded text-[10px] font-mono border border-border">K</kbd>
+        <kbd className="px-1.5 py-0.5 bg-divider rounded text-[10px] font-mono border border-border">
+          K
+        </kbd>
       </div>
     </div>
   );

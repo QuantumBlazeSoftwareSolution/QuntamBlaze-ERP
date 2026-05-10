@@ -16,12 +16,8 @@ export default function ClientProfilePage() {
   return (
     <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
       {/* Breadcrumbs / Back */}
-      <motion.div 
-        initial={{ opacity: 0, x: -10 }}
-        animate={{ opacity: 1, x: 0 }}
-        className="mb-6"
-      >
-        <Link 
+      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="mb-6">
+        <Link
           href="/dashboard/clients"
           className="inline-flex items-center gap-2 text-text-muted hover:text-accent transition-colors text-[13px] font-medium"
         >
@@ -42,11 +38,7 @@ export default function ClientProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Main Content (3/4) */}
         <div className="lg:col-span-3">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
             <ClientTabs client={client} />
           </motion.div>
         </div>

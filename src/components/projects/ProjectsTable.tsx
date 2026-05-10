@@ -9,8 +9,6 @@ interface ProjectsTableProps {
   clientFilter?: string;
 }
 
-
-
 export function ProjectsTable({ statusFilter, clientFilter }: ProjectsTableProps) {
   const { table } = useProjectsTable(statusFilter, clientFilter);
 

@@ -34,7 +34,8 @@ function SectionEditor({ section, onContentChange }: SectionEditorProps) {
     },
     editorProps: {
       attributes: {
-        class: "prose prose-invert max-w-none focus:outline-none min-h-[100px] text-[16px] text-[#8A8A8A] leading-[1.7]",
+        class:
+          "prose prose-invert max-w-none focus:outline-none min-h-[100px] text-[16px] text-[#8A8A8A] leading-[1.7]",
       },
     },
   });
@@ -53,7 +54,7 @@ function SectionEditor({ section, onContentChange }: SectionEditorProps) {
           {section.title}
         </h2>
         <div className="w-10 h-10 rounded-lg bg-white/5 border border-border flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-           <span className="text-[10px] text-text-muted font-bold">Edit</span>
+          <span className="text-[10px] text-text-muted font-bold">Edit</span>
         </div>
       </div>
       <EditorContent editor={editor} />
@@ -72,10 +73,7 @@ export function ProposalEditor({ sections, onSectionContentChange }: ProposalEdi
       <div className="max-w-[900px] mx-auto space-y-12 pb-32">
         {sections.map((section) => (
           <div key={section.id} id={section.id}>
-            <SectionEditor 
-              section={section} 
-              onContentChange={onSectionContentChange} 
-            />
+            <SectionEditor section={section} onContentChange={onSectionContentChange} />
           </div>
         ))}
       </div>

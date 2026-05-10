@@ -1,4 +1,12 @@
-import { addDays, differenceInDays, format, startOfMonth, endOfMonth, eachDayOfInterval, isToday } from 'date-fns';
+import {
+  addDays,
+  differenceInDays,
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isToday,
+} from "date-fns";
 
 export function getDaysInPeriod(start: Date, end: Date) {
   return differenceInDays(end, start) + 1;

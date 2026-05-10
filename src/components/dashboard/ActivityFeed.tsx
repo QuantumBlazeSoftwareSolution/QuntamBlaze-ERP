@@ -1,21 +1,23 @@
 "use client";
 
-import React from 'react';
-import { formatDistanceToNow } from 'date-fns';
-import { IDChip } from '@/components/ui/IDChip';
-import { ActivityItem } from '@/lib/mockData/dashboard';
-import { motion } from 'framer-motion';
+import React from "react";
+import { formatDistanceToNow } from "date-fns";
+import { IDChip } from "@/components/ui/IDChip";
+import { ActivityItem } from "@/lib/mockData/dashboard";
+import { motion } from "framer-motion";
 
 export const ActivityFeed = ({ activities }: { activities: ActivityItem[] }) => {
   return (
     <div className="bg-white border border-border rounded-xl shadow-sm overflow-hidden">
       <div className="px-5 py-4 border-b border-divider bg-page-bg">
-        <h3 className="text-text-primary font-bold text-sm uppercase tracking-wider">Recent Activity</h3>
+        <h3 className="text-text-primary font-bold text-sm uppercase tracking-wider">
+          Recent Activity
+        </h3>
       </div>
-      
+
       <div className="divide-y divide-divider">
         {activities.map((activity, index) => (
-          <motion.div 
+          <motion.div
             key={activity.id}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
@@ -35,7 +37,7 @@ export const ActivityFeed = ({ activities }: { activities: ActivityItem[] }) => 
           </motion.div>
         ))}
       </div>
-      
+
       <button className="w-full py-3 text-center text-accent text-xs font-semibold hover:bg-accent/10 transition-colors border-t border-divider">
         View Full Audit Log
       </button>

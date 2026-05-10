@@ -1,17 +1,17 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Check, Copy } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState } from "react";
+import { Check, Copy } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface IDChipProps {
   id: string;
-  size?: 'xs' | 'sm' | 'md';
-  variant?: 'default' | 'accent' | 'muted';
+  size?: "xs" | "sm" | "md";
+  variant?: "default" | "accent" | "muted";
   className?: string;
 }
 
-export const IDChip = ({ id, size = 'sm', variant = 'default', className = '' }: IDChipProps) => {
+export const IDChip = ({ id, size = "sm", variant = "default", className = "" }: IDChipProps) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = (e: React.MouseEvent) => {
@@ -23,15 +23,17 @@ export const IDChip = ({ id, size = 'sm', variant = 'default', className = '' }:
   };
 
   const sizeClasses = {
-    xs: 'text-[10px] px-1.5 py-0.5',
-    sm: 'text-xs px-2 py-0.5',
-    md: 'text-sm px-2.5 py-1',
+    xs: "text-[10px] px-1.5 py-0.5",
+    sm: "text-xs px-2 py-0.5",
+    md: "text-sm px-2.5 py-1",
   };
 
   const variantClasses = {
-    default: 'bg-page-bg border-border text-text-secondary hover:border-accent hover:text-accent-text',
-    accent: 'bg-accent-light border-accent-border text-accent-text hover:bg-accent hover:text-white',
-    muted: 'bg-divider border-border text-text-muted hover:text-text-secondary',
+    default:
+      "bg-page-bg border-border text-text-secondary hover:border-accent hover:text-accent-text",
+    accent:
+      "bg-accent-light border-accent-border text-accent-text hover:bg-accent hover:text-white",
+    muted: "bg-divider border-border text-text-muted hover:text-text-secondary",
   };
 
   return (

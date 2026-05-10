@@ -5,7 +5,7 @@ export function convertQuotationToInvoice(qto: QuotationFormData): InvoiceFormDa
   // Generate a new INV-ID based on current month
   const now = new Date();
   const yy = now.getFullYear().toString().slice(-2);
-  const mm = (now.getMonth() + 1).toString().padStart(2, '0');
+  const mm = (now.getMonth() + 1).toString().padStart(2, "0");
   const invId = `INV-${yy}${mm}-0044`; // Mock sequential ID
 
   return {
@@ -15,11 +15,11 @@ export function convertQuotationToInvoice(qto: QuotationFormData): InvoiceFormDa
     clientName: qto.clientName,
     billingAddress: "1010 Silicon Valley, CA, USA", // Default or carry over
     linkedAgreementId: "",
-    issueDate: new Date().toISOString().split('T')[0],
-    dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    lineItems: qto.lineItems.map(item => ({
+    issueDate: new Date().toISOString().split("T")[0],
+    dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    lineItems: qto.lineItems.map((item) => ({
       ...item,
       qty: item.hours || item.qty, // Map hours to qty for invoice
-    }))
+    })),
   };
 }

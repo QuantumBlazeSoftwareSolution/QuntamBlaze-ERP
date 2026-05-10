@@ -18,7 +18,7 @@ export function getColorFromString(str: string): string {
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
-  
+
   const index = Math.abs(hash) % ACCENT_COLORS.length;
   return ACCENT_COLORS[index];
 }

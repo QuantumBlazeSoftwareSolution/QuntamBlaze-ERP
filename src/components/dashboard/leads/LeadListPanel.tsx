@@ -15,9 +15,10 @@ interface LeadListPanelProps {
 export function LeadListPanel({ leads, selectedLeadId, onSelectLead }: LeadListPanelProps) {
   const [search, setSearch] = useState("");
 
-  const filteredLeads = leads.filter(lead => 
-    lead.companyName.toLowerCase().includes(search.toLowerCase()) ||
-    lead.contactName.toLowerCase().includes(search.toLowerCase())
+  const filteredLeads = leads.filter(
+    (lead) =>
+      lead.companyName.toLowerCase().includes(search.toLowerCase()) ||
+      lead.contactName.toLowerCase().includes(search.toLowerCase())
   );
 
   return (

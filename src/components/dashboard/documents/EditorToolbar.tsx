@@ -1,9 +1,18 @@
 "use client";
 
 import { Editor } from "@tiptap/react";
-import { 
-  Bold, Italic, List, ListOrdered, Heading1, Heading2, 
-  Table as TableIcon, Code, Image as ImageIcon, Save, Send 
+import {
+  Bold,
+  Italic,
+  List,
+  ListOrdered,
+  Heading1,
+  Heading2,
+  Table as TableIcon,
+  Code,
+  Image as ImageIcon,
+  Save,
+  Send,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -13,21 +22,21 @@ interface EditorToolbarProps {
   version: string;
 }
 
-const ToolbarButton = ({ 
-  onClick, 
-  active = false, 
-  children 
-}: { 
-  onClick: () => void; 
-  active?: boolean; 
-  children: React.ReactNode 
+const ToolbarButton = ({
+  onClick,
+  active = false,
+  children,
+}: {
+  onClick: () => void;
+  active?: boolean;
+  children: React.ReactNode;
 }) => (
   <button
     onClick={onClick}
     className={cn(
       "p-2 rounded-lg transition-all",
-      active 
-        ? "bg-accent/20 text-accent shadow-[0_0_10px_rgba(0,229,255,0.2)]" 
+      active
+        ? "bg-accent/20 text-accent shadow-[0_0_10px_rgba(0,229,255,0.2)]"
         : "text-text-muted hover:bg-white/5 hover:text-text-primary"
     )}
   >
@@ -41,51 +50,53 @@ export function EditorToolbar({ editor, lastSaved, version }: EditorToolbarProps
   return (
     <div className="h-16 bg-[#0A0A0A] border-b border-border flex items-center justify-between px-8 sticky top-0 z-50">
       <div className="flex items-center gap-1">
-        <ToolbarButton 
+        <ToolbarButton
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
           active={editor.isActive("heading", { level: 1 })}
         >
           <Heading1 className="w-5 h-5" />
         </ToolbarButton>
-        <ToolbarButton 
+        <ToolbarButton
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           active={editor.isActive("heading", { level: 2 })}
         >
           <Heading2 className="w-5 h-5" />
         </ToolbarButton>
         <div className="w-px h-6 bg-border mx-2" />
-        <ToolbarButton 
+        <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
           active={editor.isActive("bold")}
         >
           <Bold className="w-5 h-5" />
         </ToolbarButton>
-        <ToolbarButton 
+        <ToolbarButton
           onClick={() => editor.chain().focus().toggleItalic().run()}
           active={editor.isActive("italic")}
         >
           <Italic className="w-5 h-5" />
         </ToolbarButton>
         <div className="w-px h-6 bg-border mx-2" />
-        <ToolbarButton 
+        <ToolbarButton
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           active={editor.isActive("bulletList")}
         >
           <List className="w-5 h-5" />
         </ToolbarButton>
-        <ToolbarButton 
+        <ToolbarButton
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           active={editor.isActive("orderedList")}
         >
           <ListOrdered className="w-5 h-5" />
         </ToolbarButton>
         <div className="w-px h-6 bg-border mx-2" />
-        <ToolbarButton 
-          onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+        <ToolbarButton
+          onClick={() =>
+            editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
+          }
         >
           <TableIcon className="w-5 h-5" />
         </ToolbarButton>
-        <ToolbarButton 
+        <ToolbarButton
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
           active={editor.isActive("codeBlock")}
         >

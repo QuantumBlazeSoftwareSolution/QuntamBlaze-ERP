@@ -5,23 +5,23 @@ import { motion } from "framer-motion";
 
 export function QuickActionBar() {
   const ACTIONS = [
-    { 
-      label: "New Quotation (QTO)", 
-      icon: FilePlus, 
-      nextId: "QTO-2605-012", 
-      color: "hover:border-accent/40 hover:bg-accent/5 hover:text-accent" 
+    {
+      label: "New Quotation (QTO)",
+      icon: FilePlus,
+      nextId: "QTO-2605-012",
+      color: "hover:border-accent/40 hover:bg-accent/5 hover:text-accent",
     },
-    { 
-      label: "Generate Invoice (INV)", 
-      icon: Receipt, 
-      nextId: "INV-2605-0043", 
-      color: "hover:border-accent/40 hover:bg-accent/5 hover:text-accent" 
+    {
+      label: "Generate Invoice (INV)",
+      icon: Receipt,
+      nextId: "INV-2605-0043",
+      color: "hover:border-accent/40 hover:bg-accent/5 hover:text-accent",
     },
-    { 
-      label: "Log Receipt (RCT)", 
-      icon: DollarSign, 
-      nextId: "RCT-2605-088", 
-      color: "hover:border-accent/40 hover:bg-accent/5 hover:text-accent" 
+    {
+      label: "Log Receipt (RCT)",
+      icon: DollarSign,
+      nextId: "RCT-2605-088",
+      color: "hover:border-accent/40 hover:bg-accent/5 hover:text-accent",
     },
   ];
 

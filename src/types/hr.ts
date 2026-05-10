@@ -1,31 +1,31 @@
-export type Department = 
-  | "Engineering" 
-  | "Finance" 
-  | "Design" 
-  | "Marketing" 
-  | "Operations" 
-  | "HR" 
+export type Department =
+  | "Engineering"
+  | "Finance"
+  | "Design"
+  | "Marketing"
+  | "Operations"
+  | "HR"
   | "Sales";
 
 export type EmploymentStatus = "Active" | "Probation" | "Notice" | "Terminated" | "Contract";
 
-export type LeaveType = 
-  | "Annual" 
-  | "Sick" 
-  | "Casual" 
-  | "Maternity" 
-  | "Paternity" 
-  | "Unpaid" 
+export type LeaveType =
+  | "Annual"
+  | "Sick"
+  | "Casual"
+  | "Maternity"
+  | "Paternity"
+  | "Unpaid"
   | "Lieu";
 
-export type PipelineStage = 
-  | "Applied" 
-  | "Screening" 
-  | "Technical" 
-  | "Final" 
-  | "Offer" 
+export type PipelineStage =
+  | "Applied"
+  | "Screening"
+  | "Technical"
+  | "Final"
+  | "Offer"
   | "Hired"
-  | "Rejected" 
+  | "Rejected"
   | "Withdrawn";
 
 export type SeniorityLevel = "Junior" | "Mid" | "Senior" | "Lead" | "Director";
@@ -86,7 +86,7 @@ export interface Employee {
     accountNumber: string;
     branch: string;
   };
-  reportingTo?: { id: string, name: string };
+  reportingTo?: { id: string; name: string };
   profileHealth?: number;
   assets?: string[];
   birthDate?: string;
@@ -104,7 +104,13 @@ export interface HRStat {
 
 export interface HRActivity {
   id: string;
-  type: "New Hire" | "Promotion" | "Leave Approved" | "Interview Scheduled" | "Payslip Generated" | "Resignation Submitted";
+  type:
+    | "New Hire"
+    | "Promotion"
+    | "Leave Approved"
+    | "Interview Scheduled"
+    | "Payslip Generated"
+    | "Resignation Submitted";
   description: string;
   timestamp: string;
   entities: string[]; // IDs like EMP-ID, LEV-ID

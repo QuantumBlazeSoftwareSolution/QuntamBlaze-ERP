@@ -10,7 +10,7 @@ export const leads = pgTable("leads", {
   source: varchar("source", { length: 100 }),
   status: varchar("status", { length: 50 }).default("New").notNull(),
   score: integer("score").default(0),
-  estimatedValue: numeric("estimated_value", { precision: 12, scale: 2 }).default('0'),
+  estimatedValue: numeric("estimated_value", { precision: 12, scale: 2 }).default("0"),
   industry: varchar("industry", { length: 255 }),
   notes: text("notes"),
   assignedTo: varchar("assigned_to", { length: 255 }).references(() => users.id),

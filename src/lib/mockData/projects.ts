@@ -5,10 +5,10 @@ export interface Project {
   name: string;
   clientId: string;
   clientName: string;
-  startDate: string;   // ISO date string
-  deadline: string;    // ISO date string
-  progress: number;    // 0-100
-  budget: number;      // in USD
+  startDate: string; // ISO date string
+  deadline: string; // ISO date string
+  progress: number; // 0-100
+  budget: number; // in USD
   status: ProjectStatus;
 }
 

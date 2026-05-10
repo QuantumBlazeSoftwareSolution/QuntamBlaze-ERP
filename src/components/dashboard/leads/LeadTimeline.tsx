@@ -33,9 +33,7 @@ export function LeadTimeline({ events }: { events: LeadTimelineEvent[] }) {
 
             <div className="bg-bg-card border border-border rounded-xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
               <div className="flex justify-between items-start mb-2">
-                <h4 className="text-[14px] font-semibold text-text-primary">
-                  {event.title}
-                </h4>
+                <h4 className="text-[14px] font-semibold text-text-primary">{event.title}</h4>
                 <span className="text-[11px] font-medium text-text-muted uppercase">
                   {format(new Date(event.timestamp), "HH:mm - eeee")}
                 </span>

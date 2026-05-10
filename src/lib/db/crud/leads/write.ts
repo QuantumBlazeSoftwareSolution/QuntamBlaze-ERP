@@ -11,10 +11,7 @@ export async function createLead(data: z.infer<typeof insertLeadSchema>) {
   try {
     const parsedData = insertLeadSchema.parse(data);
 
-    const [newLead] = await db
-      .insert(leads)
-      .values(parsedData)
-      .returning();
+    const [newLead] = await db.insert(leads).values(parsedData).returning();
 
     return { success: true, data: newLead };
   } catch (error) {

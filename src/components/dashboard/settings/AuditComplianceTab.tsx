@@ -13,7 +13,9 @@ export function AuditComplianceTab() {
             </div>
             <div>
               <h3 className="text-xl font-bold text-text-primary">System Integrity Protocols</h3>
-              <p className="text-[13px] text-text-muted">Configure how the system audits user activity and retains history.</p>
+              <p className="text-[13px] text-text-muted">
+                Configure how the system audits user activity and retains history.
+              </p>
             </div>
           </div>
           <button className="flex items-center gap-2 px-5 py-2 bg-accent text-white font-bold rounded-lg text-[12px] shadow-sm">
@@ -27,7 +29,9 @@ export function AuditComplianceTab() {
             <div className="flex items-center justify-between p-4 bg-page-bg border border-divider rounded-xl">
               <div className="space-y-0.5">
                 <p className="text-[13px] font-bold text-text-primary">Enforce Audit Trail</p>
-                <p className="text-[11px] text-text-muted">Mandatory logging for all record changes.</p>
+                <p className="text-[11px] text-text-muted">
+                  Mandatory logging for all record changes.
+                </p>
               </div>
               <div className="w-10 h-5 bg-accent rounded-full relative cursor-pointer shrink-0">
                 <div className="absolute right-1 top-1 w-3 h-3 bg-white rounded-full shadow-sm" />
@@ -38,7 +42,9 @@ export function AuditComplianceTab() {
             <div className="flex items-center justify-between p-4 bg-page-bg border border-divider rounded-xl">
               <div className="space-y-0.5">
                 <p className="text-[13px] font-bold text-text-primary">Multi-factor (MFA)</p>
-                <p className="text-[11px] text-text-muted">Require 2FA for all Administrative roles.</p>
+                <p className="text-[11px] text-text-muted">
+                  Require 2FA for all Administrative roles.
+                </p>
               </div>
               <div className="w-10 h-5 bg-border rounded-full relative cursor-pointer shrink-0">
                 <div className="absolute left-1 top-1 w-3 h-3 bg-white rounded-full shadow-sm" />

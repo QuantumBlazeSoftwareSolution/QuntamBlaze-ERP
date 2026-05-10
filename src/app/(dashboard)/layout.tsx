@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React from "react";
 
 /**
  * Placeholder Sidebar for Task 4
@@ -16,8 +16,11 @@ const SidebarPlaceholder = () => {
         <div className="h-10 bg-sidebar-item-active border-l-2 border-accent rounded-r-lg flex items-center px-4 text-white text-sm font-medium">
           Dashboard
         </div>
-        {["Projects", "Tasks", "Finance", "Documents"].map(item => (
-          <div key={item} className="h-10 flex items-center px-4 text-sidebar-text text-sm hover:text-white transition-colors cursor-pointer">
+        {["Projects", "Tasks", "Finance", "Documents"].map((item) => (
+          <div
+            key={item}
+            className="h-10 flex items-center px-4 text-sidebar-text text-sm hover:text-white transition-colors cursor-pointer"
+          >
             {item}
           </div>
         ))}
@@ -30,9 +33,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex min-h-screen bg-page-bg">
       <SidebarPlaceholder />
-      <div className="flex-1 flex flex-col min-w-0">
-        {children}
-      </div>
+      <div className="flex-1 flex flex-col min-w-0">{children}</div>
     </div>
   );
 }

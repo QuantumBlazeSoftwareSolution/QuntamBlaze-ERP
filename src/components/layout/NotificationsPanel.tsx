@@ -16,8 +16,7 @@ const FILTER_TABS: { id: FilterTab; label: string; icon: typeof Bell }[] = [
 ];
 
 export function NotificationsPanel() {
-  const { isPanelOpen, closePanel, notifications, markAllRead } =
-    useNotificationsStore();
+  const { isPanelOpen, closePanel, notifications, markAllRead } = useNotificationsStore();
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
 
   const filtered = notifications.filter((n) => {

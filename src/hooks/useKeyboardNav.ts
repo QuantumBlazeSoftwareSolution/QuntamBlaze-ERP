@@ -16,18 +16,13 @@ function reducer(state: State, action: Action): State {
     case "ARROW_DOWN":
       return {
         ...state,
-        selectedIndex:
-          state.itemCount > 0
-            ? (state.selectedIndex + 1) % state.itemCount
-            : -1,
+        selectedIndex: state.itemCount > 0 ? (state.selectedIndex + 1) % state.itemCount : -1,
       };
     case "ARROW_UP":
       return {
         ...state,
         selectedIndex:
-          state.itemCount > 0
-            ? (state.selectedIndex - 1 + state.itemCount) % state.itemCount
-            : -1,
+          state.itemCount > 0 ? (state.selectedIndex - 1 + state.itemCount) % state.itemCount : -1,
       };
     case "RESET":
       return { ...state, selectedIndex: -1 };
@@ -42,10 +37,7 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-export function useKeyboardNav(
-  itemCount: number,
-  onEnter?: (index: number) => void
-) {
+export function useKeyboardNav(itemCount: number, onEnter?: (index: number) => void) {
   const [state, dispatch] = useReducer(reducer, {
     selectedIndex: -1,
     itemCount,

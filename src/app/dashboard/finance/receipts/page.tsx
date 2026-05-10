@@ -17,7 +17,7 @@ export default function ReceiptsPage() {
   const handleLogReceipt = (data: any) => {
     // Generate actual receipt object
     const newReceipt: Receipt = {
-      id: `RCT-2410-${(receipts.length + 90).toString().padStart(3, '0')}`,
+      id: `RCT-2410-${(receipts.length + 90).toString().padStart(3, "0")}`,
       invoiceId: data.invoiceId,
       clientId: "CLI-NEW",
       clientName: "New Client",
@@ -38,13 +38,17 @@ export default function ReceiptsPage() {
     <div className="space-y-8 pb-12">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           className="space-y-1"
         >
-          <h1 className="text-3xl font-bold text-text-primary tracking-tight">Receipt & Payment Log</h1>
-          <p className="text-text-secondary text-lg">Monitor and log all incoming financial transactions.</p>
+          <h1 className="text-3xl font-bold text-text-primary tracking-tight">
+            Receipt & Payment Log
+          </h1>
+          <p className="text-text-secondary text-lg">
+            Monitor and log all incoming financial transactions.
+          </p>
         </motion.div>
 
         <motion.button
@@ -66,11 +70,16 @@ export default function ReceiptsPage() {
           className="bg-bg-card border border-border rounded-2xl p-8 space-y-6 relative overflow-hidden group"
         >
           <div className="space-y-2 relative z-10">
-            <p className="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em]">Total Collected This Month</p>
+            <p className="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em]">
+              Total Collected This Month
+            </p>
             <div className="flex items-baseline gap-2">
               <span className="text-sm font-bold text-text-muted">$</span>
               <h2 className="text-4xl font-black text-success tracking-tighter">
-                {totalCollected.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {totalCollected.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </h2>
             </div>
             <div className="flex items-center gap-2 text-success pt-2">
@@ -83,7 +92,7 @@ export default function ReceiptsPage() {
         </motion.div>
 
         {/* Filters */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           className="lg:col-span-2"
@@ -102,10 +111,10 @@ export default function ReceiptsPage() {
       </motion.div>
 
       {/* Modal */}
-      <LogReceiptModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onLog={handleLogReceipt} 
+      <LogReceiptModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onLog={handleLogReceipt}
       />
     </div>
   );

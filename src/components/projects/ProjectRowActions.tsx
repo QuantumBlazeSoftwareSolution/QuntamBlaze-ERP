@@ -51,7 +51,10 @@ export function ProjectRowActions({ projectId }: ProjectRowActionsProps) {
             {actions.map((action) => (
               <button
                 key={action.label}
-                onClick={() => { action.onClick(); setOpen(false); }}
+                onClick={() => {
+                  action.onClick();
+                  setOpen(false);
+                }}
                 className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-card transition-colors"
               >
                 <action.icon className="w-3.5 h-3.5" />

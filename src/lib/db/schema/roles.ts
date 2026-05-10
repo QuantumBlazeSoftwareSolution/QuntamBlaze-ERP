@@ -6,8 +6,8 @@ export const roles = pgTable("roles", {
   description: text("description"),
   color: varchar("color", { length: 50 }).default("#10B981"),
   isSystem: boolean("is_system").default(false).notNull(),
-  permissions: jsonb("permissions").default('{}').notNull(),
-  
+  permissions: jsonb("permissions").default("{}").notNull(),
+
   // Luxury standards
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

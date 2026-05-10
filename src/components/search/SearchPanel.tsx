@@ -48,7 +48,7 @@ export function SearchPanel({ onClose }: SearchPanelProps) {
   let currentIndex = 0;
   const groupIndices: Record<string, number> = {};
   const order: EntityType[] = ["PROJECTS", "CLIENTS", "INVOICES", "TASKS", "LEADS"];
-  
+
   order.forEach((type) => {
     groupIndices[type] = currentIndex;
     if (groupedResults[type]) {
@@ -77,7 +77,9 @@ export function SearchPanel({ onClose }: SearchPanelProps) {
           className="flex-1 bg-transparent border-none text-[18px] text-text-primary placeholder:text-[#3A3A3A] focus:outline-none focus:ring-0"
         />
         <div className="flex items-center gap-1 ml-4 opacity-50">
-          <kbd className="px-1.5 py-1 bg-bg-card rounded text-[10px] font-mono border border-border">Esc</kbd>
+          <kbd className="px-1.5 py-1 bg-bg-card rounded text-[10px] font-mono border border-border">
+            Esc
+          </kbd>
         </div>
       </div>
 

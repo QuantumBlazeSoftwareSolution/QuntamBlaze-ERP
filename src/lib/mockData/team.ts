@@ -5,7 +5,8 @@ export const MOCK_TEAM: TeamMember[] = [
     id: "USR-JK-26-001",
     name: "J. Kaelen",
     email: "jkaelen@qblaze.io",
-    avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100&auto=format&fit=crop",
+    avatar:
+      "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100&auto=format&fit=crop",
     role: "Admin",
     activeProjects: ["PRJ-GOOG-26-001", "PRJ-AMZN-26-003"],
     lastActive: "2023.10.24 14:32Z",
@@ -28,5 +29,5 @@ export const MOCK_TEAM: TeamMember[] = [
     activeProjects: ["PRJ-META-26-012"],
     lastActive: "1 hour ago",
     status: "Active",
-  }
+  },
 ];

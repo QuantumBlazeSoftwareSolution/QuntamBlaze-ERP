@@ -10,41 +10,46 @@ import { cn } from "@/lib/utils";
 export function SidebarNavItem({ item }: { item: NavItem }) {
   const pathname = usePathname();
   const { isCollapsed } = useSidebarStore();
-  
-  const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+
+  const isActive =
+    pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
   const Icon = item.icon;
 
   return (
     <Link href={item.href} className="block relative group">
-      <div className={cn(
-        "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 relative",
-        isActive 
-          ? "bg-sidebar-item-active text-sidebar-text-active" 
-          : "text-sidebar-text hover:text-white hover:bg-white/[0.03]"
-      )}>
+      <div
+        className={cn(
+          "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 relative",
+          isActive
+            ? "bg-sidebar-item-active text-sidebar-text-active"
+            : "text-sidebar-text hover:text-white hover:bg-white/[0.03]"
+        )}
+      >
         {/* Active Indicator */}
         {isActive && (
-          <motion.div 
+          <motion.div
             layoutId="active-nav"
             className="absolute left-0 top-2 bottom-2 w-0.5 bg-sidebar-accent rounded-full"
           />
         )}
 
         <Icon className={cn("w-[18px] h-[18px] shrink-0", isActive && "text-sidebar-accent")} />
-        
+
         {!isCollapsed && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             className="flex-1 flex items-center justify-between overflow-hidden"
           >
             <span className="text-[13px] font-medium whitespace-nowrap">{item.label}</span>
             {item.badge && (
-              <span className={cn(
-                "px-1.5 py-0.5 rounded-full text-[10px] font-bold min-w-[18px] text-center",
-                item.badge.color,
-                item.badge.textColor
-              )}>
+              <span
+                className={cn(
+                  "px-1.5 py-0.5 rounded-full text-[10px] font-bold min-w-[18px] text-center",
+                  item.badge.color,
+                  item.badge.textColor
+                )}
+              >
                 {item.badge.count}
               </span>
             )}

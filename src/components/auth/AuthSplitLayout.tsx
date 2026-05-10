@@ -1,6 +1,6 @@
-import React from 'react';
-import { QBLogoMark } from './QBLogoMark';
-import { CheckCircle2 } from 'lucide-react';
+import React from "react";
+import { QBLogoMark } from "./QBLogoMark";
+import { CheckCircle2 } from "lucide-react";
 
 interface AuthSplitLayoutProps {
   children: React.ReactNode;
@@ -9,20 +9,25 @@ interface AuthSplitLayoutProps {
   leftContent?: React.ReactNode;
 }
 
-export const AuthSplitLayout = ({ children, title, subtitle, leftContent }: AuthSplitLayoutProps) => {
+export const AuthSplitLayout = ({
+  children,
+  title,
+  subtitle,
+  leftContent,
+}: AuthSplitLayoutProps) => {
   return (
     <div className="flex h-screen w-full overflow-hidden bg-surface-white">
       {/* Left Panel (Dark) */}
       <div className="hidden lg:flex w-1/2 bg-sidebar-bg relative flex-col justify-between p-12 overflow-hidden">
         {/* Subtle diagonal geometric pattern overlay */}
-        <div 
+        <div
           className="absolute inset-0 opacity-5 pointer-events-none"
           style={{
             backgroundImage: `repeating-linear-gradient(45deg, #ffffff 0, #ffffff 1px, transparent 0, transparent 50%)`,
-            backgroundSize: '20px 20px'
+            backgroundSize: "20px 20px",
           }}
         />
-        
+
         <div className="relative z-10">
           <QBLogoMark />
         </div>
@@ -33,12 +38,12 @@ export const AuthSplitLayout = ({ children, title, subtitle, leftContent }: Auth
               <h1 className="text-white text-4xl lg:text-5xl font-bold leading-tight mb-8">
                 The Intelligence Layer for Your Business
               </h1>
-              
+
               <ul className="space-y-4">
                 {[
                   "Unified ERP workflows and automation",
                   "Real-time analytics and reporting",
-                  "Enterprise-grade security and compliance"
+                  "Enterprise-grade security and compliance",
                 ].map((feature, i) => (
                   <li key={i} className="flex items-center gap-3 text-sidebar-text text-sm">
                     <CheckCircle2 className="w-5 h-5 text-accent shrink-0" />

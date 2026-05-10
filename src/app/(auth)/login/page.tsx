@@ -9,10 +9,7 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <AuthSplitLayout 
-      title="Welcome back" 
-      subtitle="Sign in to your account to continue"
-    >
+    <AuthSplitLayout title="Welcome back" subtitle="Sign in to your account to continue">
       <LoginForm />
     </AuthSplitLayout>
   );

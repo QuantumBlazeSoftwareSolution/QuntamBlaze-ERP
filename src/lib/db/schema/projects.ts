@@ -8,7 +8,7 @@ export const projects = pgTable("projects", {
   startDate: timestamp("start_date"),
   deadline: timestamp("deadline"),
   progress: integer("progress").default(0),
-  budget: numeric("budget", { precision: 12, scale: 2 }).default('0'),
+  budget: numeric("budget", { precision: 12, scale: 2 }).default("0"),
   status: varchar("status", { length: 50 }).default("Draft").notNull(),
 
   // Luxury standards

@@ -9,7 +9,7 @@ export const clients = pgTable("clients", {
   contactPerson: varchar("contact_person", { length: 255 }),
   contactEmail: varchar("contact_email", { length: 255 }),
   contactPhone: varchar("contact_phone", { length: 100 }),
-  totalBilled: numeric("total_billed", { precision: 12, scale: 2 }).default('0'),
+  totalBilled: numeric("total_billed", { precision: 12, scale: 2 }).default("0"),
   status: varchar("status", { length: 50 }).default("Active").notNull(),
   joinedAt: timestamp("joined_at").defaultNow().notNull(),
 

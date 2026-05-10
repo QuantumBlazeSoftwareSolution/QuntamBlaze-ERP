@@ -9,7 +9,12 @@ interface SearchResultItemProps {
   onClick: () => void;
 }
 
-export function SearchResultItem({ entity, isSelected, onMouseEnter, onClick }: SearchResultItemProps) {
+export function SearchResultItem({
+  entity,
+  isSelected,
+  onMouseEnter,
+  onClick,
+}: SearchResultItemProps) {
   return (
     <div
       onMouseEnter={onMouseEnter}

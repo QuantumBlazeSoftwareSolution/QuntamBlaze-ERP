@@ -1,7 +1,17 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type EntityType = "CLI" | "PRJ" | "PRO" | "INV" | "TSK" | "LED" | "QTO" | "RCT" | "AGR" | "SRS";
+export type EntityType =
+  | "CLI"
+  | "PRJ"
+  | "PRO"
+  | "INV"
+  | "TSK"
+  | "LED"
+  | "QTO"
+  | "RCT"
+  | "AGR"
+  | "SRS";
 
 export interface IDEntityConfig {
   type: EntityType;
@@ -33,18 +43,20 @@ export const useIDConfigStore = create<IDConfigState>()(
   persist(
     (set) => ({
       configs: INITIAL_CONFIGS,
-      updateSequence: (type, sequence) => set((state) => ({
-        configs: {
-          ...state.configs,
-          [type]: { ...state.configs[type], sequence }
-        }
-      })),
-      resetSequence: (type) => set((state) => ({
-        configs: {
-          ...state.configs,
-          [type]: { ...state.configs[type], sequence: 1 }
-        }
-      })),
+      updateSequence: (type, sequence) =>
+        set((state) => ({
+          configs: {
+            ...state.configs,
+            [type]: { ...state.configs[type], sequence },
+          },
+        })),
+      resetSequence: (type) =>
+        set((state) => ({
+          configs: {
+            ...state.configs,
+            [type]: { ...state.configs[type], sequence: 1 },
+          },
+        })),
     }),
     {
       name: "quantum-blaze-id-config",

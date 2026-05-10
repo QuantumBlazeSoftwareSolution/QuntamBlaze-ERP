@@ -5,7 +5,7 @@ interface AuditState {
   isOpen: boolean;
   entries: AuditEntry[];
   entityId: string | null;
-  
+
   openAuditLog: (entityId?: string) => void;
   closeAuditLog: () => void;
   setEntries: (entries: AuditEntry[]) => void;

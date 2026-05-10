@@ -17,12 +17,14 @@ export function DocumentsTab({ client }: { client: ClientDetail }) {
     <div className="space-y-6">
       <div className="flex items-center gap-3 mb-8">
         <FileText className="w-5 h-5 text-accent" />
-        <h2 className="text-[11px] font-bold text-text-secondary uppercase tracking-[0.2em]">Compliance & Documents</h2>
+        <h2 className="text-[11px] font-bold text-text-secondary uppercase tracking-[0.2em]">
+          Compliance & Documents
+        </h2>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
         {client.documents.map((doc) => (
-          <div 
+          <div
             key={doc.id}
             className="group bg-bg-card/50 border border-border rounded-2xl p-6 flex items-center justify-between hover:bg-bg-card hover:border-accent/30 transition-all cursor-pointer"
           >
@@ -32,11 +34,18 @@ export function DocumentsTab({ client }: { client: ClientDetail }) {
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-3">
-                  <h3 className="text-[16px] font-bold text-text-primary group-hover:text-accent transition-colors">{doc.name}</h3>
-                  <span className="px-2 py-0.5 rounded bg-accent/5 border border-accent/20 text-[10px] font-bold text-accent uppercase">{doc.version}</span>
+                  <h3 className="text-[16px] font-bold text-text-primary group-hover:text-accent transition-colors">
+                    {doc.name}
+                  </h3>
+                  <span className="px-2 py-0.5 rounded bg-accent/5 border border-accent/20 text-[10px] font-bold text-accent uppercase">
+                    {doc.version}
+                  </span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <IDChip id={doc.id} className="bg-transparent border-none p-0 text-text-muted hover:text-text-secondary" />
+                  <IDChip
+                    id={doc.id}
+                    className="bg-transparent border-none p-0 text-text-muted hover:text-text-secondary"
+                  />
                   <div className="flex items-center gap-1.5 text-text-muted text-[12px]">
                     <Clock className="w-3.5 h-3.5" />
                     <span>Updated {format(new Date(doc.lastModified), "MMM dd, yyyy")}</span>

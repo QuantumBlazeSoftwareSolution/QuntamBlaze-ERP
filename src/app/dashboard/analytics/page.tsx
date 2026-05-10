@@ -1,14 +1,7 @@
 "use client";
 
 import { motion, Variants } from "framer-motion";
-import {
-  TrendingUp,
-  Users,
-  Clock,
-  DollarSign,
-  BarChart2,
-  Percent,
-} from "lucide-react";
+import { TrendingUp, Users, Clock, DollarSign, BarChart2, Percent } from "lucide-react";
 import { RevenueAreaChart } from "@/components/dashboard/analytics/RevenueAreaChart";
 import { TopClientsBar } from "@/components/dashboard/analytics/TopClientsBar";
 import { ProjectStatusDonut } from "@/components/dashboard/ProjectStatusDonut";
@@ -182,9 +175,7 @@ export default function AnalyticsPage() {
         {/* Budget Utilization Summary Card */}
         <div className="bg-white border border-border rounded-2xl p-6 shadow-sm flex flex-col">
           <h3 className="text-sm font-bold text-text-primary mb-1">Budget Health</h3>
-          <p className="text-[12px] text-text-muted mb-6">
-            Utilization across all active projects
-          </p>
+          <p className="text-[12px] text-text-muted mb-6">Utilization across all active projects</p>
           <div className="flex-1 flex flex-col justify-center space-y-5">
             {[
               { label: "Alpha Core Migration", burn: 78, color: "bg-accent" },
@@ -203,8 +194,8 @@ export default function AnalyticsPage() {
                       p.burn >= 90
                         ? "text-warning"
                         : p.burn >= 75
-                        ? "text-accent"
-                        : "text-text-primary"
+                          ? "text-accent"
+                          : "text-text-primary"
                     }`}
                   >
                     {p.burn}%

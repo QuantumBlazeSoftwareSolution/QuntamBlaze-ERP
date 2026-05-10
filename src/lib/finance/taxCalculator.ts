@@ -30,14 +30,14 @@ export function calculateTaxGroups(lineItems: LineItem[]): Record<number, TaxGro
 }
 
 export function calculateTotals(lineItems: LineItem[]) {
-  const subtotal = lineItems.reduce((acc, item) => acc + (item.qty * item.rate), 0);
+  const subtotal = lineItems.reduce((acc, item) => acc + item.qty * item.rate, 0);
   const taxGroups = calculateTaxGroups(lineItems);
   const totalTax = Object.values(taxGroups).reduce((acc, group) => acc + group.taxAmount, 0);
-  
+
   return {
     subtotal,
     totalTax,
     totalDue: subtotal + totalTax,
-    taxGroups
+    taxGroups,
   };
 }

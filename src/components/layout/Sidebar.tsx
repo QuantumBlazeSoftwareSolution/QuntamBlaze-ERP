@@ -1,14 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { 
-  PanelLeftClose, 
-  PanelLeftOpen, 
-  Settings, 
-  Bell, 
-  LogOut,
-  ChevronRight
-} from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen, Settings, Bell, LogOut, ChevronRight } from "lucide-react";
 import { SidebarNavItem } from "./SidebarNavItem";
 import { NAV_CONFIG } from "@/lib/navigation/navConfig";
 import { useSidebarStore } from "@/store/sidebarStore";
@@ -31,13 +24,13 @@ export function Sidebar() {
           <div className="w-4 h-4 bg-accent rounded-sm rotate-45" />
         </div>
         {!isCollapsed && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex flex-col"
-          >
-            <span className="text-lg font-black text-text-primary tracking-tighter leading-none">Quantum Blaze</span>
-            <span className="text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] mt-0.5">Ops Control v4.2</span>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col">
+            <span className="text-lg font-black text-text-primary tracking-tighter leading-none">
+              Quantum Blaze
+            </span>
+            <span className="text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] mt-0.5">
+              Ops Control v4.2
+            </span>
           </motion.div>
         )}
       </div>
@@ -67,35 +60,41 @@ export function Sidebar() {
       {/* Footer Actions */}
       <div className="p-3 border-t border-sidebar-border space-y-2">
         <Link href="/dashboard/settings" className="block">
-           <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:text-white hover:bg-white/[0.03] transition-all">
-              <Settings className="w-[18px] h-[18px] shrink-0" />
-              {!isCollapsed && <span className="text-[13px] font-medium">System Settings</span>}
-           </div>
+          <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:text-white hover:bg-white/[0.03] transition-all">
+            <Settings className="w-[18px] h-[18px] shrink-0" />
+            {!isCollapsed && <span className="text-[13px] font-medium">System Settings</span>}
+          </div>
         </Link>
 
         {/* User Profile / Collapse Toggle */}
-        <div className={cn(
-          "bg-white/[0.03] border border-white/5 rounded-xl transition-all",
-          isCollapsed ? "p-2" : "p-3"
-        )}>
-           <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-accent/20 border border-accent/30 flex items-center justify-center text-[10px] font-bold text-accent shrink-0 relative">
-                 AM
-                 <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-accent border-2 border-sidebar-bg rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+        <div
+          className={cn(
+            "bg-white/[0.03] border border-white/5 rounded-xl transition-all",
+            isCollapsed ? "p-2" : "p-3"
+          )}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-accent/20 border border-accent/30 flex items-center justify-center text-[10px] font-bold text-accent shrink-0 relative">
+              AM
+              <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-accent border-2 border-sidebar-bg rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+            </div>
+            {!isCollapsed && (
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-bold text-text-primary truncate">A. Mercer</p>
+                <p className="text-[10px] text-accent font-bold uppercase tracking-widest">Cmdr</p>
               </div>
-              {!isCollapsed && (
-                <div className="flex-1 min-w-0">
-                   <p className="text-[13px] font-bold text-text-primary truncate">A. Mercer</p>
-                   <p className="text-[10px] text-accent font-bold uppercase tracking-widest">Cmdr</p>
-                </div>
+            )}
+            <button
+              onClick={toggleCollapse}
+              className="p-1.5 text-[#3A3A3A] hover:text-text-primary transition-colors"
+            >
+              {isCollapsed ? (
+                <PanelLeftOpen className="w-4 h-4" />
+              ) : (
+                <PanelLeftClose className="w-4 h-4" />
               )}
-              <button 
-                onClick={toggleCollapse}
-                className="p-1.5 text-[#3A3A3A] hover:text-text-primary transition-colors"
-              >
-                {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
-              </button>
-           </div>
+            </button>
+          </div>
         </div>
       </div>
     </motion.aside>

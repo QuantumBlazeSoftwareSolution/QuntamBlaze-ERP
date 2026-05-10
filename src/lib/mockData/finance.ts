@@ -98,7 +98,9 @@ export const MOCK_INVOICES: Invoice[] = [
     id: `INV-2405-00${i + 6}`,
     projectId: `PRJ-${["X992", "V221", "M100", "Z774", "L882"][i % 5]}`,
     clientId: `CLI-${["A10", "B44", "C01", "D22", "E99"][i % 5]}`,
-    clientName: ["Alphabet Inc.", "Lockheed Martin", "Goldman Sachs", "Meta Platforms", "SpaceX"][i % 5],
+    clientName: ["Alphabet Inc.", "Lockheed Martin", "Goldman Sachs", "Meta Platforms", "SpaceX"][
+      i % 5
+    ],
     issueDate: "2024-05-18",
     dueDate: "2024-06-18",
     amount: 15000 * (i + 1),

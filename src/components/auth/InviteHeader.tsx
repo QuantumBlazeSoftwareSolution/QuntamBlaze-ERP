@@ -10,9 +10,7 @@ export function InviteHeader({ email }: InviteHeaderProps) {
       <div className="w-16 h-16 rounded-xl bg-bg-surface flex items-center justify-center border-t border-l border-border shadow-[inset_1px_1px_0_rgba(255,255,255,0.05)] mb-4">
         <span className="text-2xl font-bold text-accent tracking-tighter">QB</span>
       </div>
-      <h1 className="text-2xl font-medium text-text-primary tracking-tight">
-        Account Setup
-      </h1>
+      <h1 className="text-2xl font-medium text-text-primary tracking-tight">Account Setup</h1>
       <p className="text-sm text-text-secondary mt-2 mb-6">
         You&apos;ve been invited to Quantum Blaze
       </p>

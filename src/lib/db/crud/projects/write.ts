@@ -13,10 +13,7 @@ export async function createProject(data: z.infer<typeof insertProjectSchema>) {
     // Validate payload
     const parsedData = insertProjectSchema.parse(data);
 
-    const [newProject] = await db
-      .insert(projects)
-      .values(parsedData)
-      .returning();
+    const [newProject] = await db.insert(projects).values(parsedData).returning();
 
     return { success: true, data: newProject };
   } catch (error) {

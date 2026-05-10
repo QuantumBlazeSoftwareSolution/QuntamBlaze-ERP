@@ -23,7 +23,15 @@ const colorMap: Record<string, string> = {
   red: "text-red-600 bg-red-50",
 };
 
-export function HRStatTile({ label, value, trend, trendType, icon, colorFamily, index }: HRStatTileProps) {
+export function HRStatTile({
+  label,
+  value,
+  trend,
+  trendType,
+  icon,
+  colorFamily,
+  index,
+}: HRStatTileProps) {
   const Icon = (LucideIcons as any)[icon];
 
   return (
@@ -33,10 +41,15 @@ export function HRStatTile({ label, value, trend, trendType, icon, colorFamily, 
       transition={{ delay: index * 0.06 }}
       className="bg-white border border-[#E2E8F0] rounded-xl p-5 hover:shadow-md transition-shadow"
     >
-      <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", colorMap[colorFamily] || "text-gray-600 bg-gray-50")}>
+      <div
+        className={cn(
+          "w-10 h-10 rounded-xl flex items-center justify-center",
+          colorMap[colorFamily] || "text-gray-600 bg-gray-50"
+        )}
+      >
         {Icon && <Icon className="w-5 h-5" />}
       </div>
-      
+
       <div className="mt-3">
         <h3 className="text-[#0F172A] text-2xl font-bold">{value}</h3>
         <p className="text-[#475569] text-sm mt-1">{label}</p>
@@ -49,10 +62,12 @@ export function HRStatTile({ label, value, trend, trendType, icon, colorFamily, 
           ) : (
             <LucideIcons.TrendingDown className="w-3.5 h-3.5 text-[#EF4444]" />
           )}
-          <span className={cn(
-            "text-xs font-medium",
-            trendType === "up" ? "text-[#10B981]" : "text-[#EF4444]"
-          )}>
+          <span
+            className={cn(
+              "text-xs font-medium",
+              trendType === "up" ? "text-[#10B981]" : "text-[#EF4444]"
+            )}
+          >
             {trend}
           </span>
         </div>

@@ -1,45 +1,45 @@
 "use client";
 
-import React from 'react';
-import { motion, Variants } from 'framer-motion';
-import { TopBar } from '@/components/dashboard/TopBar';
-import { StatTile } from '@/components/dashboard/StatTile';
-import { ProjectHealthCard } from '@/components/dashboard/ProjectHealthCard';
-import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
-import { ProjectStatusDonut } from '@/components/dashboard/ProjectStatusDonut';
-import { 
-  statsData, 
-  projectHealthData, 
-  activityFeedData, 
-  statusDistribution 
-} from '@/lib/mockData/dashboard';
+import React from "react";
+import { motion, Variants } from "framer-motion";
+import { TopBar } from "@/components/dashboard/TopBar";
+import { StatTile } from "@/components/dashboard/StatTile";
+import { ProjectHealthCard } from "@/components/dashboard/ProjectHealthCard";
+import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
+import { ProjectStatusDonut } from "@/components/dashboard/ProjectStatusDonut";
+import {
+  statsData,
+  projectHealthData,
+  activityFeedData,
+  statusDistribution,
+} from "@/lib/mockData/dashboard";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.07
-    }
-  }
+      staggerChildren: 0.07,
+    },
+  },
 };
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 12 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: "easeOut" }
-  }
+    transition: { duration: 0.4, ease: "easeOut" },
+  },
 };
 
 export default function DashboardPage() {
   return (
     <div className="flex-1 overflow-auto">
       <TopBar title="Overview" />
-      
+
       <main className="p-8">
-        <motion.div 
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"

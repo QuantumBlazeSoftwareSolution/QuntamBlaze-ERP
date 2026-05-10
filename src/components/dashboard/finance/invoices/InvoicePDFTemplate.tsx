@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     borderColor: "#050505",
     fontSize: 14,
     fontWeight: "bold",
-  }
+  },
 });
 
 export const InvoicePDFTemplate = ({ data }: { data: InvoiceFormData }) => {
@@ -114,7 +114,9 @@ export const InvoicePDFTemplate = ({ data }: { data: InvoiceFormData }) => {
             <Text style={styles.infoLabel}>Billed To</Text>
             <Text style={styles.infoValue}>{data.clientName}</Text>
             <Text style={{ fontSize: 9, color: "#3A3A3A", marginTop: 2 }}>{data.clientId}</Text>
-            <Text style={{ fontSize: 9, color: "#3A3A3A", marginTop: 2 }}>{data.billingAddress}</Text>
+            <Text style={{ fontSize: 9, color: "#3A3A3A", marginTop: 2 }}>
+              {data.billingAddress}
+            </Text>
           </View>
           <View style={{ textAlign: "right" }}>
             <View style={{ marginBottom: 10 }}>
@@ -172,12 +174,8 @@ export const InvoicePDFTemplate = ({ data }: { data: InvoiceFormData }) => {
           <Text style={{ fontSize: 9, color: "#3A3A3A" }}>
             Account Name: Quantum Blaze Solutions
           </Text>
-          <Text style={{ fontSize: 9, color: "#3A3A3A" }}>
-            IBAN: AE02 4000 0000 1234 5678 901
-          </Text>
-          <Text style={{ fontSize: 9, color: "#3A3A3A" }}>
-            Swift: QBZAAEAD
-          </Text>
+          <Text style={{ fontSize: 9, color: "#3A3A3A" }}>IBAN: AE02 4000 0000 1234 5678 901</Text>
+          <Text style={{ fontSize: 9, color: "#3A3A3A" }}>Swift: QBZAAEAD</Text>
         </View>
       </Page>
     </Document>

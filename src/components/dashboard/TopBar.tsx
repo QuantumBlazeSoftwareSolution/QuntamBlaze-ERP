@@ -1,7 +1,7 @@
 "use client";
 
-import React from 'react';
-import { Search, Bell, User } from 'lucide-react';
+import React from "react";
+import { Search, Bell, User } from "lucide-react";
 
 export const TopBar = ({ title }: { title: string }) => {
   return (
@@ -12,8 +12,8 @@ export const TopBar = ({ title }: { title: string }) => {
         {/* Search Bar */}
         <div className="relative group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted group-focus-within:text-accent transition-colors" />
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Search ID or name... (⌘K)"
             className="h-9 w-64 pl-10 pr-4 bg-white border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
           />
@@ -25,13 +25,15 @@ export const TopBar = ({ title }: { title: string }) => {
             <Bell className="w-5 h-5" />
             <span className="absolute top-2 right-2 w-2 h-2 bg-danger border-2 border-white rounded-full" />
           </button>
-          
+
           <div className="h-8 w-px bg-divider mx-1" />
 
           <button className="flex items-center gap-3 pl-2 group">
             <div className="text-right hidden sm:block">
               <p className="text-xs font-bold text-text-primary leading-tight">Jane Doe</p>
-              <p className="text-[10px] font-mono text-text-muted uppercase tracking-tighter">USR-JD-26-004</p>
+              <p className="text-[10px] font-mono text-text-muted uppercase tracking-tighter">
+                USR-JD-26-004
+              </p>
             </div>
             <div className="w-9 h-9 rounded-full bg-accent-light border border-accent-border flex items-center justify-center text-accent group-hover:bg-accent group-hover:text-white transition-all">
               <User className="w-5 h-5" />

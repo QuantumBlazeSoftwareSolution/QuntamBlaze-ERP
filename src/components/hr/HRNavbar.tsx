@@ -1,9 +1,9 @@
 "use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
+import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { label: "Overview", href: "/dashboard/hr" },
@@ -22,8 +22,10 @@ export function HRNavbar() {
     <div className="bg-white border-b border-[#E2E8F0] px-8 flex items-center h-14 sticky top-0 z-30">
       <div className="flex gap-8 h-full">
         {NAV_ITEMS.map((item) => {
-          const isActive = pathname === item.href || (item.href !== "/dashboard/hr" && pathname.startsWith(item.href));
-          
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/dashboard/hr" && pathname.startsWith(item.href));
+
           return (
             <Link
               key={item.href}

@@ -64,7 +64,9 @@ export function InvoiceStatusChip({ status }: { status: InvoiceStatus }) {
         config.bgColor
       )}
     >
-      <span className={cn("w-1.5 h-1.5 rounded-full shadow-[0_0_8px_currentColor]", config.dotColor)} />
+      <span
+        className={cn("w-1.5 h-1.5 rounded-full shadow-[0_0_8px_currentColor]", config.dotColor)}
+      />
       {config.label}
     </span>
   );

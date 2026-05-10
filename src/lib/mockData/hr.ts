@@ -8,16 +8,17 @@ export const MOCK_EMPLOYEES: Employee[] = [
     department: "Engineering",
     status: "Active",
     joinDate: "2023-01-15",
-    avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100&auto=format&fit=crop",
+    avatar:
+      "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100&auto=format&fit=crop",
     email: "alex.mercer@quantumblaze.com",
     phone: "+94 77 123 4567",
     address: "123 Innovation Drive, Colombo 07",
     nic: "199204500123",
     bankDetails: {
-       bank: "Commercial Bank",
-       accountName: "A. Mercer",
-       accountNumber: "800****542",
-       branch: "Kollupitiya"
+      bank: "Commercial Bank",
+      accountName: "A. Mercer",
+      accountNumber: "800****542",
+      branch: "Kollupitiya",
     },
     reportingTo: { id: "EMP-ENG-26-000", name: "Sarah Connor" },
     profileHealth: 92,
@@ -62,7 +63,7 @@ export const MOCK_JOBS: Job[] = [
     postedDate: "2024-05-01",
     status: "Active",
     hiringManager: { id: "EMP-HR-26-004", name: "Sarah Jenkins" },
-  }
+  },
 ];
 
 export const MOCK_CANDIDATES: Candidate[] = [
@@ -97,18 +98,74 @@ export const MOCK_CANDIDATES: Candidate[] = [
     score: 92,
     nextInterviewDate: "2024-05-11",
     daysInStage: 5,
-  }
+  },
 ];
 
 export const HR_DASHBOARD_STATS: HRStat[] = [
-  { label: "Total Headcount", value: 124, trend: "↑ 3 this month", trendType: "up", icon: "Users", colorFamily: "teal" },
-  { label: "Open Positions", value: 12, trend: "8 active JOB-IDs", trendType: "up", icon: "Briefcase", colorFamily: "blue" },
-  { label: "In Pipeline", value: 47, trend: "active CND-IDs", trendType: "up", icon: "UserPlus", colorFamily: "violet" },
-  { label: "New Hires (30d)", value: 5, trend: "last 30 days", trendType: "up", icon: "UserCheck", colorFamily: "green" },
-  { label: "Attendance Rate", value: "98.2%", trend: "↑ 0.5%", trendType: "up", icon: "Clock", colorFamily: "teal" },
-  { label: "Pending Leaves", value: 8, trend: "LEV- awaiting approval", trendType: "down", icon: "CalendarOff", colorFamily: "amber" },
-  { label: "Payroll This Month", value: "$420,500", trend: "PAY- run value", trendType: "up", icon: "Wallet", colorFamily: "blue" },
-  { label: "Attrition Rate", value: "2.4%", trend: "↓ vs last quarter", trendType: "down", icon: "TrendingDown", colorFamily: "red" },
+  {
+    label: "Total Headcount",
+    value: 124,
+    trend: "↑ 3 this month",
+    trendType: "up",
+    icon: "Users",
+    colorFamily: "teal",
+  },
+  {
+    label: "Open Positions",
+    value: 12,
+    trend: "8 active JOB-IDs",
+    trendType: "up",
+    icon: "Briefcase",
+    colorFamily: "blue",
+  },
+  {
+    label: "In Pipeline",
+    value: 47,
+    trend: "active CND-IDs",
+    trendType: "up",
+    icon: "UserPlus",
+    colorFamily: "violet",
+  },
+  {
+    label: "New Hires (30d)",
+    value: 5,
+    trend: "last 30 days",
+    trendType: "up",
+    icon: "UserCheck",
+    colorFamily: "green",
+  },
+  {
+    label: "Attendance Rate",
+    value: "98.2%",
+    trend: "↑ 0.5%",
+    trendType: "up",
+    icon: "Clock",
+    colorFamily: "teal",
+  },
+  {
+    label: "Pending Leaves",
+    value: 8,
+    trend: "LEV- awaiting approval",
+    trendType: "down",
+    icon: "CalendarOff",
+    colorFamily: "amber",
+  },
+  {
+    label: "Payroll This Month",
+    value: "$420,500",
+    trend: "PAY- run value",
+    trendType: "up",
+    icon: "Wallet",
+    colorFamily: "blue",
+  },
+  {
+    label: "Attrition Rate",
+    value: "2.4%",
+    trend: "↓ vs last quarter",
+    trendType: "down",
+    icon: "TrendingDown",
+    colorFamily: "red",
+  },
 ];
 
 export const DEPT_HEADCOUNT_DATA = [
@@ -154,7 +211,7 @@ export const MOCK_HR_ACTIVITIES: HRActivity[] = [
     description: "Annual leave approved for Sarah Jenkins",
     timestamp: "5 hours ago",
     entities: ["LEV-EMP-HR-26-004-012"],
-  }
+  },
 ];
 
 export const MOCK_HR_ALERTS: HRAlert[] = [
@@ -171,5 +228,5 @@ export const MOCK_HR_ALERTS: HRAlert[] = [
     message: "Probation review due for EMP-FIN-26-009.",
     color: "blue",
     entityId: "EMP-FIN-26-009",
-  }
+  },
 ];

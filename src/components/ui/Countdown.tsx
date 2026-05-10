@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 interface CountdownProps {
   initialSeconds: number;
@@ -26,14 +26,16 @@ export const Countdown = ({ initialSeconds, onComplete }: CountdownProps) => {
   const formatTime = (totalSeconds: number) => {
     const minutes = Math.floor(totalSeconds / 60);
     const remainingSeconds = totalSeconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
   // Turn amber/warning color when less than 60 seconds remain
   const isNearZero = seconds < 60;
 
   return (
-    <span className={`font-mono font-medium ${isNearZero ? 'text-warning' : 'text-text-secondary'}`}>
+    <span
+      className={`font-mono font-medium ${isNearZero ? "text-warning" : "text-text-secondary"}`}
+    >
       {formatTime(seconds)}
     </span>
   );

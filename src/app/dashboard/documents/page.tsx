@@ -13,9 +13,9 @@ import { useDocumentStore } from "@/store/useDocumentStore";
 export default function DocumentRepositoryPage() {
   const tree = useMemo(() => buildDocumentTree(MOCK_PROJECTS), []);
   const { selectedDocumentId } = useDocumentStore();
-  
-  const selectedDocument = useMemo(() => 
-    MOCK_DOCUMENTS.find(doc => doc.id === selectedDocumentId),
+
+  const selectedDocument = useMemo(
+    () => MOCK_DOCUMENTS.find((doc) => doc.id === selectedDocumentId),
     [selectedDocumentId]
   );
 

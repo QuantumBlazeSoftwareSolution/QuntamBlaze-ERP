@@ -26,8 +26,36 @@ export const MOCK_FORECAST_DATA: ForecastPoint[] = [
 ];
 
 export const MOCK_RISK_FACTORS: RiskFactor[] = [
-  { id: "RSK-01", category: "Security", name: "Third-party API Vulnerability", probability: 15, impact: 85, trend: "decreasing" },
-  { id: "RSK-02", category: "Financial", name: "Currency Exchange Volatility", probability: 65, impact: 40, trend: "increasing" },
-  { id: "RSK-03", category: "Operational", name: "Supply Chain Disruption", probability: 30, impact: 70, trend: "stable" },
-  { id: "RSK-04", category: "Security", name: "Data Center Failover Failure", probability: 5, impact: 95, trend: "stable" },
+  {
+    id: "RSK-01",
+    category: "Security",
+    name: "Third-party API Vulnerability",
+    probability: 15,
+    impact: 85,
+    trend: "decreasing",
+  },
+  {
+    id: "RSK-02",
+    category: "Financial",
+    name: "Currency Exchange Volatility",
+    probability: 65,
+    impact: 40,
+    trend: "increasing",
+  },
+  {
+    id: "RSK-03",
+    category: "Operational",
+    name: "Supply Chain Disruption",
+    probability: 30,
+    impact: 70,
+    trend: "stable",
+  },
+  {
+    id: "RSK-04",
+    category: "Security",
+    name: "Data Center Failover Failure",
+    probability: 5,
+    impact: 95,
+    trend: "stable",
+  },
 ];

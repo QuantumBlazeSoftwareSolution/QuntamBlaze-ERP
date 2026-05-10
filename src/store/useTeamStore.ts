@@ -3,7 +3,12 @@ import { Role, ModulePermissions, PermissionSet } from "@/types/team";
 
 interface TeamState {
   rolePermissions: Record<Role, ModulePermissions>;
-  updatePermission: (role: Role, module: keyof ModulePermissions, type: keyof PermissionSet, value: boolean) => void;
+  updatePermission: (
+    role: Role,
+    module: keyof ModulePermissions,
+    type: keyof PermissionSet,
+    value: boolean
+  ) => void;
 }
 
 const DEFAULT_PERMISSIONS: PermissionSet = { read: true, write: false, admin: false };
@@ -53,16 +58,17 @@ const INITIAL_PERMISSIONS: Record<Role, ModulePermissions> = {
 
 export const useTeamStore = create<TeamState>((set) => ({
   rolePermissions: INITIAL_PERMISSIONS,
-  updatePermission: (role, module, type, value) => set((state) => ({
-    rolePermissions: {
-      ...state.rolePermissions,
-      [role]: {
-        ...state.rolePermissions[role],
-        [module]: {
-          ...state.rolePermissions[role][module],
-          [type]: value,
+  updatePermission: (role, module, type, value) =>
+    set((state) => ({
+      rolePermissions: {
+        ...state.rolePermissions,
+        [role]: {
+          ...state.rolePermissions[role],
+          [module]: {
+            ...state.rolePermissions[role][module],
+            [type]: value,
+          },
         },
       },
-    },
-  })),
+    })),
 }));
