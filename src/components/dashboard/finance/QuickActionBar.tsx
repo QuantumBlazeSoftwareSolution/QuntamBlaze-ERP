@@ -37,10 +37,10 @@ export function QuickActionBar() {
             transition={{ delay: 0.1 + index * 0.1 }}
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.98 }}
-            className={`flex flex-col items-start p-6 bg-bg-card border border-border rounded-xl transition-all text-left group ${action.color}`}
+            className={`flex flex-col items-start p-6 bg-white border border-border rounded-xl shadow-sm transition-all text-left group ${action.color}`}
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-white/5 border border-border flex items-center justify-center group-hover:bg-accent/10 transition-all">
+              <div className="w-10 h-10 rounded-lg bg-page-bg border border-border flex items-center justify-center group-hover:bg-accent/10 transition-all">
                 <Icon className="w-5 h-5 text-text-secondary group-hover:text-accent" />
               </div>
               <span className="text-[13px] font-bold text-text-primary tracking-tight">
@@ -51,7 +51,7 @@ export function QuickActionBar() {
               <span className="text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] mb-1">
                 Next Auto-ID
               </span>
-              <span className="text-[12px] font-mono text-[#3A3A3A] group-hover:text-accent/60 transition-colors">
+              <span className="text-[12px] font-mono text-text-muted group-hover:text-accent/80 transition-colors">
                 {action.nextId}
               </span>
             </div>
