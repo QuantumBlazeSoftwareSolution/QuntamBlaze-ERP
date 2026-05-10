@@ -4,8 +4,19 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ChevronsUpDown, ChevronUp, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
-import { Project } from "@/lib/mockData/projects";
+import { ProjectStatus } from "@/types/project";
 import { IDChip } from "@/components/ui/IDChip";
+
+interface Project {
+  id: string;
+  name: string;
+  clientId: string;
+  startDate: string | Date;
+  deadline: string | Date;
+  progress: number;
+  budget: number;
+  status: ProjectStatus;
+}
 import { ProjectStatusChip } from "@/components/projects/ProjectStatusChip";
 import { ProjectProgressBar } from "@/components/projects/ProjectProgressBar";
 import { ProjectRowActions } from "@/components/projects/ProjectRowActions";

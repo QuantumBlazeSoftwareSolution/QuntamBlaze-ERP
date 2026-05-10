@@ -1,8 +1,11 @@
 import { NewProjectButton } from "@/components/projects/NewProjectButton";
 import { ProjectsPageClient } from "@/components/projects/ProjectsPageClient";
 import { NewProjectModal } from "@/components/projects/NewProjectModal";
+import { projectsCrud } from "@/lib/db/crud/projects";
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const projects = await projectsCrud.getAll();
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -17,7 +20,7 @@ export default function ProjectsPage() {
       </div>
 
       {/* Client-side table + filter + toggle */}
-      <ProjectsPageClient />
+      <ProjectsPageClient initialProjects={projects} />
 
       <NewProjectModal />
     </div>

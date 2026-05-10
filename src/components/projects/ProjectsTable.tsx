@@ -7,10 +7,11 @@ import { useProjectsTable } from "@/hooks/useProjectsTable";
 interface ProjectsTableProps {
   statusFilter?: string;
   clientFilter?: string;
+  projects?: any[];
 }
 
-export function ProjectsTable({ statusFilter, clientFilter }: ProjectsTableProps) {
-  const { table } = useProjectsTable(statusFilter, clientFilter);
+export function ProjectsTable({ statusFilter, clientFilter, projects = [] }: ProjectsTableProps) {
+  const { table } = useProjectsTable(statusFilter, clientFilter, projects);
 
   return (
     <div className="w-full overflow-x-auto rounded-xl border border-divider bg-white shadow-sm">

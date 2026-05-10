@@ -11,13 +11,12 @@ import {
 } from "@tanstack/react-table";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpDown, MoreVertical } from "lucide-react";
-import { Lead, LeadStatus, MOCK_LEADS } from "@/lib/mockData/leads";
 import { IDChip } from "@/components/ui/IDChip";
 import { LeadDetailsSheet } from "./LeadDetailsSheet";
 import { formatCurrency } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
-const STATUS_CHIP: Record<LeadStatus, string> = {
+const STATUS_CHIP: Record<string, string> = {
   New: "bg-blue-50 text-blue-600 border-blue-200",
   Contacted: "bg-purple-50 text-purple-600 border-purple-200",
   Qualified: "bg-accent/10 text-accent border-accent/20",
@@ -39,16 +38,21 @@ function ScoreBar({ score }: { score: number }) {
   );
 }
 
-const columnHelper = createColumnHelper<Lead>();
+const columnHelper = createColumnHelper<any>();
 
-export function LeadsTable({ statusFilter }: { statusFilter: LeadStatus | "all" }) {
+interface LeadsTableProps {
+  statusFilter: string;
+  data: any[];
+}
+
+export function LeadsTable({ statusFilter, data }: LeadsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [selectedLead, setSelectedLead] = useState<any | null>(null);
 
   const filtered = useMemo(
     () =>
-      statusFilter === "all" ? MOCK_LEADS : MOCK_LEADS.filter((l) => l.status === statusFilter),
-    [statusFilter]
+      statusFilter === "all" ? data : data.filter((l) => l.status === statusFilter),
+    [statusFilter, data]
   );
 
   const columns = useMemo(
@@ -62,7 +66,7 @@ export function LeadsTable({ statusFilter }: { statusFilter: LeadStatus | "all" 
             LED-ID <ArrowUpDown className="w-3 h-3" />
           </button>
         ),
-        cell: (info) => <IDChip id={info.getValue()} />,
+        cell: (info) => <IDChip id={info.getValue() as string} />,
       }),
       columnHelper.accessor("company", {
         header: ({ column }) => (
@@ -202,7 +206,7 @@ export function LeadsTable({ statusFilter }: { statusFilter: LeadStatus | "all" 
             {filtered.length} lead{filtered.length !== 1 ? "s" : ""}
           </span>
           <span className="text-[12px] font-mono font-bold text-text-secondary">
-            Pipeline: {formatCurrency(filtered.reduce((s, l) => s + l.estimatedValue, 0))}
+            Pipeline: {formatCurrency(filtered.reduce((s, l) => s + Number(l.estimatedValue || 0), 0))}
           </span>
         </div>
       </div>

@@ -1,68 +1,102 @@
-"use client";
+import { employeesCrud } from "@/lib/db/crud/employees";
+import HRDashboardClient from "@/components/hr/HRDashboardClient";
 
-import { motion } from "framer-motion";
-import { HRStatTile } from "@/components/hr/HRStatTile";
-import { HeadcountByDepartment } from "@/components/hr/HeadcountByDepartment";
-import { HiringFunnelChart } from "@/components/hr/HiringFunnelChart";
-import { AttendanceTrendLine } from "@/components/hr/AttendanceTrendLine";
-import { PayrollTrendLine } from "@/components/hr/PayrollTrendLine";
-import { HRActivityFeed } from "@/components/hr/HRActivityFeed";
-import { HRAlerts } from "@/components/hr/HRAlerts";
-import { HRNavbar } from "@/components/hr/HRNavbar";
-import { HR_DASHBOARD_STATS } from "@/lib/mockData/hr";
-import { cn } from "@/lib/utils";
+export default async function HRDashboard() {
+  const employees = await employeesCrud.getAll();
 
-export default function HRDashboard() {
+  // Compute stats from real data
+  const totalHeadcount = employees.length;
+  const newHires30d = employees.filter(e => {
+    const joinDate = new Date(e.joinDate || "");
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    return joinDate > thirtyDaysAgo;
+  }).length;
+
+  const hrStats = [
+    {
+      label: "Total Headcount",
+      value: totalHeadcount,
+      trend: `↑ ${newHires30d} this month`,
+      trendType: "up" as const,
+      icon: "Users",
+      colorFamily: "teal" as const,
+    },
+    {
+      label: "Open Positions",
+      value: 12, // Stubbed for now
+      trend: "8 active JOB-IDs",
+      trendType: "up" as const,
+      icon: "Briefcase",
+      colorFamily: "blue" as const,
+    },
+    {
+      label: "In Pipeline",
+      value: 47, // Stubbed for now
+      trend: "active CND-IDs",
+      trendType: "up" as const,
+      icon: "UserPlus",
+      colorFamily: "violet" as const,
+    },
+    {
+      label: "New Hires (30d)",
+      value: newHires30d,
+      trend: "last 30 days",
+      trendType: "up" as const,
+      icon: "UserCheck",
+      colorFamily: "green" as const,
+    },
+    {
+      label: "Attendance Rate",
+      value: "98.2%",
+      trend: "↑ 0.5%",
+      trendType: "up" as const,
+      icon: "Clock",
+      colorFamily: "teal" as const,
+    },
+    {
+      label: "Pending Leaves",
+      value: 8,
+      trend: "LEV- awaiting approval",
+      trendType: "down" as const,
+      icon: "CalendarOff",
+      colorFamily: "amber" as const,
+    },
+    {
+      label: "Payroll This Month",
+      value: "$420,500",
+      trend: "PAY- run value",
+      trendType: "up" as const,
+      icon: "Wallet",
+      colorFamily: "blue" as const,
+    },
+    {
+      label: "Attrition Rate",
+      value: "2.4%",
+      trend: "↓ vs last quarter",
+      trendType: "down" as const,
+      icon: "TrendingDown",
+      colorFamily: "red" as const,
+    },
+  ];
+
+  // Dept distribution from real data
+  const deptCounts = employees.reduce((acc: Record<string, number>, e) => {
+    const dept = e.department || "Other";
+    acc[dept] = (acc[dept] || 0) + 1;
+    return acc;
+  }, {});
+
+  const deptHeadcountData = Object.entries(deptCounts).map(([name, count], i) => ({
+    name,
+    count,
+    color: ["#3B82F6", "#F59E0B", "#8B5CF6", "#EC4899", "#10B981", "#06B6D4", "#EF4444"][i % 7]
+  }));
+
   return (
-    <div className="flex-1 bg-[#F8FAFC] min-h-screen">
-      <HRNavbar />
-
-      <div className="p-8 max-w-[1600px] mx-auto">
-        <header className="mb-8">
-          <h1 className="text-[#0F172A] text-2xl font-bold">HR Command Center</h1>
-          <div className="flex items-center justify-between mt-1">
-            <p className="text-[#475569] text-sm">
-              Strategic workforce intelligence and talent orchestration.
-            </p>
-            <span className="text-[#94A3B8] text-sm font-medium">May 2026</span>
-          </div>
-        </header>
-
-        {/* KPI Tiles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {HR_DASHBOARD_STATS.map((stat, idx) => (
-            <HRStatTile key={stat.label} {...stat} index={idx} />
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          {/* Main Analytics Column */}
-          <div className="xl:col-span-2 space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <HeadcountByDepartment />
-              <HiringFunnelChart />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <AttendanceTrendLine />
-              <PayrollTrendLine />
-            </div>
-          </div>
-
-          {/* Activity & Alerts Column */}
-          <div className="space-y-6">
-            <div className="flex flex-col">
-              <span className="text-[#94A3B8] text-[11px] font-semibold uppercase tracking-widest mb-4 px-2">
-                Critical Alerts
-              </span>
-              <HRAlerts />
-            </div>
-
-            <div className="flex flex-col">
-              <HRActivityFeed />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <HRDashboardClient 
+      hrStats={hrStats}
+      deptHeadcountData={deptHeadcountData}
+    />
   );
 }

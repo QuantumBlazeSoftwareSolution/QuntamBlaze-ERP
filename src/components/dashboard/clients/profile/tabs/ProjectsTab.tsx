@@ -4,7 +4,7 @@ import { Briefcase, ChevronRight } from "lucide-react";
 import { ClientDetail } from "@/types/client";
 import { IDChip } from "@/components/ui/IDChip";
 import { ProjectStatusChip } from "@/components/projects/ProjectStatusChip";
-import { ProjectStatus } from "@/lib/mockData/projects";
+import { ProjectStatus } from "@/types/project";
 
 export function ProjectsTab({ client }: { client: ClientDetail }) {
   return (

@@ -11,10 +11,13 @@ import {
   PaginationState,
 } from "@tanstack/react-table";
 import { useState, useEffect } from "react";
-import { MOCK_PROJECTS } from "@/lib/mockData/projects";
 import { projectColumns } from "@/lib/tableColumns/projectColumns";
 
-export function useProjectsTable(statusFilter?: string, clientFilter?: string) {
+export function useProjectsTable(
+  statusFilter?: string,
+  clientFilter?: string,
+  data: any[] = []
+) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [pagination, setPagination] = useState<PaginationState>({
@@ -32,7 +35,7 @@ export function useProjectsTable(statusFilter?: string, clientFilter?: string) {
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
-    data: MOCK_PROJECTS,
+    data,
     columns: projectColumns,
     state: { sorting, columnFilters, pagination },
     onSortingChange: setSorting,

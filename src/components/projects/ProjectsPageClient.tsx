@@ -5,19 +5,47 @@ import { FilterBar } from "./FilterBar";
 import { ProjectsTable } from "./ProjectsTable";
 import { ProjectHealthCard } from "@/components/dashboard/ProjectHealthCard";
 import { ProjectStatusDonut } from "@/components/dashboard/ProjectStatusDonut";
-import { MOCK_PROJECTS } from "@/lib/mockData/projects";
-import { statusDistribution } from "@/lib/mockData/dashboard";
 
 type ViewMode = "table" | "card";
 
-export function ProjectsPageClient() {
+// DB shape (from projectsCrud.getAll)
+type DBProject = {
+  id: string;
+  name: string;
+  clientId: string | null;
+  status: string;
+  progress: number | null;
+  budget: string | null;
+  startDate: Date | null;
+  deadline: Date | null;
+  description: string | null;
+  client?: { id: string; name: string } | null;
+  milestones?: any[];
+};
+
+interface ProjectsPageClientProps {
+  initialProjects: DBProject[];
+}
+
+export function ProjectsPageClient({ initialProjects }: ProjectsPageClientProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("table");
   const [activeStatus, setActiveStatus] = useState("");
   const [activeClient, setActiveClient] = useState("");
 
   const handleViewChange = useCallback((v: ViewMode) => setViewMode(v), []);
 
-  const filteredProjects = MOCK_PROJECTS.filter((p) => {
+  const statusCounts = initialProjects.reduce((acc: Record<string, number>, p) => {
+    acc[p.status] = (acc[p.status] || 0) + 1;
+    return acc;
+  }, {});
+
+  const dynamicStatusDistribution = [
+    { name: "Active", value: statusCounts["Active"] || 0, color: "#10B981" },
+    { name: "On-Hold", value: statusCounts["On-Hold"] || 0, color: "#F59E0B" },
+    { name: "Completed", value: statusCounts["Completed"] || 0, color: "#3B82F6" },
+  ];
+
+  const filteredProjects = initialProjects.filter((p) => {
     const statusMatch = activeStatus ? p.status === activeStatus : true;
     const clientMatch = activeClient ? p.clientId === activeClient : true;
     return statusMatch && clientMatch;
@@ -40,14 +68,18 @@ export function ProjectsPageClient() {
         {/* Left Column: Projects List (Independent Scroll) */}
         <div className="lg:col-span-2 overflow-y-auto pr-4 custom-scrollbar">
           <div className="pb-6">
-            <ProjectsTable statusFilter={activeStatus} clientFilter={activeClient} />
+            <ProjectsTable
+              statusFilter={activeStatus}
+              clientFilter={activeClient}
+              projects={initialProjects}
+            />
           </div>
         </div>
 
         {/* Right Column: Analytics & Health (Independent Scroll) */}
         <aside className="overflow-y-auto pr-2 custom-scrollbar">
           <div className="pb-6 space-y-6">
-            <ProjectStatusDonut data={statusDistribution} />
+            <ProjectStatusDonut data={dynamicStatusDistribution} />
 
             <div className="bg-white border border-border rounded-xl p-6 shadow-sm">
               <h3 className="text-xs font-bold uppercase tracking-widest text-text-muted mb-6">
@@ -60,18 +92,18 @@ export function ProjectsPageClient() {
                     project={{
                       id: p.id,
                       name: p.name,
-                      clientId: p.clientId,
+                      clientId: p.clientId || "",
                       status:
-                        p.status === "OnHold"
+                        p.status === "On-Hold"
                           ? "on-hold"
-                          : p.status === "Review"
+                          : p.status === "Completed"
                             ? "completed"
-                            : p.status === "Active"
-                              ? "active"
-                              : "active",
-                      progress: p.progress,
-                      budgetSpent: Math.round(p.budget * (p.progress / 100)),
-                      budgetTotal: p.budget,
+                            : "active",
+                      progress: p.progress || 0,
+                      budgetSpent: Math.round(
+                        Number(p.budget || 0) * ((p.progress || 0) / 100)
+                      ),
+                      budgetTotal: Number(p.budget || 0),
                     }}
                   />
                 ))}

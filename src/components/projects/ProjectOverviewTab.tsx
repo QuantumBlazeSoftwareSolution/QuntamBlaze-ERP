@@ -43,7 +43,11 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
                   </div>
                   <div>
                     <p className="text-[10px] font-black text-[#94A3B8] uppercase">Kickoff</p>
-                    <p className="text-xs font-bold text-[#0F172A]">{project.startDate}</p>
+                    <p className="text-xs font-bold text-[#0F172A]">
+                      {project.startDate instanceof Date 
+                        ? project.startDate.toLocaleDateString() 
+                        : String(project.startDate || "")}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -52,7 +56,11 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
                   </div>
                   <div>
                     <p className="text-[10px] font-black text-[#94A3B8] uppercase">Deadline</p>
-                    <p className="text-xs font-bold text-[#0F172A]">{project.deadline}</p>
+                    <p className="text-xs font-bold text-[#0F172A]">
+                      {project.deadline instanceof Date 
+                        ? project.deadline.toLocaleDateString() 
+                        : String(project.deadline || "")}
+                    </p>
                   </div>
                 </div>
               </div>

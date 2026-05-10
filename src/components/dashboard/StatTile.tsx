@@ -3,7 +3,9 @@
 import React from "react";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { LineChart, Line, ResponsiveContainer } from "recharts";
-import { SparklinePoint } from "@/lib/mockData/dashboard";
+interface SparklinePoint {
+  value: number;
+}
 
 interface StatTileProps {
   label: string;

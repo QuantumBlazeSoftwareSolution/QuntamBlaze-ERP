@@ -13,7 +13,6 @@ export const projects = pgTable("projects", {
   status: varchar("status", { length: 50 }).default("Draft").notNull(),
   description: varchar("description", { length: 2000 }),
 
-  // Luxury standards
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   deletedAt: timestamp("deleted_at"),
@@ -26,7 +25,7 @@ export const projectMilestones = pgTable("project_milestones", {
     .notNull(),
   label: varchar("label", { length: 255 }).notNull(),
   subLabel: varchar("sub_label", { length: 255 }),
-  state: varchar("state", { length: 50 }).default("upcoming").notNull(), // completed, current, upcoming
+  state: varchar("state", { length: 50 }).default("upcoming").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

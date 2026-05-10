@@ -13,7 +13,6 @@ export const clients = pgTable("clients", {
   status: varchar("status", { length: 50 }).default("Active").notNull(),
   joinedAt: timestamp("joined_at").defaultNow().notNull(),
 
-  // Luxury standards
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   deletedAt: timestamp("deleted_at"),

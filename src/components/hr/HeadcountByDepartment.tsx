@@ -10,9 +10,8 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import { DEPT_HEADCOUNT_DATA } from "@/lib/mockData/hr";
 
-export function HeadcountByDepartment() {
+export function HeadcountByDepartment({ data }: { data: any[] }) {
   return (
     <div className="bg-white border border-[#E2E8F0] rounded-xl p-6 h-[350px]">
       <div className="flex items-center justify-between mb-6">
@@ -25,7 +24,7 @@ export function HeadcountByDepartment() {
       <div className="h-[250px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={DEPT_HEADCOUNT_DATA}
+            data={data}
             layout="vertical"
             margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
           >
@@ -52,7 +51,7 @@ export function HeadcountByDepartment() {
               }}
             />
             <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={20}>
-              {DEPT_HEADCOUNT_DATA.map((entry, index) => (
+              {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Bar>

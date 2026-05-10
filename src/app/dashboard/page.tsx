@@ -1,87 +1,96 @@
-"use client";
+import { projectsCrud } from "@/lib/db/crud/projects";
+import { leadsCrud } from "@/lib/db/crud/leads";
+import { invoicesCrud } from "@/lib/db/crud/invoices";
+import { formatCurrency } from "@/lib/utils/format";
+import DashboardPageClient from "@/components/dashboard/DashboardPageClient";
 
-import { motion, Variants } from "framer-motion";
-import { StatTile } from "@/components/dashboard/StatTile";
-import { ProjectHealthCard } from "@/components/dashboard/ProjectHealthCard";
-import { ProjectStatusDonut } from "@/components/dashboard/ProjectStatusDonut";
-import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
-import {
-  statsData,
-  projectHealthData,
-  activityFeedData,
-  statusDistribution,
-} from "@/lib/mockData/dashboard";
-import Link from "next/link";
+export default async function DashboardPage() {
+  const [allProjects, allLeads, allInvoices] = await Promise.all([
+    projectsCrud.getAll(),
+    leadsCrud.getAll(),
+    invoicesCrud.getAll(),
+  ]);
 
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.07,
+  // Compute Stats
+  const totalRevenue = allInvoices
+    .filter((inv) => inv.status === "Paid")
+    .reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
+
+  const activeProjectsCount = allProjects.filter((p) => p.status === "Active").length;
+  const outstandingInvoicesCount = allInvoices.filter((inv) => inv.status !== "Paid").length;
+  const leadConversionRate =
+    allLeads.length > 0
+      ? (allLeads.filter((l) => l.status === "Won").length / allLeads.length) * 100
+      : 0;
+
+  const statsData = [
+    {
+      label: "Total Revenue",
+      value: formatCurrency(totalRevenue),
+      trend: 12.5,
+      sparkline: [40, 35, 50, 45, 60, 55, 70].map((v) => ({ value: v })),
     },
-  },
-};
+    {
+      label: "Active Projects",
+      value: activeProjectsCount.toString(),
+      trend: 8.2,
+      sparkline: [20, 22, 21, 24, 23, 25, 24].map((v) => ({ value: v })),
+    },
+    {
+      label: "Outstanding Invoices",
+      value: outstandingInvoicesCount.toString(),
+      trend: -2.4,
+      sparkline: [18, 16, 17, 15, 14, 13, 14].map((v) => ({ value: v })),
+    },
+    {
+      label: "Lead Conversion",
+      value: `${leadConversionRate.toFixed(1)}%`,
+      trend: 4.1,
+      sparkline: [15, 16, 15.5, 17, 18, 17.5, 18.5].map((v) => ({ value: v })),
+    },
+  ];
 
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } },
-};
+  // Project Health
+  const projectHealthData = allProjects.slice(0, 4).map((p) => ({
+    id: p.id,
+    name: p.name,
+    clientId: p.clientId,
+    progress: p.progress || 0,
+    budgetSpent: Number(p.budget || 0) * ((p.progress || 0) / 100),
+    budgetTotal: Number(p.budget || 0),
+    status: p.status.toLowerCase() as any,
+  }));
 
-export default function DashboardPage() {
+  // Status Distribution
+  const statusCounts = allProjects.reduce((acc: Record<string, number>, p) => {
+    acc[p.status] = (acc[p.status] || 0) + 1;
+    return acc;
+  }, {});
+
+  const statusDistribution = [
+    { name: "Active", value: statusCounts["Active"] || 0, color: "#10B981" },
+    { name: "On-Hold", value: statusCounts["On-Hold"] || 0, color: "#F59E0B" },
+    { name: "Completed", value: statusCounts["Completed"] || 0, color: "#3B82F6" },
+  ];
+
+  // Activity Feed (Dummy for now, will wire to real logs later)
+  const activityFeedData = [
+    {
+      id: "ACT-001",
+      type: "project" as const,
+      entityId: allProjects[0]?.id || "",
+      userId: "System",
+      action: "re-synchronized with DB",
+      timestamp: new Date().toISOString(),
+    },
+  ];
+
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-      className="flex flex-col h-[calc(100vh-140px)] min-h-[500px]"
-    >
-      {/* Top Stats Row (Fixed) */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 shrink-0 mb-6">
-        {statsData.map((stat) => (
-          <motion.div key={stat.label} variants={itemVariants}>
-            <StatTile {...stat} />
-          </motion.div>
-        ))}
-      </section>
-
-      {/* Bento Grid Content (Scrollable Columns) */}
-      <section className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
-        {/* Project Health Grid (Takes up 2 columns) */}
-        <div className="lg:col-span-2 overflow-y-auto pr-4 custom-scrollbar">
-          <div className="pb-6 space-y-6">
-            <motion.div variants={itemVariants} className="flex items-center justify-between">
-              <h2 className="text-2xl font-medium text-text-primary">Active Deployments</h2>
-              <Link href="/dashboard/projects">
-                <button className="px-4 py-2 border border-accent/50 text-accent font-bold tracking-[0.1em] text-[11px] uppercase rounded hover:bg-accent/10 hover:shadow-sm transition-all cursor-pointer">
-                  View All
-                </button>
-              </Link>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {projectHealthData.map((project) => (
-                <motion.div key={project.id} variants={itemVariants}>
-                  <ProjectHealthCard project={project} />
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column: Activity & Charts */}
-        <div className="overflow-y-auto pr-2 custom-scrollbar">
-          <div className="pb-6 space-y-6">
-            <motion.div variants={itemVariants}>
-              <ProjectStatusDonut data={statusDistribution} />
-            </motion.div>
-
-            <motion.div variants={itemVariants}>
-              <ActivityFeed activities={activityFeedData} />
-            </motion.div>
-          </div>
-        </div>
-      </section>
-    </motion.div>
+    <DashboardPageClient
+      statsData={statsData}
+      projectHealthData={projectHealthData}
+      statusDistribution={statusDistribution}
+      activityFeedData={activityFeedData}
+    />
   );
 }

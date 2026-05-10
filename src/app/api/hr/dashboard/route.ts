@@ -1,21 +1,36 @@
 import { NextResponse } from "next/server";
-import {
-  HR_DASHBOARD_STATS,
-  DEPT_HEADCOUNT_DATA,
-  HIRING_FUNNEL_DATA,
-  ATTENDANCE_TREND_DATA,
-  PAYROLL_TREND_DATA,
-} from "@/lib/mockData/hr";
+import { employeesCrud } from "@/lib/db/crud/employees";
 
 export async function GET() {
-  // In a real implementation, this would query the Drizzle database:
-  // const headcountByDept = await db.select(...).from(employees)...
+  const employees = await employeesCrud.getAll();
+
+  // Dept distribution
+  const deptCounts = employees.reduce((acc: Record<string, number>, e) => {
+    const dept = e.department || "Other";
+    acc[dept] = (acc[dept] || 0) + 1;
+    return acc;
+  }, {});
+
+  const headcountByDept = Object.entries(deptCounts).map(([name, count], i) => ({
+    name,
+    count,
+    color: ["#3B82F6", "#F59E0B", "#8B5CF6", "#EC4899", "#10B981", "#06B6D4", "#EF4444"][i % 7]
+  }));
+
+  // Stubbed others for now
+  const hiringFunnel = [
+    { stage: "Applied", value: 450 },
+    { stage: "Screening", value: 120 },
+    { stage: "Technical", value: 45 },
+    { stage: "Final", value: 12 },
+    { stage: "Offer", value: 5 },
+  ];
 
   return NextResponse.json({
-    stats: HR_DASHBOARD_STATS,
-    headcountByDept: DEPT_HEADCOUNT_DATA,
-    hiringFunnel: HIRING_FUNNEL_DATA,
-    attendanceTrend: ATTENDANCE_TREND_DATA,
-    payrollTrend: PAYROLL_TREND_DATA,
+    stats: [], // Simplified for API response
+    headcountByDept,
+    hiringFunnel,
+    attendanceTrend: [],
+    payrollTrend: [],
   });
 }

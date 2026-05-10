@@ -1,4 +1,4 @@
-import { ProjectStatus } from "@/lib/mockData/projects";
+export type ProjectStatus = "Active" | "On-Hold" | "Completed" | "Planning" | "Cancelled";
 
 export interface TeamMember {
   initials: string;
@@ -27,8 +27,8 @@ export interface ProjectDetail {
   clientName: string;
   status: ProjectStatus;
   description: string;
-  startDate: string;
-  deadline: string;
+  startDate: string | Date;
+  deadline: string | Date;
   progress: number;
   budget: number;
   budgetSpent: number;

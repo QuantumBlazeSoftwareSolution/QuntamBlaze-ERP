@@ -1,9 +1,9 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
-import { ProjectStatus } from "@/lib/mockData/projects";
+import { ProjectStatus } from "@/types/project";
 
-const STATUS_OPTIONS: ProjectStatus[] = ["Active", "OnHold", "Completed", "Draft", "Review"];
+const STATUS_OPTIONS: ProjectStatus[] = ["Active", "On-Hold", "Completed", "Planning", "Cancelled"];
 const CLIENT_OPTIONS = [
   { id: "CLI-GOOG-01", label: "Google" },
   { id: "CLI-AMZN-04", label: "Amazon" },
@@ -36,7 +36,7 @@ export function FilterBar({
           <option value="">Status</option>
           {STATUS_OPTIONS.map((s) => (
             <option key={s} value={s}>
-              {s === "OnHold" ? "On-Hold" : s}
+              {s}
             </option>
           ))}
         </select>

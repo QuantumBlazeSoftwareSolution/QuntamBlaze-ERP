@@ -1,10 +1,10 @@
 "use client";
 
-import { ProjectStatus } from "@/lib/mockData/projects";
+import { ProjectStatus } from "@/types/project";
 import { cn } from "@/lib/utils";
 
 const STATUS_CONFIG: Record<
-  ProjectStatus,
+  string,
   { label: string; dotColor: string; borderColor: string; textColor: string }
 > = {
   Active: {
@@ -13,13 +13,7 @@ const STATUS_CONFIG: Record<
     borderColor: "border-accent/40",
     textColor: "text-accent",
   },
-  Review: {
-    label: "Review",
-    dotColor: "bg-warning",
-    borderColor: "border-warning/40",
-    textColor: "text-warning",
-  },
-  OnHold: {
+  "On-Hold": {
     label: "On-Hold",
     dotColor: "bg-warning",
     borderColor: "border-warning/40",
@@ -31,16 +25,22 @@ const STATUS_CONFIG: Record<
     borderColor: "border-success/40",
     textColor: "text-success",
   },
-  Draft: {
-    label: "Draft",
-    dotColor: "bg-[#3A3A3A]",
-    borderColor: "border-[#3A3A3A]/40",
-    textColor: "text-[#3A3A3A]",
+  Planning: {
+    label: "Planning",
+    dotColor: "bg-blue-500",
+    borderColor: "border-blue-200",
+    textColor: "text-blue-600",
+  },
+  Cancelled: {
+    label: "Cancelled",
+    dotColor: "bg-red-500",
+    borderColor: "border-red-200",
+    textColor: "text-red-600",
   },
 };
 
 export function ProjectStatusChip({ status }: { status: ProjectStatus }) {
-  const config = STATUS_CONFIG[status];
+  const config = STATUS_CONFIG[status] || STATUS_CONFIG["Active"];
 
   return (
     <span
