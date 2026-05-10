@@ -1,5 +1,6 @@
 import { NewProjectButton } from "@/components/projects/NewProjectButton";
 import { ProjectsPageClient } from "@/components/projects/ProjectsPageClient";
+import { NewProjectModal } from "@/components/projects/NewProjectModal";
 
 export default function ProjectsPage() {
   return (
@@ -17,6 +18,8 @@ export default function ProjectsPage() {
 
       {/* Client-side table + filter + toggle */}
       <ProjectsPageClient />
+
+      <NewProjectModal />
     </div>
   );
 }
