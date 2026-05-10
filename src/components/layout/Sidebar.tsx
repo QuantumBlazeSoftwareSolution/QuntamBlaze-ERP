@@ -25,7 +25,7 @@ export function Sidebar() {
         </div>
         {!isCollapsed && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col">
-            <span className="text-lg font-black text-text-primary tracking-tighter leading-none">
+            <span className="text-lg font-black text-white tracking-tighter leading-none">
               Quantum Blaze
             </span>
             <span className="text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] mt-0.5">
@@ -80,7 +80,7 @@ export function Sidebar() {
             </div>
             {!isCollapsed && (
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-bold text-text-primary truncate">A. Mercer</p>
+                <p className="text-[13px] font-bold text-white truncate">A. Mercer</p>
                 <p className="text-[10px] text-accent font-bold uppercase tracking-widest">Cmdr</p>
               </div>
             )}

@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  --color-sidebar-bg: #0F0F0F;
-  --color-sidebar-border: #1C1C1C;
-  --color-sidebar-text: #6B7280;
+  --color-sidebar-bg: #1A1C2E;
+  --color-sidebar-border: #2D304D;
+  --color-sidebar-text: #8E91B2;
   --color-sidebar-text-active: #FFFFFF;
-  --color-sidebar-item-active: #1C1C1C;
+  --color-sidebar-item-active: rgba(255, 255, 255, 0.08);
   --color-sidebar-accent: #10B981;
 
   --color-page-bg: #F8FAFC;
