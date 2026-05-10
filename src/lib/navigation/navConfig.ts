@@ -57,4 +57,15 @@ export const NAV_CONFIG: NavSection[] = [
       { label: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
     ],
   },
+  {
+    label: "Workforce",
+    items: [
+      { 
+        label: "HR Management", 
+        href: "/dashboard/hr", 
+        icon: Users,
+        badge: { count: 3, color: "bg-[#10B981]/20", textColor: "text-[#10B981]" }
+      },
+    ],
+  },
 ];

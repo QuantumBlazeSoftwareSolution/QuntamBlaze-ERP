@@ -12,3 +12,4 @@ export * from "./hr/skills";
 export * from "./hr/attendance";
 export * from "./hr/shifts";
 export * from "./hr/leave";
+export * from "./hr/leave_transactions";

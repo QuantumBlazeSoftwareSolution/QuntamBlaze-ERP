@@ -5,6 +5,11 @@ import {
   HRNavbar } from '@/components/hr/HRNavbar';
 import { LeavePolicyManager } from '@/components/hr/leave/LeavePolicyManager';
 import { AccrualLogicBuilder } from '@/components/hr/leave/AccrualLogicBuilder';
+import { LeaveBalanceTracker } from '@/components/hr/leave/LeaveBalanceTracker';
+import { LeaveRequestPortal } from '@/components/hr/leave/LeaveRequestPortal';
+import { LeaveApprovalCenter } from '@/components/hr/leave/LeaveApprovalCenter';
+import { LeaveTeamCalendar } from '@/components/hr/leave/LeaveTeamCalendar';
+import { DepartmentAvailabilityMatrix } from '@/components/hr/leave/DepartmentAvailabilityMatrix';
 import { 
   FileText, 
   Settings, 
@@ -12,12 +17,15 @@ import {
   Calendar,
   Layers,
   ArrowUpRight,
-  ShieldCheck
+  ShieldCheck,
+  Inbox,
+  Send,
+  Users
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function LeaveManagementPage() {
-  const [activeTab, setActiveTab] = React.useState<'policies' | 'accruals' | 'types'>('policies');
+  const [activeTab, setActiveTab] = React.useState<'policies' | 'accruals' | 'inbox' | 'apply' | 'availability'>('policies');
 
   return (
     <div className="flex-1 bg-[#F8FAFC] min-h-screen flex flex-col">
@@ -55,37 +63,39 @@ export default function LeaveManagementPage() {
              label="Accrual Logic" 
            />
            <TabButton 
-             active={activeTab === 'types'} 
-             onClick={() => setActiveTab('types')} 
-             label="Leave Types" 
+             active={activeTab === 'inbox'} 
+             onClick={() => setActiveTab('inbox')} 
+             label="Approval Inbox" 
+           />
+           <TabButton 
+             active={activeTab === 'apply'} 
+             onClick={() => setActiveTab('apply')} 
+             label="My Requests" 
+           />
+           <TabButton 
+             active={activeTab === 'availability'} 
+             onClick={() => setActiveTab('availability')} 
+             label="Team Availability" 
            />
         </div>
+
+        {/* Global Balance Tracker (Visible in Apply/Inbox mostly) */}
+        {(activeTab === 'apply' || activeTab === 'inbox') && <LeaveBalanceTracker />}
 
         <div className="flex-1 grid grid-cols-1 xl:grid-cols-3 gap-8">
            {/* Main Workspace */}
            <div className="xl:col-span-2">
               {activeTab === 'policies' && <LeavePolicyManager />}
-              {activeTab === 'accruals' && (
-                <div className="grid grid-cols-1 gap-8">
-                   <AccrualLogicBuilder />
-                </div>
-              )}
-              {activeTab === 'types' && (
-                <div className="bg-white border border-[#E2E8F0] border-dashed rounded-3xl p-20 flex flex-col items-center justify-center text-center">
-                   <div className="w-16 h-16 rounded-2xl bg-[#F8FAFC] flex items-center justify-center text-[#94A3B8] mb-4">
-                      <Layers className="w-8 h-8" />
-                   </div>
-                   <h3 className="text-lg font-bold text-[#0F172A]">Leave Type Dictionary</h3>
-                   <p className="text-sm text-[#64748B] max-w-xs mt-2">
-                      Manage the core definitions of leave types. This module is being linked to the Policy Engine.
-                   </p>
-                </div>
-              )}
+              {activeTab === 'accruals' && <AccrualLogicBuilder />}
+              {activeTab === 'inbox' && <LeaveApprovalCenter />}
+              {activeTab === 'apply' && <LeaveRequestPortal />}
+              {activeTab === 'availability' && <LeaveTeamCalendar />}
            </div>
 
            {/* Side Stats & Information */}
            <div className="xl:col-span-1 space-y-8">
-              <div className="bg-white border border-[#E2E8F0] rounded-3xl p-8 shadow-sm">
+              {activeTab === 'availability' ? <DepartmentAvailabilityMatrix /> : (
+                <div className="bg-white border border-[#E2E8F0] rounded-3xl p-8 shadow-sm">
                  <h4 className="text-sm font-black text-[#0F172A] uppercase tracking-widest mb-6">Leave Distribution</h4>
                  <div className="space-y-6">
                     <ProgressStat label="Annual Leave" percentage={45} color="bg-blue-500" />
