@@ -557,14 +557,14 @@ export function ChatWorkspaceClient({
                               {isSelf && (
                                 <>
                                   {(!msg.status || msg.status === "delivered") && (
-                                    <CheckCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" title="Delivered" />
+                                    <CheckCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                                   )}
                                   {msg.status === "waiting" && (
-                                    <Clock className="w-3 h-3 text-slate-400 animate-pulse shrink-0" title="Sending..." />
+                                    <Clock className="w-3 h-3 text-slate-400 animate-pulse shrink-0" />
                                   )}
                                   {msg.status === "failed" && (
                                     <div className="flex items-center gap-1 text-danger font-bold text-[10px] shrink-0">
-                                      <AlertCircle className="w-3 h-3" title="Failed to send" />
+                                      <AlertCircle className="w-3 h-3" />
                                       <button
                                         type="button"
                                         onClick={() => handleRetrySendMessage(msg)}
