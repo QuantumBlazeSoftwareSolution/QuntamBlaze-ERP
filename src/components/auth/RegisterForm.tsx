@@ -4,17 +4,18 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Loader2, User } from "lucide-react";
 import { motion, Variants } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-const loginSchema = z.object({
+const registerSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(1, "Password is required"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const staggerVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
@@ -29,7 +30,7 @@ const staggerVariants: Variants = {
   }),
 };
 
-export const LoginForm = () => {
+export const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
@@ -38,18 +39,18 @@ export const LoginForm = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = async (data: LoginFormValues) => {
+  const onSubmit = async (data: RegisterFormValues) => {
     setIsSubmitting(true);
 
     try {
       // Mock 1.5s authentication delay
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log(`[QB-AUTH] Session initiated · USR-JD-26-004 · ${new Date().toISOString()}`);
-      // Redirect to dashboard after successful login
+      console.log(`[QB-AUTH] Account created · USR-JD-26-005 · ${new Date().toISOString()}`);
+      // Redirect to dashboard after successful registration
       router.push("/dashboard");
     } catch (error) {
       console.error(error);
@@ -60,6 +61,22 @@ export const LoginForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 w-full">
       <motion.div custom={0} initial="hidden" animate="visible" variants={staggerVariants}>
+        <label className="block text-text-primary text-sm font-medium mb-1.5">Full Name</label>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <User className="h-5 w-5 text-text-muted" />
+          </div>
+          <input
+            {...register("name")}
+            type="text"
+            className="w-full border border-border rounded-lg h-11 pl-10 pr-4 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder:text-text-muted bg-white"
+            placeholder="John Doe"
+          />
+        </div>
+        {errors.name && <p className="text-red-500 text-xs mt-1.5">{errors.name.message}</p>}
+      </motion.div>
+
+      <motion.div custom={1} initial="hidden" animate="visible" variants={staggerVariants}>
         <label className="block text-text-primary text-sm font-medium mb-1.5">Email</label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -75,13 +92,8 @@ export const LoginForm = () => {
         {errors.email && <p className="text-red-500 text-xs mt-1.5">{errors.email.message}</p>}
       </motion.div>
 
-      <motion.div custom={1} initial="hidden" animate="visible" variants={staggerVariants}>
-        <div className="flex justify-between items-center mb-1.5">
-          <label className="block text-text-primary text-sm font-medium">Password</label>
-          <Link href="/forgot-password" className="text-accent text-sm hover:underline">
-            Forgot Password?
-          </Link>
-        </div>
+      <motion.div custom={2} initial="hidden" animate="visible" variants={staggerVariants}>
+        <label className="block text-text-primary text-sm font-medium mb-1.5">Password</label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Lock className="h-5 w-5 text-text-muted" />
@@ -105,33 +117,27 @@ export const LoginForm = () => {
         )}
       </motion.div>
 
-      <motion.div custom={2} initial="hidden" animate="visible" variants={staggerVariants}>
+      <motion.div custom={3} initial="hidden" animate="visible" variants={staggerVariants}>
         <button
           type="submit"
           disabled={isSubmitting}
           className="bg-accent hover:bg-accent-hover text-white font-semibold rounded-lg h-11 w-full flex items-center justify-center transition-colors mt-2"
         >
-          {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign In"}
+          {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Account"}
         </button>
       </motion.div>
 
       <motion.div
-        custom={3}
+        custom={4}
         initial="hidden"
         animate="visible"
         variants={staggerVariants}
         className="text-center mt-6"
       >
         <p className="text-text-secondary text-sm">
-          Don't have an account?{" "}
-          <Link href="/register" className="text-accent hover:underline font-medium">
-            Sign up
-          </Link>
-        </p>
-        <p className="text-text-secondary text-sm mt-2">
-          Have an invite?{" "}
-          <Link href="/invite/demo-token-001" className="text-accent hover:underline font-medium">
-            Accept Invite
+          Already have an account?{" "}
+          <Link href="/login" className="text-accent hover:underline font-medium">
+            Sign in
           </Link>
         </p>
       </motion.div>
