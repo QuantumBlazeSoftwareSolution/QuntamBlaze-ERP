@@ -52,7 +52,7 @@ export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
               {activeTab === "overview" && <ProjectOverviewTab project={project} />}
               {activeTab === "tasks" && <KanbanBoard />}
               {activeTab === "timeline" && <GanttView />}
-              {activeTab === "documents" && <ProjectDocumentsTab />}
+              {activeTab === "documents" && <ProjectDocumentsTab project={project} />}
               {activeTab === "financials" && <ProjectFinancialsTab />}
               {activeTab === "activity" && <ProjectActivityTab />}
             </Suspense>

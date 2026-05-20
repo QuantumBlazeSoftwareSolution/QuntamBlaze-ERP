@@ -18,6 +18,8 @@ import {
   Trash2,
   AlertCircle,
   Check,
+  Copy,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -72,6 +74,16 @@ export function IntegrationsTab() {
     type: "success" | "error";
     message: string;
   } | null>(null);
+
+  // Setup Instruction Modal States
+  const [showSetupModal, setShowSetupModal] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copyRedirectUri = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/api/auth/callback/google-drive`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   // Fetch status on load
   const loadStatus = async () => {
@@ -406,7 +418,7 @@ export function IntegrationsTab() {
               animate={{ opacity: 0.5 }}
               exit={{ opacity: 0 }}
               onClick={() => setDrawerOpen(false)}
-              className="fixed inset-0 bg-black z-40"
+              className="fixed inset-0 bg-black z-[999]"
             />
 
             {/* Drawer Panel */}
@@ -415,7 +427,7 @@ export function IntegrationsTab() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-white border-l border-border shadow-2xl p-8 flex flex-col justify-between overflow-y-auto"
+              className="fixed inset-y-0 right-0 z-[1000] w-full max-w-lg bg-white border-l border-border shadow-2xl p-8 flex flex-col justify-between overflow-y-auto"
             >
               {/* Header */}
               <div className="space-y-6">
@@ -425,7 +437,17 @@ export function IntegrationsTab() {
                       <HardDrive className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-text-primary">Google Drive</h3>
+                      <h3 className="text-xl font-bold text-text-primary flex items-center gap-1.5">
+                        Google Drive
+                        <button
+                          type="button"
+                          onClick={() => setShowSetupModal(true)}
+                          title="View Setup Guide"
+                          className="text-text-muted hover:text-accent transition-colors border-0 bg-transparent p-0 cursor-pointer"
+                        >
+                          <HelpCircle className="w-4 h-4" />
+                        </button>
+                      </h3>
                       <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">Cloud Sync Settings</p>
                     </div>
                   </div>
@@ -455,17 +477,27 @@ export function IntegrationsTab() {
                 {!gdriveStatus.hasConfig ? (
                   /* STEP 1: Save Client Config */
                   <form onSubmit={handleSaveCredentials} className="space-y-6">
-                    <div className="bg-blue-50/50 border border-blue-100/50 p-5 rounded-2xl space-y-2">
-                      <div className="flex items-center gap-2 text-[12px] font-black text-blue-600 uppercase tracking-widest">
-                        <Settings className="w-4 h-4" />
-                        Setup Instructions
+                    <div className="bg-slate-50 border border-border p-5 rounded-2xl space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-[12px] font-bold text-slate-800 uppercase tracking-wider">
+                          <Settings className="w-4 h-4 text-accent" />
+                          Configuration Guide
+                        </div>
+                        <span className="px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 text-[9px] font-black uppercase tracking-widest rounded-full">
+                          RECOMMENDED
+                        </span>
                       </div>
-                      <p className="text-[11px] text-text-secondary leading-relaxed">
-                        To enable direct cloud transfers, create an **OAuth 2.0 Web Application** inside your [Google Cloud Console](https://console.cloud.google.com). 
+                      <p className="text-[12px] text-text-secondary leading-relaxed">
+                        To connect Google Drive, you'll need to create an OAuth Client ID and Secret in the Google Cloud Console. We've built an interactive step-by-step guide to help you do this in 2 minutes.
                       </p>
-                      <div className="p-3 bg-white border border-border rounded-xl text-[11px] font-mono text-text-primary break-all select-all">
-                        <span className="font-bold text-text-muted">Redirect URI:</span> {window.location.origin}/api/auth/callback/google-drive
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowSetupModal(true)}
+                        className="w-full flex items-center justify-center gap-2 h-11 border border-accent/20 hover:border-accent bg-accent/5 hover:bg-accent/10 text-accent font-bold rounded-xl text-[12px] uppercase tracking-widest transition-all cursor-pointer"
+                      >
+                        <HelpCircle className="w-4 h-4" />
+                        View Setup Instructions
+                      </button>
                     </div>
 
                     <div className="space-y-4">
@@ -538,7 +570,14 @@ export function IntegrationsTab() {
                     </button>
 
                     <div className="flex justify-between items-center pt-4 border-t border-divider">
-                      <p className="text-[10px] text-text-muted">Need to edit Client ID/Secret?</p>
+                      <button
+                        type="button"
+                        onClick={() => setShowSetupModal(true)}
+                        className="text-[11px] font-bold text-accent hover:underline flex items-center gap-1 cursor-pointer border-0 bg-transparent p-0"
+                      >
+                        <HelpCircle className="w-3.5 h-3.5" />
+                        View Setup Guide
+                      </button>
                       <button
                         onClick={async () => {
                           if (confirm("Reset current credentials?")) {
@@ -546,7 +585,7 @@ export function IntegrationsTab() {
                             await loadStatus();
                           }
                         }}
-                        className="text-[11px] font-bold text-danger hover:underline cursor-pointer"
+                        className="text-[11px] font-bold text-danger hover:underline cursor-pointer border-0 bg-transparent p-0"
                       >
                         Reset Credentials
                       </button>
@@ -686,6 +725,165 @@ export function IntegrationsTab() {
               )}
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* Setup Instructions Popup Modal */}
+      <AnimatePresence>
+        {showSetupModal && (
+          <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
+            {/* Modal Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowSetupModal(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            />
+
+            {/* Modal Container Panel */}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="relative max-w-2xl w-full bg-white border border-border rounded-3xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden z-[2001]"
+            >
+              {/* Header */}
+              <div className="p-6 md:p-8 border-b border-divider flex items-center justify-between bg-slate-50/50">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-blue-50 border border-blue-100 rounded-2xl text-blue-500">
+                    <Settings className="w-5 h-5 animate-spin-slow" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-text-primary">Google Cloud Configuration</h3>
+                    <p className="text-[11px] text-text-muted uppercase tracking-widest font-black">2-Minute Setup Steps</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowSetupModal(false)}
+                  className="p-2 rounded-xl hover:bg-page-bg text-text-muted hover:text-text-primary transition-all cursor-pointer border-0 bg-transparent"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Steps Scroll Area */}
+              <div className="p-6 md:p-8 overflow-y-auto space-y-6 custom-scrollbar flex-1 text-[13px] text-text-secondary leading-relaxed">
+                {/* Step 1 */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm shrink-0">
+                    1
+                  </div>
+                  <div className="space-y-1.5 pt-0.5">
+                    <h4 className="font-bold text-text-primary text-[14px]">Create a Google Cloud Project</h4>
+                    <p>
+                      Go to the <a href="https://console.cloud.google.com/" target="_blank" rel="noreferrer" className="text-blue-500 font-bold hover:underline">Google Cloud Console</a>. Click the project selector dropdown at the top, select <strong>"New Project"</strong>, name it <code>QuantumBlaze ERP Sync</code>, and click <strong>Create</strong>.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 2 */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm shrink-0">
+                    2
+                  </div>
+                  <div className="space-y-1.5 pt-0.5">
+                    <h4 className="font-bold text-text-primary text-[14px]">Enable the Google Drive API</h4>
+                    <p>
+                      Search for <strong>"Google Drive API"</strong> in the top search bar, click on it, and click the blue <strong>"Enable"</strong> button to enable cloud file synchronizations.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 3 */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm shrink-0">
+                    3
+                  </div>
+                  <div className="space-y-1.5 pt-0.5">
+                    <h4 className="font-bold text-text-primary text-[14px]">Configure OAuth Consent Screen & Scopes</h4>
+                    <p>
+                      Go to <strong>"OAuth consent screen"</strong> inside the left navigation pane. Set User Type to <strong>"External"</strong> and fill out the required App details.
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1.5 mt-2 text-text-muted">
+                      <li><strong>Scopes</strong>: Add the <code className="bg-slate-100 px-1.5 py-0.5 rounded text-accent font-bold font-mono">.../auth/drive.file</code> scope (this lets the app read and write files).</li>
+                      <li><strong>Test Users (CRITICAL)</strong>: Add your personal Google/Gmail account under the test users section so you can authenticate during testing without needing Google's review.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Step 4 */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm shrink-0">
+                    4
+                  </div>
+                  <div className="space-y-3 pt-0.5 w-full">
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-text-primary text-[14px]">Create OAuth Credentials</h4>
+                      <p>
+                        Go to the <strong>"Credentials"</strong> tab, click <strong>"+ Create Credentials"</strong> and select <strong>"OAuth client ID"</strong>. Select <strong>"Web application"</strong> as the Application Type.
+                      </p>
+                    </div>
+                    
+                    {/* Copy Box */}
+                    <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-2xl space-y-2">
+                      <div className="flex items-center justify-between text-[11px] font-black text-blue-600 uppercase tracking-widest">
+                        Authorized Redirect URI
+                        <button
+                          type="button"
+                          onClick={copyRedirectUri}
+                          className="text-[10px] font-bold bg-white border border-blue-200 hover:border-blue-400 text-blue-600 hover:text-blue-700 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer"
+                        >
+                          {copied ? (
+                            <>
+                              <Check className="w-3.5 h-3.5" />
+                              Copied!
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5" />
+                              Copy Link
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <div className="p-3 bg-white border border-border rounded-xl text-[11px] font-mono text-text-primary break-all select-all">
+                        {window.location.origin}/api/auth/callback/google-drive
+                      </div>
+                      <p className="text-[10px] text-text-muted">
+                        Paste the exact link above into the <strong>"Authorized redirect URIs"</strong> section in your Google Cloud Console.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 5 */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm shrink-0">
+                    5
+                  </div>
+                  <div className="space-y-1.5 pt-0.5">
+                    <h4 className="font-bold text-text-primary text-[14px]">Connect and Sync!</h4>
+                    <p>
+                      Copy your generated <strong>Client ID</strong> and <strong>Client Secret</strong>, paste them into this drawer, click save, and click the connect button. You're fully ready!
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="p-6 border-t border-divider bg-slate-50 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowSetupModal(false)}
+                  className="px-6 h-11 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[12px] uppercase tracking-widest rounded-xl hover:scale-[1.01] transition-all cursor-pointer border-0"
+                >
+                  Got It, Let's Setup!
+                </button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

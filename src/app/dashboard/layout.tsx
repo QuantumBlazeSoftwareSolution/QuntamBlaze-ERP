@@ -47,7 +47,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* Main Content Stage */}
           <main
             className={cn(
-              "relative z-10 pt-24 pb-12 px-8 flex-1 overflow-y-auto custom-scrollbar transition-all duration-300",
+              "relative pt-24 pb-12 px-8 flex-1 overflow-y-auto custom-scrollbar transition-all duration-300",
               isCollapsed ? "ml-0" : "ml-0"
             )}
           >
