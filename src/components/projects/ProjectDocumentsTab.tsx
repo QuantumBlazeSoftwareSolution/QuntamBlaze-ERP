@@ -20,8 +20,8 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   getProjectDocumentsAction,
-  uploadProjectDocumentAction,
   getGoogleDriveStatusAction,
+  getGDriveUploadContextAction,
 } from "@/app/actions/gdriveActions";
 import Link from "next/link";
 
@@ -155,34 +155,93 @@ export function ProjectDocumentsTab({ project }: ProjectDocumentsTabProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // 100MB validation for client resumable upload
+    const maxBytes = 100 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      setNotification({
+        type: "error",
+        message: "Document file size exceeds the 100MB upload limit.",
+      });
+      setTimeout(() => setNotification(null), 5000);
+      return;
+    }
+
     setUploading(true);
     setNotification(null);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const res = await uploadProjectDocumentAction(project.id, formData);
-      if (res.success) {
-        setNotification({
-          type: "success",
-          message: `Successfully uploaded "${file.name}" to Google Drive!`,
-        });
-        // Clear input value
-        if (fileInputRef.current) fileInputRef.current.value = "";
-        
-        // Refresh list
-        await loadContent();
-      } else {
-        setNotification({
-          type: "error",
-          message: res.error || "Failed to upload file to Google Drive.",
-        });
+      // 1. Fetch token and target folder ID from Server Action
+      const contextRes = await getGDriveUploadContextAction(project.id, "project");
+      if (!contextRes.success || !contextRes.accessToken || !contextRes.folderId) {
+        throw new Error(contextRes.error || "Failed to initialize cloud credentials.");
       }
+
+      const { accessToken, folderId } = contextRes;
+
+      // 2. Initiate Resumable Session with Google Drive
+      const initRes = await fetch(
+        "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json; charset=UTF-8",
+            "X-Upload-Content-Type": file.type || "application/octet-stream",
+          },
+          body: JSON.stringify({
+            name: file.name,
+            parents: [folderId],
+          }),
+        }
+      );
+
+      if (!initRes.ok) {
+        const initErr = await initRes.json();
+        throw new Error(initErr.error?.message || "Failed to initialize Google Drive upload session.");
+      }
+
+      const uploadUrl = initRes.headers.get("Location");
+      if (!uploadUrl) {
+        throw new Error("Failed to retrieve resumable upload target location from Google.");
+      }
+
+      // 3. Directly stream the binary payload to Google (Bypasses ERP Node server!)
+      const uploadRes = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.type || "application/octet-stream",
+        },
+        body: file, // Streams directly from local disk! Zero RAM bloating
+      });
+
+      if (!uploadRes.ok) {
+        const uploadErr = await uploadRes.json();
+        throw new Error(uploadErr.error?.message || "File chunk streaming upload failed.");
+      }
+
+      const uploadedFile = await uploadRes.json();
+      const fileId = uploadedFile.id;
+
+      if (!fileId) {
+        throw new Error("No Google Drive File ID returned after completion.");
+      }
+
+      // 4. Success feedback and reload documents
+      setNotification({
+        type: "success",
+        message: `Successfully uploaded "${file.name}" to Google Drive!`,
+      });
+      
+      // Clear input value
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      
+      // Refresh list
+      await loadContent();
     } catch (err: any) {
+      console.error("Client Google Drive project upload error:", err);
       setNotification({
         type: "error",
-        message: err.message || "An unexpected error occurred during upload.",
+        message: err.message || "An unexpected error occurred during direct upload.",
       });
     } finally {
       setUploading(false);

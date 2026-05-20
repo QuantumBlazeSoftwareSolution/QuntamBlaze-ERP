@@ -32,7 +32,7 @@ export default async function ChatPage({ searchParams }: ChatPageProps) {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] min-h-[500px]">
+    <div className="flex flex-col h-[calc(100vh-180px)] min-h-[500px] mb-8">
       <div className="mb-6 shrink-0">
         <h1 className="text-3xl font-bold text-text-primary tracking-tight">Workspace Chat</h1>
         <p className="text-text-secondary mt-1">

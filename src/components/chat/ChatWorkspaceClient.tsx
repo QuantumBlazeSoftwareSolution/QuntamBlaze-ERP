@@ -23,7 +23,8 @@ import {
   RefreshCw,
 } from "lucide-react";
 import Pusher from "pusher-js";
-import { getChatMessagesAction, sendChatMessageAction, uploadChatAttachmentAction } from "@/app/actions/chatActions";
+import { getChatMessagesAction, sendChatMessageAction } from "@/app/actions/chatActions";
+import { getGDriveUploadContextAction, grantGDriveFilePermissionAction } from "@/app/actions/gdriveActions";
 import { getPusherStatusAction } from "@/app/actions/pusherActions";
 import { cn } from "@/lib/utils";
 
@@ -90,6 +91,10 @@ export function ChatWorkspaceClient({
   const [attachmentsQueue, setAttachmentsQueue] = useState<Attachment[]>([]);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [uploadingFileName, setUploadingFileName] = useState<string>("");
+  const [uploadingFileSize, setUploadingFileSize] = useState<number>(0);
+  const [uploadingFileMime, setUploadingFileMime] = useState<string>("");
 
   // Pusher State
   const [pusherConfig, setPusherConfig] = useState<{ key: string; cluster: string } | null>(null);
@@ -209,30 +214,131 @@ export function ChatWorkspaceClient({
     const file = e.target.files?.[0];
     if (!file || !selectedProjectId) return;
 
-    // 10MB validation
-    const maxBytes = 10 * 1024 * 1024;
+    // 100MB validation for client resumable upload
+    const maxBytes = 100 * 1024 * 1024;
     if (file.size > maxBytes) {
-      setUploadError("Standard attachment limit is 10MB. Please choose a smaller file.");
+      setUploadError("Standard attachment limit is 100MB. Please choose a smaller file.");
       return;
     }
 
     setUploadError("");
     setUploadingFile(true);
+    setUploadingFileName(file.name);
+    setUploadingFileSize(file.size);
+    setUploadingFileMime(file.type || "application/octet-stream");
+    setUploadProgress(0);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const res = await uploadChatAttachmentAction(selectedProjectId, formData);
-      if (res.success && res.attachment) {
-        setAttachmentsQueue((prev) => [...prev, res.attachment as Attachment]);
-      } else {
-        setUploadError(res.error || "File upload failed.");
+      // 1. Fetch token and target folder ID from Server Action
+      const contextRes = await getGDriveUploadContextAction(selectedProjectId, "chat");
+      if (!contextRes.success || !contextRes.accessToken || !contextRes.folderId) {
+        throw new Error(contextRes.error || "Failed to initialize cloud credentials.");
       }
+
+      const { accessToken, folderId } = contextRes;
+
+      // 2. Initiate Resumable Session with Google Drive
+      const initRes = await fetch(
+        "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json; charset=UTF-8",
+            "X-Upload-Content-Type": file.type || "application/octet-stream",
+          },
+          body: JSON.stringify({
+            name: file.name,
+            parents: [folderId],
+          }),
+        }
+      );
+
+      if (!initRes.ok) {
+        const initErr = await initRes.json();
+        throw new Error(initErr.error?.message || "Failed to initialize Google Drive upload session.");
+      }
+
+      const uploadUrl = initRes.headers.get("Location");
+      if (!uploadUrl) {
+        throw new Error("Failed to retrieve resumable upload target location from Google.");
+      }
+
+      // 3. Directly stream the binary payload to Google using XHR for progress tracking
+      const uploadFileWithProgress = (url: string, uploadFile: File): Promise<any> => {
+        return new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open("PUT", url);
+          xhr.setRequestHeader("Content-Type", uploadFile.type || "application/octet-stream");
+
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const percentComplete = Math.round((event.loaded / event.total) * 100);
+              setUploadProgress(percentComplete);
+            }
+          };
+
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              try {
+                const response = JSON.parse(xhr.responseText);
+                resolve(response);
+              } catch (e) {
+                reject(new Error("Invalid response format from Google Drive."));
+              }
+            } else {
+              try {
+                const response = JSON.parse(xhr.responseText);
+                reject(new Error(response.error?.message || "File upload failed."));
+              } catch (e) {
+                reject(new Error(`Upload failed with status code ${xhr.status}`));
+              }
+            }
+          };
+
+          xhr.onerror = () => {
+            reject(new Error("Network connection error occurred during file upload."));
+          };
+
+          xhr.send(uploadFile);
+        });
+      };
+
+      const uploadedFile = await uploadFileWithProgress(uploadUrl, file);
+      const fileId = uploadedFile.id;
+
+      if (!fileId) {
+        throw new Error("No Google Drive File ID returned after completion.");
+      }
+
+      // 4. Grant "anyone with link can read" permissions so team members can view it inline
+      // We run this via a secure Server Action to completely bypass browser CORS limitations.
+      const permRes = await grantGDriveFilePermissionAction(fileId);
+      if (!permRes.success) {
+        console.warn("Failed to grant public viewing permissions on direct client upload:", permRes.error);
+      }
+
+      // 5. Append attachment details to message queue
+      setAttachmentsQueue((prev) => [
+        ...prev,
+        {
+          id: fileId,
+          name: file.name,
+          link: `https://drive.google.com/open?id=${fileId}`,
+          mimeType: file.type || "application/octet-stream",
+          size: file.size,
+        },
+      ]);
+
     } catch (err: any) {
-      setUploadError(err.message || "An unexpected error occurred during upload.");
+      console.error("Client Google Drive upload error:", err);
+      setUploadError(err.message || "An unexpected error occurred during direct upload.");
     } finally {
       setUploadingFile(false);
+      setUploadProgress(null);
+      setUploadingFileName("");
+      setUploadingFileSize(0);
+      setUploadingFileMime("");
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
@@ -370,7 +476,7 @@ export function ChatWorkspaceClient({
   return (
     <div className={cn(
       "flex bg-[#F8FAFC] border border-border rounded-3xl overflow-hidden shadow-sm",
-      hideSidebar ? "h-[650px]" : "h-[calc(100vh-140px)]"
+      hideSidebar ? "h-[650px]" : "h-full"
     )}>
       {/* LEFT PANEL: Projects Directory */}
       {!hideSidebar && (
@@ -460,17 +566,6 @@ export function ChatWorkspaceClient({
                 </div>
               </div>
 
-              {/* Connected Active Badges */}
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 border border-emerald-100/50 text-emerald-600 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Live Sync Active
-                </div>
-                <div className="flex items-center gap-1 text-[11px] font-bold text-text-muted">
-                  <Users className="w-3.5 h-3.5" />
-                  <span>Team Workspace</span>
-                </div>
-              </div>
             </div>
 
             {/* Error notifications */}
@@ -663,6 +758,53 @@ export function ChatWorkspaceClient({
 
             {/* Bottom Actions Queue & Input */}
             <div className="p-6 bg-white border-t border-border space-y-4">
+              {/* Active Upload Progress Card */}
+              <AnimatePresence>
+                {uploadProgress !== null && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="p-4 bg-emerald-50/40 border border-emerald-500/10 backdrop-blur-md rounded-2xl flex flex-col gap-3 shadow-sm max-w-md"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2.5 truncate">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-center text-emerald-600 shrink-0">
+                          {getFileIcon(uploadingFileMime)}
+                        </div>
+                        <div className="truncate">
+                          <span className="font-bold text-[12px] text-text-primary block truncate max-w-[200px]">
+                            {uploadingFileName}
+                          </span>
+                          <span className="text-[10px] text-emerald-600 font-bold block">
+                            {formatBytes(Math.round((uploadProgress / 100) * uploadingFileSize))} of {formatBytes(uploadingFileSize)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[12px] font-black text-emerald-700 font-mono tracking-tighter">
+                          {uploadProgress}%
+                        </span>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600 shrink-0" />
+                      </div>
+                    </div>
+
+                    {/* Shimmering Progress Bar */}
+                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden relative border border-slate-200/50">
+                      <motion.div
+                        className="h-full bg-emerald-500 rounded-full relative"
+                        initial={{ width: "0%" }}
+                        animate={{ width: `${uploadProgress}%` }}
+                        transition={{ type: "spring", stiffness: 80, damping: 15 }}
+                      >
+                        {/* Premium shimmering visual pulse overlay */}
+                        <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               {/* Attachment queue list */}
               {attachmentsQueue.length > 0 && (
                 <div className="flex flex-wrap gap-2">

@@ -10,10 +10,12 @@ import {
   listGoogleDriveFolders,
   createGoogleDriveFolder,
   listGoogleDriveFilesInFolder,
-  uploadFileToGoogleDrive,
+  getFreshAccessToken,
+  grantAnyoneWithLinkPermission,
 } from "@/lib/services/gdrive";
 import { saveSystemConfigAction } from "./config";
 import { logAction } from "@/lib/logger";
+import { getSession } from "@/lib/session";
 
 interface BaseFolderSettings {
   baseFolderId: string;
@@ -212,6 +214,62 @@ async function getOrCreateProjectSubfolder(projectId: string, baseFolderId: stri
 }
 
 /**
+ * Helper to recursively list folders and find/create subfolder by name.
+ */
+async function getOrCreateSubfolderByName(name: string, parentId: string): Promise<string> {
+  const folders = await listGoogleDriveFolders(parentId);
+  const existingFolder = folders.find((f: any) => f.name === name);
+  if (existingFolder) {
+    return existingFolder.id;
+  }
+  const newFolder = await createGoogleDriveFolder(name, parentId);
+  return newFolder.id;
+}
+
+/**
+ * Generates temporary access token and targets the correct Google Drive folder ID for client upload.
+ */
+export async function getGDriveUploadContextAction(
+  projectId: string,
+  type: "chat" | "project"
+) {
+  try {
+    const session = await getSession();
+    if (!session || !session.userId) {
+      throw new Error("Unauthorized. Please log in.");
+    }
+
+    const driveStatus = await getGoogleDriveStatusAction();
+    if (!driveStatus.success || !driveStatus.isConnected || !driveStatus.baseFolder) {
+      throw new Error("Google Drive integration is not configured or active.");
+    }
+
+    const baseFolderId = driveStatus.baseFolder.baseFolderId;
+    let folderId = "";
+
+    if (type === "chat") {
+      // 1. Get or Create "chat" folder inside the Base Folder
+      const chatFolderId = await getOrCreateSubfolderByName("chat", baseFolderId);
+      // 2. Get or Create "[projectId]" folder inside the "chat" folder
+      folderId = await getOrCreateSubfolderByName(projectId, chatFolderId);
+    } else {
+      // For project document uploads: resolves or creates "Project-[projectId]" folder
+      folderId = await getOrCreateProjectSubfolder(projectId, baseFolderId);
+    }
+
+    const accessToken = await getFreshAccessToken();
+    if (!accessToken) {
+      throw new Error("Failed to retrieve Google Drive access token.");
+    }
+
+    return { success: true, accessToken, folderId };
+  } catch (error: any) {
+    console.error("Failed to generate Google Drive upload context:", error);
+    return { success: false, error: error.message || "Failed to generate upload context." };
+  }
+}
+
+/**
  * Lists all files inside the project's subfolder under the Base Folder.
  */
 export async function getProjectDocumentsAction(projectId: string) {
@@ -246,45 +304,7 @@ export async function getProjectDocumentsAction(projectId: string) {
   }
 }
 
-/**
- * Uploads a document directly to the project subfolder.
- */
-export async function uploadProjectDocumentAction(projectId: string, formData: FormData) {
-  try {
-    const status = await getGoogleDriveStatusAction();
-    if (!status.success || !status.isConnected || !status.baseFolder) {
-      throw new Error("Google Drive integration is not active.");
-    }
 
-    const baseFolderId = status.baseFolder.baseFolderId;
-    const file = formData.get("file") as File;
-    if (!file) {
-      throw new Error("No file payload found in the upload form.");
-    }
-
-    // Resolve or create project specific folder
-    const projectFolderId = await getOrCreateProjectSubfolder(projectId, baseFolderId);
-
-    // Read file buffer
-    const arrayBuffer = await file.arrayBuffer();
-
-    // Perform upload
-    const uploaded = await uploadFileToGoogleDrive(
-      file.name,
-      file.type || "application/octet-stream",
-      arrayBuffer,
-      projectFolderId
-    );
-
-    // Revalidate paths to trigger fresh renders
-    revalidatePath(`/dashboard/projects/${projectId}`);
-
-    return { success: true, fileId: uploaded.id, fileName: uploaded.name };
-  } catch (error: any) {
-    console.error(`Failed to upload project document for ${projectId}:`, error);
-    return { success: false, error: error.message || "Failed to upload file to Google Drive." };
-  }
-}
 
 /**
  * Maps standard Google mimeTypes to readable UI formats
@@ -310,4 +330,23 @@ function formatBytes(bytes: number): string {
   const sizes = ["Bytes", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+}
+
+/**
+ * Server Action to securely grant public anyone-with-link read permissions to a file.
+ * This runs on the server to completely bypass browser-direct CORS restrictions.
+ */
+export async function grantGDriveFilePermissionAction(fileId: string) {
+  try {
+    const session = await getSession();
+    if (!session || !session.userId) {
+      throw new Error("Unauthorized. Please log in.");
+    }
+
+    await grantAnyoneWithLinkPermission(fileId);
+    return { success: true };
+  } catch (error: any) {
+    console.error("Failed to grant Google Drive file permission via Server Action:", error);
+    return { success: false, error: error.message || "Failed to grant file permissions." };
+  }
 }

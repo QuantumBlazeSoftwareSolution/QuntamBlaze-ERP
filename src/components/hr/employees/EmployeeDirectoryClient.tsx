@@ -9,6 +9,7 @@ import { EmployeeFilters } from "@/components/hr/employees/EmployeeFilters";
 import { EmployeeGrid } from "@/components/hr/employees/EmployeeGrid";
 import { EmployeeListTable } from "@/components/hr/employees/EmployeeListTable";
 import { OrgChart } from "@/components/hr/employees/OrgChart";
+import { AddEmployeeDrawer } from "@/components/hr/employees/AddEmployeeDrawer";
 
 interface EmployeeDirectoryClientProps {
   employees: any[];
@@ -16,6 +17,7 @@ interface EmployeeDirectoryClientProps {
 
 export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientProps) {
   const [view, setView] = useState<"grid" | "list" | "chart">("grid");
+  const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
 
   // Compute dept stats from real data
   const deptCounts = employees.reduce((acc: Record<string, number>, e) => {
@@ -55,7 +57,10 @@ export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientPr
               <Download className="w-4 h-4 text-[#94A3B8]" />
               <span>Export Directory</span>
             </button>
-            <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#10B981] text-white text-sm font-bold shadow-lg shadow-[#10B981]/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+            <button
+              onClick={() => setIsAddDrawerOpen(true)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#10B981] text-white text-sm font-bold shadow-lg shadow-[#10B981]/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+            >
               <UserPlus className="w-4 h-4" />
               <span>Add New Employee</span>
             </button>
@@ -90,6 +95,8 @@ export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientPr
           </div>
         )}
       </div>
+
+      <AddEmployeeDrawer isOpen={isAddDrawerOpen} onClose={() => setIsAddDrawerOpen(false)} />
     </div>
   );
 }
