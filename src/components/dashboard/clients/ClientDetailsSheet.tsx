@@ -8,6 +8,7 @@ import { IDChip } from "@/components/ui/IDChip";
 import { getColorFromString, getInitials } from "@/lib/utils/colorHash";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils/format";
+import { EditClientModal } from "./EditClientModal";
 
 interface ClientDetailsSheetProps {
   client: Client | null;
@@ -18,6 +19,7 @@ type TabType = "overview" | "projects" | "invoices";
 
 export const ClientDetailsSheet = ({ client, onClose }: ClientDetailsSheetProps) => {
   const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   return (
     <AnimatePresence>
@@ -222,11 +224,20 @@ export const ClientDetailsSheet = ({ client, onClose }: ClientDetailsSheetProps)
 
             {/* Footer Actions */}
             <div className="p-6 border-t border-divider bg-page-bg">
-              <button className="w-full py-3 bg-white border border-border text-text-primary font-bold text-sm rounded-lg hover:bg-page-bg transition-colors shadow-sm">
+              <button 
+                onClick={() => setIsEditModalOpen(true)}
+                className="w-full py-3 bg-white border border-border text-text-primary font-bold text-sm rounded-lg hover:bg-page-bg transition-colors shadow-sm"
+              >
                 Edit Client Profile
               </button>
             </div>
           </motion.div>
+
+          <EditClientModal 
+            isOpen={isEditModalOpen} 
+            onClose={() => setIsEditModalOpen(false)} 
+            client={client} 
+          />
         </>
       )}
     </AnimatePresence>

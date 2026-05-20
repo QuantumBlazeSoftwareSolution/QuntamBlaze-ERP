@@ -1,17 +1,22 @@
 "use client";
 
+import { useState } from "react";
+
 import { motion } from "framer-motion";
 import { Edit3, Globe, MapPin, User, ChevronRight } from "lucide-react";
 import { ClientDetail } from "@/types/client";
 import { IDChip } from "@/components/ui/IDChip";
 import { getColorFromString, getInitials } from "@/lib/utils/colorHash";
 import { cn } from "@/lib/utils";
+import { EditClientModal } from "../EditClientModal";
 
 interface ClientProfileHeaderProps {
   client: ClientDetail;
 }
 
 export function ClientProfileHeader({ client }: ClientProfileHeaderProps) {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   return (
     <div className="w-full bg-bg-card/50 border-b border-border p-8 mb-8 rounded-t-2xl">
       <div className="flex flex-col md:flex-row items-start justify-between gap-8">
@@ -81,12 +86,21 @@ export function ClientProfileHeader({ client }: ClientProfileHeaderProps) {
             </div>
           </div>
 
-          <button className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-border text-text-primary font-bold text-[13px] rounded-lg hover:bg-white/10 transition-all group">
+          <button 
+            onClick={() => setIsEditModalOpen(true)}
+            className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-border text-text-primary font-bold text-[13px] rounded-lg hover:bg-white/10 transition-all group"
+          >
             <Edit3 className="w-4 h-4 text-text-muted group-hover:text-accent transition-colors" />
             Edit Profile
           </button>
         </div>
       </div>
+
+      <EditClientModal 
+        isOpen={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)} 
+        client={client} 
+      />
     </div>
   );
 }

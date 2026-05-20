@@ -1,21 +1,22 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Wand2, AlertCircle, Plus, DollarSign, Calendar } from "lucide-react";
+import { X, Wand2, AlertCircle, Plus, Calendar, Search } from "lucide-react";
 import { projectSchema, ProjectFormData } from "@/lib/schemas/projectSchema";
 import { useModalStore } from "@/store/modalStore";
-import { generateProjectId } from "@/lib/idEngine";
+import { previewProjectIdAction, createProjectAction } from "@/app/actions/projects";
 import { cn } from "@/lib/utils";
+import { searchClientsAction } from "@/app/actions/clients";
 
-const CLIENTS = [
-  { id: "CLI-GOOG-01", name: "Google" },
-  { id: "CLI-AMZN-04", name: "Amazon" },
-  { id: "CLI-MSFT-09", name: "Microsoft" },
-  { id: "CLI-META-12", name: "Meta" },
-];
+const formatNumberWithCommas = (value: string) => {
+  const cleanValue = value.replace(/\D/g, "");
+  if (!cleanValue) return "";
+  return Number(cleanValue).toLocaleString("en-US");
+};
 
 const TEAM_MEMBERS = [
   { id: "USR-JD-01", name: "John Doe", initials: "JD", color: "bg-emerald-500" },
@@ -26,6 +27,32 @@ const TEAM_MEMBERS = [
 export function NewProjectModal() {
   const { isNewProjectModalOpen, closeNewProjectModal } = useModalStore();
   const [generatedId, setGeneratedId] = useState<string>("");
+  const [mounted, setMounted] = useState(false);
+
+  // Client search state
+  const [clientSearchQuery, setClientSearchQuery] = useState("");
+  const [clientResults, setClientResults] = useState<{id: string, name: string}[]>([]);
+  const [isClientDropdownOpen, setIsClientDropdownOpen] = useState(false);
+  const [selectedClientName, setSelectedClientName] = useState("");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    const fetchClients = async () => {
+      const res = await searchClientsAction(clientSearchQuery);
+      if (active && res.success && res.clients) {
+        setClientResults(res.clients);
+      }
+    };
+    const timer = setTimeout(fetchClients, 300);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [clientSearchQuery]);
 
   const {
     register,
@@ -39,31 +66,46 @@ export function NewProjectModal() {
     defaultValues: {
       type: "Fixed Price",
       teamMembers: [],
-      budget: 0,
+      budget: "" as any,
     },
   });
+
+  const { onChange: onBudgetChange, ...budgetRest } = register("budget");
 
   const selectedClientId = watch("clientId");
   const selectedTeamMembers = watch("teamMembers");
 
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   // Reactively generate PRJ-ID when client changes
   useEffect(() => {
-    if (selectedClientId) {
-      const client = CLIENTS.find((c) => c.id === selectedClientId);
-      if (client) {
-        setGeneratedId(generateProjectId(client.name, 5)); // Hardcoded sequence for demo
-      }
+    if (selectedClientId && selectedClientName) {
+      const getPreviewId = async () => {
+        const nextId = await previewProjectIdAction(selectedClientName);
+        setGeneratedId(nextId);
+      };
+      getPreviewId();
     } else {
       setGeneratedId("");
     }
-  }, [selectedClientId]);
+  }, [selectedClientId, selectedClientName]);
 
   const onSubmit = async (data: ProjectFormData) => {
-    console.log("Project Data:", { ...data, id: generatedId });
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    reset();
-    closeNewProjectModal();
+    setSubmitError(null);
+    try {
+      const res = await createProjectAction(data);
+      if (res.success) {
+        reset();
+        setSelectedClientName("");
+        setClientSearchQuery("");
+        closeNewProjectModal();
+      } else {
+        setSubmitError(res.error || "Failed to initiate project.");
+      }
+    } catch (err: any) {
+      console.error(err);
+      setSubmitError("An unexpected error occurred.");
+    }
   };
 
   const toggleTeamMember = (memberId: string) => {
@@ -77,10 +119,10 @@ export function NewProjectModal() {
     setValue("teamMembers", current);
   };
 
-  if (!isNewProjectModalOpen) return null;
+  if (!isNewProjectModalOpen || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -93,7 +135,7 @@ export function NewProjectModal() {
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative bg-white border border-[#E2E8F0] rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col"
+        className="relative bg-white border border-[#E2E8F0] rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-full"
       >
         {/* Header */}
         <div className="px-8 py-6 border-b border-[#F1F5F9] flex items-center justify-between">
@@ -166,17 +208,72 @@ export function NewProjectModal() {
                 <label className="text-[10px] font-black text-[#0F172A] uppercase tracking-widest ml-1">
                   Client Attribution
                 </label>
-                <select
-                  {...register("clientId")}
-                  className="w-full h-12 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-4 text-sm font-bold text-[#0F172A] focus:outline-none focus:border-[#10B981] appearance-none"
-                >
-                  <option value="">Select Strategic Client</option>
-                  {CLIENTS.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <div 
+                    className={cn(
+                      "w-full h-12 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-4 text-sm font-bold text-[#0F172A] focus-within:ring-4 focus-within:ring-[#10B981]/10 focus-within:border-[#10B981] transition-all flex items-center cursor-pointer",
+                      errors.clientId && "border-red-300 ring-red-50"
+                    )}
+                    onClick={() => setIsClientDropdownOpen(true)}
+                  >
+                    {selectedClientName && !isClientDropdownOpen ? (
+                      <div className="flex-1 flex items-center justify-between" onClick={() => setIsClientDropdownOpen(true)}>
+                        <span>{selectedClientName}</span>
+                        <Search className="w-4 h-4 text-[#94A3B8]" />
+                      </div>
+                    ) : (
+                      <div className="flex-1 flex items-center gap-2">
+                        <Search className="w-4 h-4 text-[#94A3B8]" />
+                        <input 
+                          className="w-full bg-transparent outline-none placeholder-[#94A3B8]"
+                          placeholder="Search clients..."
+                          value={clientSearchQuery}
+                          onChange={(e) => {
+                            setClientSearchQuery(e.target.value);
+                            setIsClientDropdownOpen(true);
+                          }}
+                          onFocus={() => setIsClientDropdownOpen(true)}
+                          onBlur={() => setTimeout(() => setIsClientDropdownOpen(false), 200)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  
+                  <AnimatePresence>
+                    {isClientDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -5 }}
+                        className="absolute z-10 w-full mt-2 bg-white border border-[#E2E8F0] rounded-xl shadow-xl max-h-48 overflow-y-auto custom-scrollbar"
+                      >
+                        {clientResults.length > 0 ? (
+                          clientResults.map((client) => (
+                            <div
+                              key={client.id}
+                              className="px-4 py-3 hover:bg-[#F8FAFC] cursor-pointer border-b border-[#F1F5F9] last:border-0"
+                              onClick={() => {
+                                setValue("clientId", client.id, { shouldValidate: true });
+                                setSelectedClientName(client.name);
+                                setIsClientDropdownOpen(false);
+                                setClientSearchQuery("");
+                              }}
+                            >
+                              <p className="text-sm font-bold text-[#0F172A]">{client.name}</p>
+                              <p className="text-[10px] font-black text-[#94A3B8] uppercase tracking-widest">{client.id}</p>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="px-4 py-3 text-sm font-bold text-[#94A3B8]">
+                            {clientSearchQuery ? "No clients found." : "Type to search..."}
+                          </div>
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  {/* Hidden input to register with react-hook-form */}
+                  <input type="hidden" {...register("clientId")} />
+                </div>
                 {errors.clientId && (
                   <p className="text-[10px] font-bold text-red-500 mt-1 flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" /> {errors.clientId.message}
@@ -240,13 +337,26 @@ export function NewProjectModal() {
                   Budget Allocation
                 </label>
                 <div className="relative">
-                  <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-[#94A3B8] uppercase tracking-widest select-none pointer-events-none">
+                    LKR
+                  </span>
                   <input
-                    type="number"
-                    {...register("budget")}
-                    className="w-full h-12 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl pl-12 pr-4 text-sm font-bold text-[#0F172A] focus:outline-none focus:border-[#10B981]"
+                    type="text"
+                    {...budgetRest}
+                    onChange={(e) => {
+                      const formatted = formatNumberWithCommas(e.target.value);
+                      e.target.value = formatted;
+                      onBudgetChange(e);
+                    }}
+                    placeholder="0"
+                    className="w-full h-12 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl pl-14 pr-4 text-sm font-bold text-[#0F172A] focus:outline-none focus:border-[#10B981] transition-all"
                   />
                 </div>
+                {errors.budget && (
+                  <p className="text-[10px] font-bold text-red-500 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" /> {errors.budget.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -302,9 +412,16 @@ export function NewProjectModal() {
                     <AlertCircle className="w-3 h-3" /> {errors.description.message}
                   </p>
                 )}
-              </div>
             </div>
-          </form>
+          </div>
+
+          {submitError && (
+            <div className="mt-6 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3 animate-pulse">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+              <p className="text-xs font-bold text-red-800">{submitError}</p>
+            </div>
+          )}
+        </form>
         </div>
 
         {/* Footer */}
@@ -327,6 +444,7 @@ export function NewProjectModal() {
           </button>
         </div>
       </motion.div>
-    </div>
+    </div>,
+    document.body
   );
 }

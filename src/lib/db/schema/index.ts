@@ -22,3 +22,4 @@ export * from "./hr/payroll_configs";
 export * from "./hr/payroll_runs";
 export * from "./hr/performance";
 export * from "./hr/activities";
+export * from "./logs";

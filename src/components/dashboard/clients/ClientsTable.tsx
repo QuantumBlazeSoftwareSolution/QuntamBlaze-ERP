@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -28,6 +28,16 @@ const columnHelper = createColumnHelper<Client>();
 export function ClientsTable({ data }: { data: Client[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [selectedClient, setSelectedClient] = React.useState<Client | null>(null);
+
+  useEffect(() => {
+    if (selectedClient) {
+      const updatedClient = data.find((c) => c.id === selectedClient.id);
+      if (updatedClient && JSON.stringify(updatedClient) !== JSON.stringify(selectedClient)) {
+        setSelectedClient(updatedClient);
+      }
+    }
+  }, [data, selectedClient]);
+
   const columns = useMemo(
     () => [
       columnHelper.accessor("id", {

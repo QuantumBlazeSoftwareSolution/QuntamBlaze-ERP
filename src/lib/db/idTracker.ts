@@ -33,3 +33,18 @@ export async function incrementAndGet(id: string, prefix: string): Promise<numbe
 
   return result[0].lastSequence;
 }
+
+/**
+ * Previews the next sequence for an entity ID without incrementing it.
+ */
+export async function previewNextSequence(id: string): Promise<number> {
+  const existing = await db.query.idConfig.findFirst({
+    where: eq(idConfig.id, id),
+  });
+
+  if (!existing) {
+    return 1;
+  }
+
+  return existing.lastSequence + 1;
+}
