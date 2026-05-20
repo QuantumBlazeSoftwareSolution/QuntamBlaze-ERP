@@ -18,12 +18,22 @@ const KanbanBoard = React.lazy(() =>
 const GanttView = React.lazy(() =>
   import("@/components/projects/GanttView").then((m) => ({ default: m.GanttView }))
 );
+const ChatWorkspaceClient = React.lazy(() =>
+  import("@/components/chat/ChatWorkspaceClient").then((m) => ({ default: m.ChatWorkspaceClient }))
+);
 
 interface ProjectDetailClientProps {
   project: any; // We'll type this properly based on DB output
+  currentUser: {
+    userId: string;
+    name: string;
+    email: string;
+    roleName: string;
+    roleColor: string;
+  };
 }
 
-export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
+export function ProjectDetailClient({ project, currentUser }: ProjectDetailClientProps) {
   const searchParams = useSearchParams();
   const activeTab = searchParams.get("tab") || "overview";
 
@@ -55,6 +65,20 @@ export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
               {activeTab === "documents" && <ProjectDocumentsTab project={project} />}
               {activeTab === "financials" && <ProjectFinancialsTab />}
               {activeTab === "activity" && <ProjectActivityTab />}
+              {activeTab === "chat" && (
+                <ChatWorkspaceClient
+                  initialProjects={[{
+                    id: project.id,
+                    name: project.name,
+                    status: project.status,
+                    progress: project.progress || 0,
+                    description: project.description,
+                  }]}
+                  currentUser={currentUser}
+                  initialSelectedProjectId={project.id}
+                  hideSidebar={true}
+                />
+              )}
             </Suspense>
           </motion.div>
         </AnimatePresence>

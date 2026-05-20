@@ -42,6 +42,7 @@ export const NAV_CONFIG: NavSection[] = [
         icon: Briefcase,
         badge: { count: 12, color: "bg-sidebar-border", textColor: "text-white" },
       },
+      { label: "Chat", href: "/dashboard/chat", icon: MessageSquare },
       { label: "Documents", href: "/dashboard/documents", icon: FileText },
     ],
   },

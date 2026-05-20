@@ -31,6 +31,11 @@ import {
   saveBaseFolderSettingsAction,
   createBaseFolderAction,
 } from "@/app/actions/gdriveActions";
+import {
+  savePusherConfigAction,
+  getPusherStatusAction,
+  disconnectPusherAction,
+} from "@/app/actions/pusherActions";
 
 export function IntegrationsTab() {
   const searchParams = useSearchParams();
@@ -51,7 +56,11 @@ export function IntegrationsTab() {
   const [loadingStatus, setLoadingStatus] = useState(true);
 
   // Drawer & Selection states
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerType, setDrawerType] = useState<"gdrive" | "pusher" | null>(null);
+  const drawerOpen = !!drawerType;
+  const setDrawerOpen = (open: boolean) => {
+    if (!open) setDrawerType(null);
+  };
   const [folders, setFolders] = useState<Array<{ id: string; name: string }>>([]);
   const [loadingFolders, setLoadingFolders] = useState(false);
   const [selectedFolderId, setSelectedFolderId] = useState("");
@@ -63,9 +72,29 @@ export function IntegrationsTab() {
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
+  // Pusher status and action states
+  const [pusherStatus, setPusherStatus] = useState<{
+    isConfigured: boolean;
+    appId: string;
+    key: string;
+    cluster: string;
+  }>({
+    isConfigured: false,
+    appId: "",
+    key: "",
+    cluster: "",
+  });
+  const [loadingPusherStatus, setLoadingPusherStatus] = useState(true);
+  const [isSavingPusherConfig, setIsSavingPusherConfig] = useState(false);
+  const [isDisconnectingPusher, setIsDisconnectingPusher] = useState(false);
+
   // Form states
   const [clientIdInput, setClientIdInput] = useState("");
   const [clientSecretInput, setClientSecretInput] = useState("");
+  const [pusherAppIdInput, setPusherAppIdInput] = useState("");
+  const [pusherKeyInput, setPusherKeyInput] = useState("");
+  const [pusherSecretInput, setPusherSecretInput] = useState("");
+  const [pusherClusterInput, setPusherClusterInput] = useState("");
   const [drawerError, setDrawerError] = useState("");
   const [drawerSuccess, setDrawerSuccess] = useState("");
 
@@ -77,6 +106,7 @@ export function IntegrationsTab() {
 
   // Setup Instruction Modal States
   const [showSetupModal, setShowSetupModal] = useState(false);
+  const [showPusherSetupModal, setShowPusherSetupModal] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const copyRedirectUri = () => {
@@ -106,8 +136,30 @@ export function IntegrationsTab() {
     }
   };
 
+  const loadPusherStatus = async () => {
+    try {
+      const res = await getPusherStatusAction();
+      if (res.success) {
+        setPusherStatus({
+          isConfigured: res.isConfigured || false,
+          appId: res.appId || "",
+          key: res.key || "",
+          cluster: res.cluster || "",
+        });
+        if (res.appId) setPusherAppIdInput(res.appId);
+        if (res.key) setPusherKeyInput(res.key);
+        if (res.cluster) setPusherClusterInput(res.cluster);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingPusherStatus(false);
+    }
+  };
+
   useEffect(() => {
     loadStatus();
+    loadPusherStatus();
 
     // Check URL query parameters
     const success = searchParams.get("gdrive_success");
@@ -269,6 +321,58 @@ export function IntegrationsTab() {
     }
   };
 
+  const handleSavePusherCredentials = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingPusherConfig(true);
+    setDrawerError("");
+    setDrawerSuccess("");
+
+    try {
+      const res = await savePusherConfigAction(
+        pusherAppIdInput,
+        pusherKeyInput,
+        pusherSecretInput,
+        pusherClusterInput
+      );
+      if (res.success) {
+        setDrawerSuccess("Pusher configuration saved successfully!");
+        await loadPusherStatus();
+      } else {
+        setDrawerError(res.error || "Failed to save configuration.");
+      }
+    } catch (err: any) {
+      setDrawerError(err.message || "An unexpected error occurred.");
+    } finally {
+      setIsSavingPusherConfig(false);
+    }
+  };
+
+  const handleDisconnectPusher = async () => {
+    if (!confirm("Are you sure you want to disconnect Pusher Channels? Real-time chats will stop working.")) {
+      return;
+    }
+    setIsDisconnectingPusher(true);
+    setDrawerError("");
+    try {
+      const res = await disconnectPusherAction();
+      if (res.success) {
+        setDrawerSuccess("Pusher Channels successfully disconnected.");
+        setPusherAppIdInput("");
+        setPusherKeyInput("");
+        setPusherSecretInput("");
+        setPusherClusterInput("");
+        await loadPusherStatus();
+        setTimeout(() => setDrawerType(null), 2000);
+      } else {
+        setDrawerError(res.error || "Failed to disconnect Pusher.");
+      }
+    } catch (err: any) {
+      setDrawerError(err.message || "Disconnection failed.");
+    } finally {
+      setIsDisconnectingPusher(false);
+    }
+  };
+
   const INTEGRATIONS = [
     {
       id: "slack",
@@ -294,7 +398,21 @@ export function IntegrationsTab() {
         : "Not Connected",
       color: "text-blue-500",
       actionLabel: "CONFIGURE HUB",
-      onAction: () => setDrawerOpen(true),
+      onAction: () => setDrawerType("gdrive"),
+    },
+    {
+      id: "pusher",
+      name: "Pusher (WebSocket)",
+      description: "Enable real-time messaging, collaboration, and instant updates across the workspace.",
+      icon: MessageSquare,
+      status: loadingPusherStatus
+        ? "Loading..."
+        : pusherStatus.isConfigured
+        ? "Connected"
+        : "Not Connected",
+      color: "text-indigo-500",
+      actionLabel: "CONFIGURE HUB",
+      onAction: () => setDrawerType("pusher"),
     },
     {
       id: "gmail",
@@ -393,10 +511,10 @@ export function IntegrationsTab() {
 
             <button
               onClick={integration.onAction}
-              disabled={integration.id !== "gdrive"}
+              disabled={integration.id !== "gdrive" && integration.id !== "pusher"}
               className={cn(
                 "mt-8 flex items-center justify-between w-full p-4 rounded-xl bg-page-bg border border-divider group-hover:border-accent/50 transition-all cursor-pointer",
-                integration.id !== "gdrive" && "opacity-50 cursor-not-allowed"
+                (integration.id !== "gdrive" && integration.id !== "pusher") && "opacity-50 cursor-not-allowed"
               )}
             >
               <span className="text-[12px] font-bold text-text-secondary group-hover:text-text-primary">
@@ -432,25 +550,47 @@ export function IntegrationsTab() {
               {/* Header */}
               <div className="space-y-6">
                 <div className="flex items-center justify-between pb-4 border-b border-divider">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl text-blue-500">
-                      <HardDrive className="w-6 h-6" />
+                  {drawerType === "gdrive" ? (
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl text-blue-500">
+                        <HardDrive className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-text-primary flex items-center gap-1.5">
+                          Google Drive
+                          <button
+                            type="button"
+                            onClick={() => setShowSetupModal(true)}
+                            title="View Setup Guide"
+                            className="text-text-muted hover:text-accent transition-colors border-0 bg-transparent p-0 cursor-pointer"
+                          >
+                            <HelpCircle className="w-4 h-4" />
+                          </button>
+                        </h3>
+                        <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">Cloud Sync Settings</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-text-primary flex items-center gap-1.5">
-                        Google Drive
-                        <button
-                          type="button"
-                          onClick={() => setShowSetupModal(true)}
-                          title="View Setup Guide"
-                          className="text-text-muted hover:text-accent transition-colors border-0 bg-transparent p-0 cursor-pointer"
-                        >
-                          <HelpCircle className="w-4 h-4" />
-                        </button>
-                      </h3>
-                      <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">Cloud Sync Settings</p>
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-xl text-indigo-500">
+                        <MessageSquare className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-text-primary flex items-center gap-1.5">
+                          Pusher (WebSocket)
+                          <button
+                            type="button"
+                            onClick={() => setShowPusherSetupModal(true)}
+                            title="View Setup Guide"
+                            className="text-text-muted hover:text-accent transition-colors border-0 bg-transparent p-0 cursor-pointer"
+                          >
+                            <HelpCircle className="w-4 h-4" />
+                          </button>
+                        </h3>
+                        <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">Real-time Web Sync Settings</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
                   <button
                     onClick={() => setDrawerOpen(false)}
                     className="p-2 rounded-xl hover:bg-page-bg text-text-muted hover:text-text-primary transition-all"
@@ -474,25 +614,256 @@ export function IntegrationsTab() {
                 )}
 
                 {/* Main Action Modules */}
-                {!gdriveStatus.hasConfig ? (
-                  /* STEP 1: Save Client Config */
-                  <form onSubmit={handleSaveCredentials} className="space-y-6">
+                {drawerType === "gdrive" ? (
+                  <>
+                    {!gdriveStatus.hasConfig ? (
+                      /* STEP 1: Save Client Config */
+                      <form onSubmit={handleSaveCredentials} className="space-y-6">
+                        <div className="bg-slate-50 border border-border p-5 rounded-2xl space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-[12px] font-bold text-slate-800 uppercase tracking-wider">
+                              <Settings className="w-4 h-4 text-accent" />
+                              Configuration Guide
+                            </div>
+                            <span className="px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 text-[9px] font-black uppercase tracking-widest rounded-full">
+                              RECOMMENDED
+                            </span>
+                          </div>
+                          <p className="text-[12px] text-text-secondary leading-relaxed">
+                            To connect Google Drive, you'll need to create an OAuth Client ID and Secret in the Google Cloud Console. We've built an interactive step-by-step guide to help you do this in 2 minutes.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setShowSetupModal(true)}
+                            className="w-full flex items-center justify-center gap-2 h-11 border border-accent/20 hover:border-accent bg-accent/5 hover:bg-accent/10 text-accent font-bold rounded-xl text-[12px] uppercase tracking-widest transition-all cursor-pointer"
+                          >
+                            <HelpCircle className="w-4 h-4" />
+                            View Setup Instructions
+                          </button>
+                        </div>
+
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1.5">
+                              <Key className="w-3 h-3 text-accent" />
+                              OAuth Client ID
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={clientIdInput}
+                              onChange={(e) => setClientIdInput(e.target.value)}
+                              placeholder="e.g. 12345-abcde.apps.googleusercontent.com"
+                              className="w-full h-11 px-4 border border-border rounded-xl text-[13px] text-text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none"
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1.5">
+                              <Key className="w-3 h-3 text-accent" />
+                              OAuth Client Secret
+                            </label>
+                            <input
+                              type="password"
+                              required
+                              value={clientSecretInput}
+                              onChange={(e) => setClientSecretInput(e.target.value)}
+                              placeholder="Enter your Google Client Secret"
+                              className="w-full h-11 px-4 border border-border rounded-xl text-[13px] text-text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none"
+                            />
+                          </div>
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={isSavingConfig}
+                          className="w-full flex items-center justify-center gap-2 h-12 bg-accent text-white font-bold rounded-xl text-[12px] uppercase tracking-widest shadow-lg shadow-accent/20 hover:scale-[1.01] transition-all disabled:opacity-50 cursor-pointer"
+                        >
+                          {isSavingConfig ? (
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                          ) : (
+                            "Save Credentials"
+                          )}
+                        </button>
+                      </form>
+                    ) : !gdriveStatus.isConnected ? (
+                      /* STEP 2: Authenticate Account */
+                      <div className="space-y-6">
+                        <div className="p-6 bg-slate-50 border border-border rounded-2xl text-center space-y-4">
+                          <div className="w-12 h-12 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-500 mx-auto">
+                            <HardDrive className="w-6 h-6 animate-pulse" />
+                          </div>
+                          <div className="space-y-1">
+                            <h4 className="text-sm font-bold text-text-primary">Credentials Configured</h4>
+                            <p className="text-[11px] text-text-muted break-all">
+                              Client ID: {gdriveStatus.clientId.slice(0, 15)}...
+                            </p>
+                          </div>
+                          <p className="text-[12px] text-text-secondary leading-relaxed">
+                            OAuth endpoints are loaded. Click the connection link below to authenticate with Google Consent.
+                          </p>
+                        </div>
+
+                        <button
+                          onClick={handleConnectAccount}
+                          className="w-full flex items-center justify-center gap-2 h-12 bg-blue-500 text-white font-bold rounded-xl text-[12px] uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:scale-[1.01] transition-all cursor-pointer"
+                        >
+                          Connect Google Account
+                        </button>
+
+                        <div className="flex justify-between items-center pt-4 border-t border-divider">
+                          <button
+                            type="button"
+                            onClick={() => setShowSetupModal(true)}
+                            className="text-[11px] font-bold text-accent hover:underline flex items-center gap-1 cursor-pointer border-0 bg-transparent p-0"
+                          >
+                            <HelpCircle className="w-3.5 h-3.5" />
+                            View Setup Guide
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (confirm("Reset current credentials?")) {
+                                await disconnectGoogleDriveAction();
+                                await loadStatus();
+                              }
+                            }}
+                            className="text-[11px] font-bold text-danger hover:underline cursor-pointer border-0 bg-transparent p-0"
+                          >
+                            Reset Credentials
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      /* STEP 3: Configure Sync Folder */
+                      <div className="space-y-8">
+                        {/* Connection Banner */}
+                        <div className="p-4 bg-emerald-50 border border-emerald-100/50 rounded-2xl flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center">
+                              <Check className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <p className="text-[12px] font-bold text-text-primary">Account Authorized</p>
+                              <p className="text-[10px] text-emerald-600 font-mono">Status: Connected</p>
+                            </div>
+                          </div>
+                          <span className="px-2 py-0.5 bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest rounded-full">ACTIVE</span>
+                        </div>
+
+                        {/* Folder Selection Option */}
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1.5">
+                              <Folder className="w-3.5 h-3.5 text-blue-500" />
+                              Choose System Sync Folder
+                            </label>
+                            {loadingFolders ? (
+                              <div className="flex items-center justify-center h-12 bg-slate-50 border border-border rounded-xl text-[12px] text-text-muted gap-2">
+                                <RefreshCw className="w-4 h-4 animate-spin text-accent" />
+                                Loading folders from Google Drive...
+                              </div>
+                            ) : (
+                              <div className="flex gap-2">
+                                <div className="relative flex-1">
+                                  <select
+                                    value={selectedFolderId}
+                                    onChange={(e) => setSelectedFolderId(e.target.value)}
+                                    className="w-full bg-white border border-border rounded-xl px-4 h-11 text-[13px] text-text-primary focus:border-accent outline-none appearance-none"
+                                  >
+                                    <option value="">-- Select a Folder --</option>
+                                    {folders.map((f) => (
+                                      <option key={f.id} value={f.id}>
+                                        {f.name}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-text-muted">
+                                    ▼
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={handleSaveFolder}
+                                  disabled={!selectedFolderId || isSavingFolder}
+                                  className="px-6 bg-accent text-white font-bold text-[11px] uppercase tracking-widest rounded-xl hover:scale-[1.02] disabled:opacity-50 transition-all cursor-pointer"
+                                >
+                                  {isSavingFolder ? "Saving..." : "Apply"}
+                                </button>
+                              </div>
+                            )}
+                            <p className="text-[11px] text-text-muted leading-relaxed">
+                              All project proposals, receipts, and agreements will sync directly inside this base folder.
+                            </p>
+                          </div>
+
+                          {/* Folder Setup status */}
+                          {gdriveStatus.baseFolder && (
+                            <div className="p-4 bg-slate-50 border border-border rounded-xl flex items-center gap-3">
+                              <CheckCircle className="w-5 h-5 text-accent" />
+                              <div>
+                                <p className="text-[11px] text-text-muted uppercase tracking-widest font-black">Active Base Folder</p>
+                                <p className="text-[13px] font-bold text-text-primary">
+                                  {gdriveStatus.baseFolder.baseFolderName}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Divider */}
+                          <div className="relative flex py-4 items-center">
+                            <div className="flex-grow border-t border-divider"></div>
+                            <span className="flex-shrink mx-4 text-text-muted text-[10px] font-black uppercase tracking-wider">or</span>
+                            <div className="flex-grow border-t border-divider"></div>
+                          </div>
+
+                          {/* Create New Base Folder Form */}
+                          <form onSubmit={handleCreateFolder} className="space-y-3">
+                            <div className="space-y-2">
+                              <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1.5">
+                                <FolderPlus className="w-3.5 h-3.5 text-accent" />
+                                Create New Base Folder
+                              </label>
+                              <div className="flex gap-2">
+                                <input
+                                  type="text"
+                                  required
+                                  value={newFolderName}
+                                  onChange={(e) => setNewFolderName(e.target.value)}
+                                  placeholder="e.g. QuantumBlaze ERP Sync"
+                                  className="flex-1 h-11 px-4 border border-border rounded-xl text-[13px] text-text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none"
+                                />
+                                <button
+                                  type="submit"
+                                  disabled={isCreatingFolder || !newFolderName.trim()}
+                                  className="px-6 bg-slate-900 text-white font-bold text-[11px] uppercase tracking-widest rounded-xl hover:scale-[1.02] disabled:opacity-50 transition-all cursor-pointer"
+                                >
+                                  {isCreatingFolder ? "Creating..." : "Create"}
+                                </button>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  /* PUSHER DRAWER CONTENT */
+                  <form onSubmit={handleSavePusherCredentials} className="space-y-6">
                     <div className="bg-slate-50 border border-border p-5 rounded-2xl space-y-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-[12px] font-bold text-slate-800 uppercase tracking-wider">
                           <Settings className="w-4 h-4 text-accent" />
                           Configuration Guide
                         </div>
-                        <span className="px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 text-[9px] font-black uppercase tracking-widest rounded-full">
+                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 border border-indigo-100 text-[9px] font-black uppercase tracking-widest rounded-full">
                           RECOMMENDED
                         </span>
                       </div>
                       <p className="text-[12px] text-text-secondary leading-relaxed">
-                        To connect Google Drive, you'll need to create an OAuth Client ID and Secret in the Google Cloud Console. We've built an interactive step-by-step guide to help you do this in 2 minutes.
+                        To enable real-time collaboration, you can create a free account in Pusher and configure your Channels application. This keeps messages synced across active client browsers instantly.
                       </p>
                       <button
                         type="button"
-                        onClick={() => setShowSetupModal(true)}
+                        onClick={() => setShowPusherSetupModal(true)}
                         className="w-full flex items-center justify-center gap-2 h-11 border border-accent/20 hover:border-accent bg-accent/5 hover:bg-accent/10 text-accent font-bold rounded-xl text-[12px] uppercase tracking-widest transition-all cursor-pointer"
                       >
                         <HelpCircle className="w-4 h-4" />
@@ -504,14 +875,14 @@ export function IntegrationsTab() {
                       <div className="space-y-2">
                         <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1.5">
                           <Key className="w-3 h-3 text-accent" />
-                          OAuth Client ID
+                          App ID
                         </label>
                         <input
                           type="text"
                           required
-                          value={clientIdInput}
-                          onChange={(e) => setClientIdInput(e.target.value)}
-                          placeholder="e.g. 12345-abcde.apps.googleusercontent.com"
+                          value={pusherAppIdInput}
+                          onChange={(e) => setPusherAppIdInput(e.target.value)}
+                          placeholder="e.g. 2157063"
                           className="w-full h-11 px-4 border border-border rounded-xl text-[13px] text-text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none"
                         />
                       </div>
@@ -519,14 +890,44 @@ export function IntegrationsTab() {
                       <div className="space-y-2">
                         <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1.5">
                           <Key className="w-3 h-3 text-accent" />
-                          OAuth Client Secret
+                          Key
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={pusherKeyInput}
+                          onChange={(e) => setPusherKeyInput(e.target.value)}
+                          placeholder="e.g. 226eb885d95848fe3c5c"
+                          className="w-full h-11 px-4 border border-border rounded-xl text-[13px] text-text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1.5">
+                          <Key className="w-3 h-3 text-accent" />
+                          Secret
                         </label>
                         <input
                           type="password"
                           required
-                          value={clientSecretInput}
-                          onChange={(e) => setClientSecretInput(e.target.value)}
-                          placeholder="Enter your Google Client Secret"
+                          value={pusherSecretInput}
+                          onChange={(e) => setPusherSecretInput(e.target.value)}
+                          placeholder="Enter your Pusher App Secret"
+                          className="w-full h-11 px-4 border border-border rounded-xl text-[13px] text-text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1.5">
+                          <Key className="w-3 h-3 text-accent" />
+                          Cluster
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={pusherClusterInput}
+                          onChange={(e) => setPusherClusterInput(e.target.value)}
+                          placeholder="e.g. ap2"
                           className="w-full h-11 px-4 border border-border rounded-xl text-[13px] text-text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none"
                         />
                       </div>
@@ -534,178 +935,21 @@ export function IntegrationsTab() {
 
                     <button
                       type="submit"
-                      disabled={isSavingConfig}
+                      disabled={isSavingPusherConfig}
                       className="w-full flex items-center justify-center gap-2 h-12 bg-accent text-white font-bold rounded-xl text-[12px] uppercase tracking-widest shadow-lg shadow-accent/20 hover:scale-[1.01] transition-all disabled:opacity-50 cursor-pointer"
                     >
-                      {isSavingConfig ? (
+                      {isSavingPusherConfig ? (
                         <RefreshCw className="w-4 h-4 animate-spin" />
                       ) : (
-                        "Save Credentials"
+                        "Save Pusher Configuration"
                       )}
                     </button>
                   </form>
-                ) : !gdriveStatus.isConnected ? (
-                  /* STEP 2: Authenticate Account */
-                  <div className="space-y-6">
-                    <div className="p-6 bg-slate-50 border border-border rounded-2xl text-center space-y-4">
-                      <div className="w-12 h-12 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-500 mx-auto">
-                        <HardDrive className="w-6 h-6 animate-pulse" />
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-sm font-bold text-text-primary">Credentials Configured</h4>
-                        <p className="text-[11px] text-text-muted break-all">
-                          Client ID: {gdriveStatus.clientId.slice(0, 15)}...
-                        </p>
-                      </div>
-                      <p className="text-[12px] text-text-secondary leading-relaxed">
-                        OAuth endpoints are loaded. Click the connection link below to authenticate with Google Consent.
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={handleConnectAccount}
-                      className="w-full flex items-center justify-center gap-2 h-12 bg-blue-500 text-white font-bold rounded-xl text-[12px] uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:scale-[1.01] transition-all cursor-pointer"
-                    >
-                      Connect Google Account
-                    </button>
-
-                    <div className="flex justify-between items-center pt-4 border-t border-divider">
-                      <button
-                        type="button"
-                        onClick={() => setShowSetupModal(true)}
-                        className="text-[11px] font-bold text-accent hover:underline flex items-center gap-1 cursor-pointer border-0 bg-transparent p-0"
-                      >
-                        <HelpCircle className="w-3.5 h-3.5" />
-                        View Setup Guide
-                      </button>
-                      <button
-                        onClick={async () => {
-                          if (confirm("Reset current credentials?")) {
-                            await disconnectGoogleDriveAction();
-                            await loadStatus();
-                          }
-                        }}
-                        className="text-[11px] font-bold text-danger hover:underline cursor-pointer border-0 bg-transparent p-0"
-                      >
-                        Reset Credentials
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  /* STEP 3: Configure Sync Folder */
-                  <div className="space-y-8">
-                    {/* Connection Banner */}
-                    <div className="p-4 bg-emerald-50 border border-emerald-100/50 rounded-2xl flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center">
-                          <Check className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <p className="text-[12px] font-bold text-text-primary">Account Authorized</p>
-                          <p className="text-[10px] text-emerald-600 font-mono">Status: Connected</p>
-                        </div>
-                      </div>
-                      <span className="px-2 py-0.5 bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest rounded-full">ACTIVE</span>
-                    </div>
-
-                    {/* Folder Selection Option */}
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1.5">
-                          <Folder className="w-3.5 h-3.5 text-blue-500" />
-                          Choose System Sync Folder
-                        </label>
-                        {loadingFolders ? (
-                          <div className="flex items-center justify-center h-12 bg-slate-50 border border-border rounded-xl text-[12px] text-text-muted gap-2">
-                            <RefreshCw className="w-4 h-4 animate-spin text-accent" />
-                            Loading folders from Google Drive...
-                          </div>
-                        ) : (
-                          <div className="flex gap-2">
-                            <div className="relative flex-1">
-                              <select
-                                value={selectedFolderId}
-                                onChange={(e) => setSelectedFolderId(e.target.value)}
-                                className="w-full bg-white border border-border rounded-xl px-4 h-11 text-[13px] text-text-primary focus:border-accent outline-none appearance-none"
-                              >
-                                <option value="">-- Select a Folder --</option>
-                                {folders.map((f) => (
-                                  <option key={f.id} value={f.id}>
-                                    {f.name}
-                                  </option>
-                                ))}
-                              </select>
-                              <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-text-muted">
-                                ▼
-                              </div>
-                            </div>
-                            <button
-                              onClick={handleSaveFolder}
-                              disabled={!selectedFolderId || isSavingFolder}
-                              className="px-6 bg-accent text-white font-bold text-[11px] uppercase tracking-widest rounded-xl hover:scale-[1.02] disabled:opacity-50 transition-all cursor-pointer"
-                            >
-                              {isSavingFolder ? "Saving..." : "Apply"}
-                            </button>
-                          </div>
-                        )}
-                        <p className="text-[11px] text-text-muted leading-relaxed">
-                          All project proposals, receipts, and agreements will sync directly inside this base folder.
-                        </p>
-                      </div>
-
-                      {/* Folder Setup status */}
-                      {gdriveStatus.baseFolder && (
-                        <div className="p-4 bg-slate-50 border border-border rounded-xl flex items-center gap-3">
-                          <CheckCircle className="w-5 h-5 text-accent" />
-                          <div>
-                            <p className="text-[11px] text-text-muted uppercase tracking-widest font-black">Active Base Folder</p>
-                            <p className="text-[13px] font-bold text-text-primary">
-                              {gdriveStatus.baseFolder.baseFolderName}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Divider */}
-                      <div className="relative flex py-4 items-center">
-                        <div className="flex-grow border-t border-divider"></div>
-                        <span className="flex-shrink mx-4 text-text-muted text-[10px] font-black uppercase tracking-wider">or</span>
-                        <div className="flex-grow border-t border-divider"></div>
-                      </div>
-
-                      {/* Create New Base Folder Form */}
-                      <form onSubmit={handleCreateFolder} className="space-y-3">
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1.5">
-                            <FolderPlus className="w-3.5 h-3.5 text-accent" />
-                            Create New Base Folder
-                          </label>
-                          <div className="flex gap-2">
-                            <input
-                              type="text"
-                              required
-                              value={newFolderName}
-                              onChange={(e) => setNewFolderName(e.target.value)}
-                              placeholder="e.g. QuantumBlaze ERP Sync"
-                              className="flex-1 h-11 px-4 border border-border rounded-xl text-[13px] text-text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none"
-                            />
-                            <button
-                              type="submit"
-                              disabled={isCreatingFolder || !newFolderName.trim()}
-                              className="px-6 bg-slate-900 text-white font-bold text-[11px] uppercase tracking-widest rounded-xl hover:scale-[1.02] disabled:opacity-50 transition-all cursor-pointer"
-                            >
-                              {isCreatingFolder ? "Creating..." : "Create"}
-                            </button>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
                 )}
               </div>
 
               {/* Drawer Footer Actions */}
-              {gdriveStatus.isConnected && (
+              {drawerType === "gdrive" && gdriveStatus.isConnected && (
                 <div className="pt-6 border-t border-divider mt-auto">
                   <button
                     onClick={handleDisconnect}
@@ -718,6 +962,25 @@ export function IntegrationsTab() {
                       <>
                         <Trash2 className="w-4 h-4" />
                         Disconnect Integration
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {drawerType === "pusher" && pusherStatus.isConfigured && (
+                <div className="pt-6 border-t border-divider mt-auto">
+                  <button
+                    onClick={handleDisconnectPusher}
+                    disabled={isDisconnectingPusher}
+                    className="w-full flex items-center justify-center gap-2 h-12 border border-danger/25 text-danger/80 hover:text-white hover:bg-danger hover:border-transparent font-bold rounded-xl text-[12px] uppercase tracking-widest transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {isDisconnectingPusher ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <>
+                        <Trash2 className="w-4 h-4" />
+                        Disconnect Pusher Channels
                       </>
                     )}
                   </button>
@@ -877,6 +1140,137 @@ export function IntegrationsTab() {
                 <button
                   type="button"
                   onClick={() => setShowSetupModal(false)}
+                  className="px-6 h-11 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[12px] uppercase tracking-widest rounded-xl hover:scale-[1.01] transition-all cursor-pointer border-0"
+                >
+                  Got It, Let's Setup!
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Pusher Setup Instructions Popup Modal */}
+      <AnimatePresence>
+        {showPusherSetupModal && (
+          <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
+            {/* Modal Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowPusherSetupModal(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            />
+
+            {/* Modal Container Panel */}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="relative max-w-2xl w-full bg-white border border-border rounded-3xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden z-[2001]"
+            >
+              {/* Header */}
+              <div className="p-6 md:p-8 border-b border-divider flex items-center justify-between bg-slate-50/50">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-purple-50 border border-purple-100 rounded-2xl text-purple-500">
+                    <Settings className="w-5 h-5 animate-spin-slow" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-text-primary">Pusher Channels Configuration</h3>
+                    <p className="text-[11px] text-text-muted uppercase tracking-widest font-black">2-Minute Setup Steps</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowPusherSetupModal(false)}
+                  className="p-2 rounded-xl hover:bg-page-bg text-text-muted hover:text-text-primary transition-all cursor-pointer border-0 bg-transparent"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Steps Scroll Area */}
+              <div className="p-6 md:p-8 overflow-y-auto space-y-6 custom-scrollbar flex-1 text-[13px] text-text-secondary leading-relaxed">
+                {/* Step 1 */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 font-bold text-sm shrink-0">
+                    1
+                  </div>
+                  <div className="space-y-1.5 pt-0.5">
+                    <h4 className="font-bold text-text-primary text-[14px]">Create a Pusher Account</h4>
+                    <p>
+                      Go to the <a href="https://dashboard.pusher.com/" target="_blank" rel="noreferrer" className="text-purple-500 font-bold hover:underline">Pusher Dashboard</a>. Sign up for a free account (no credit card required) or sign in to your existing account.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 2 */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 font-bold text-sm shrink-0">
+                    2
+                  </div>
+                  <div className="space-y-1.5 pt-0.5">
+                    <h4 className="font-bold text-text-primary text-[14px]">Create a Channels App</h4>
+                    <p>
+                      Inside the Pusher Console, go to <strong>"Channels"</strong> in the sidebar. Click on the <strong>"Create app"</strong> button. Name your application (e.g. <code>QuantumBlaze ERP Chat</code>) and choose a cluster close to you (e.g. <code>ap2</code> for Mumbai/Colombo/Asia).
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 3 */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 font-bold text-sm shrink-0">
+                    3
+                  </div>
+                  <div className="space-y-1.5 pt-0.5">
+                    <h4 className="font-bold text-text-primary text-[14px]">Go to "App Keys" Section</h4>
+                    <p>
+                      Once the app is created, navigate to the <strong>"App Keys"</strong> tab in the left-hand navigation menu of your Pusher app.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 4 */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 font-bold text-sm shrink-0">
+                    4
+                  </div>
+                  <div className="space-y-3 pt-0.5 w-full">
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-text-primary text-[14px]">Copy Credentials</h4>
+                      <p>
+                        You will see code blocks containing:
+                      </p>
+                    </div>
+                    <ul className="list-disc pl-5 space-y-1.5 text-text-muted">
+                      <li><code>app_id</code>: Your unique Pusher application identification</li>
+                      <li><code>key</code>: The public client API key</li>
+                      <li><code>secret</code>: Your private server API signature</li>
+                      <li><code>cluster</code>: The regional server network cluster</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Step 5 */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 font-bold text-sm shrink-0">
+                    5
+                  </div>
+                  <div className="space-y-1.5 pt-0.5">
+                    <h4 className="font-bold text-text-primary text-[14px]">Save and Start Collaborating!</h4>
+                    <p>
+                      Paste all four parameters into the drawer configuration panel and click save. The ERP will immediately activate real-time syncing!
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="p-6 border-t border-divider bg-slate-50 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowPusherSetupModal(false)}
                   className="px-6 h-11 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[12px] uppercase tracking-widest rounded-xl hover:scale-[1.01] transition-all cursor-pointer border-0"
                 >
                   Got It, Let's Setup!

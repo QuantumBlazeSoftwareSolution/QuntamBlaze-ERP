@@ -12,6 +12,7 @@ const TABS = [
   { id: "documents", label: "Documents" },
   { id: "financials", label: "Financials" },
   { id: "activity", label: "Activity" },
+  { id: "chat", label: "Chat" },
 ];
 
 export function ProjectTabs() {

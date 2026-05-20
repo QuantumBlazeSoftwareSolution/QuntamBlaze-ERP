@@ -1,8 +1,14 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { projectsCrud } from "@/lib/db/crud/projects";
 import { ProjectDetailClient } from "@/components/projects/ProjectDetailClient";
+import { getSession } from "@/lib/session";
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ prjId: string }> }) {
+  const session = await getSession();
+  if (!session || !session.userId) {
+    redirect("/login");
+  }
+
   const { prjId } = await params;
   const projectData = await projectsCrud.getById(prjId);
 
@@ -26,5 +32,13 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     linkedDocuments: [], // TODO: Wire this up
   };
 
-  return <ProjectDetailClient project={formattedProject} />;
+  const currentUser = {
+    userId: session.userId,
+    name: session.name || "Unknown User",
+    email: session.email || "",
+    roleName: session.roleName || "Member",
+    roleColor: session.roleColor || "#10B981",
+  };
+
+  return <ProjectDetailClient project={formattedProject} currentUser={currentUser} />;
 }
