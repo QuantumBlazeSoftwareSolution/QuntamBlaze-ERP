@@ -18,6 +18,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { HRNavbar } from "@/components/hr/HRNavbar";
 import { EmployeeProfileHeader } from "@/components/hr/employees/EmployeeProfileHeader";
+import { EditEmployeeDrawer } from "@/components/hr/employees/EditEmployeeDrawer";
 import { PersonalInfoTab } from "@/components/hr/employees/PersonalInfoTab";
 import { EmploymentDetailsTab } from "@/components/hr/employees/EmploymentDetailsTab";
 import { BankPayrollTab } from "@/components/hr/employees/BankPayrollTab";
@@ -45,6 +46,7 @@ interface EmployeeProfileClientProps {
 
 export function EmployeeProfileClient({ employee }: EmployeeProfileClientProps) {
   const [activeTab, setActiveTab] = useState("personal");
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 
   return (
     <div className="flex-1 bg-[#F8FAFC] min-h-screen flex flex-col">
@@ -61,7 +63,7 @@ export function EmployeeProfileClient({ employee }: EmployeeProfileClientProps) 
         </Link>
 
         {/* Profile Header */}
-        <EmployeeProfileHeader employee={employee} />
+        <EmployeeProfileHeader employee={employee} onEditClick={() => setIsEditDrawerOpen(true)} />
 
         {/* Tab Navigation */}
         <div className="flex items-center gap-2 mt-8 mb-8 overflow-x-auto pb-2 scrollbar-hide">
@@ -143,6 +145,12 @@ export function EmployeeProfileClient({ employee }: EmployeeProfileClientProps) 
           </AnimatePresence>
         </div>
       </div>
+
+      <EditEmployeeDrawer
+        isOpen={isEditDrawerOpen}
+        onClose={() => setIsEditDrawerOpen(false)}
+        employee={employee}
+      />
     </div>
   );
 }

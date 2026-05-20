@@ -70,6 +70,9 @@ export interface Candidate {
 
 export interface Employee {
   id: string;
+  firstName?: string;
+  lastName?: string;
+  employeeRole?: string;
   name: string;
   role: string;
   department: Department;

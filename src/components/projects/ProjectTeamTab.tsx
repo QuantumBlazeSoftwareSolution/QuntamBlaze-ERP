@@ -48,6 +48,8 @@ interface Employee {
   name: string;
   email: string;
   role: string | null;
+  employeeRole: string;
+  baseRole: string;
   avatar: string | null;
   status: string;
 }
@@ -114,6 +116,22 @@ export function ProjectTeamTab({ project }: ProjectTeamTabProps) {
     );
     if (alreadyInCurrentRole) return false;
 
+    // Smart Role-Specific Filtering based on baseRole mapping
+    if (activeRoleForAssign) {
+      const baseRole = (employee.baseRole || "").toUpperCase();
+      if (activeRoleForAssign === "PM") {
+        if (baseRole !== "PM") return false;
+      } else if (activeRoleForAssign === "TL") {
+        if (baseRole !== "DEV" && baseRole !== "PM") return false;
+      } else if (activeRoleForAssign === "Dev") {
+        if (baseRole !== "DEV") return false;
+      } else if (activeRoleForAssign === "QA") {
+        if (baseRole !== "QA") return false;
+      } else if (activeRoleForAssign === "UI/UX") {
+        if (baseRole !== "UI/UX") return false;
+      }
+    }
+ 
     // Filter by search query
     const matchQuery = 
       employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -612,8 +630,11 @@ export function ProjectTeamTab({ project }: ProjectTeamTabProps) {
                                 </span>
                               )}
                             </p>
-                            <p className="text-[10px] text-[#10B981] font-semibold truncate">
+                            <p className="text-[10px] text-[#10B981] font-semibold truncate flex items-center gap-1.5">
                               {employee.role || "Team Member"}
+                              <span className="text-[9px] text-slate-400 font-semibold bg-slate-100 px-1 rounded uppercase shrink-0">
+                                {employee.employeeRole}
+                              </span>
                             </p>
                           </div>
                         </div>

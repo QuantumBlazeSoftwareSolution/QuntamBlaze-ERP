@@ -7,6 +7,7 @@ export const employees = pgTable("employees", {
   lastName: varchar("last_name", { length: 100 }),
   name: varchar("name", { length: 255 }).notNull(), // Full name for quick access
   role: varchar("role", { length: 255 }),
+  employeeRole: varchar("employee_role", { length: 50 }).default("SE").notNull(),
   department: varchar("department", { length: 100 }),
   status: varchar("status", { length: 50 }).default("Active").notNull(),
   joinDate: timestamp("join_date"),

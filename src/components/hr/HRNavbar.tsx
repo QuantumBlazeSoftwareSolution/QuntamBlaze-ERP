@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { label: "Leave", href: "/dashboard/hr/leave" },
   { label: "Payroll", href: "/dashboard/hr/payroll" },
   { label: "Performance", href: "/dashboard/hr/performance" },
+  { label: "Roles", href: "/dashboard/hr/roles" },
 ];
 
 export function HRNavbar() {

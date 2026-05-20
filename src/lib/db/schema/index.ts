@@ -14,6 +14,7 @@ export * from "./hr/interviews";
 export * from "./hr/onboarding";
 export * from "./hr/skills";
 export * from "./hr/employees";
+export * from "./hr/employeeRoles";
 export * from "./hr/attendance";
 export * from "./hr/shifts";
 export * from "./hr/leave";
@@ -26,4 +27,4 @@ export * from "./logs";
 export * from "./authentication";
 export * from "./systemConfig";
 export * from "./chat";
-
+export * from "./personalTasks";

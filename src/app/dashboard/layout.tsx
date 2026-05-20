@@ -27,7 +27,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* TopAppBar */}
           <header
             className={cn(
-              "fixed top-0 right-0 z-30 flex items-center justify-between px-8 h-16 bg-white/80 backdrop-blur-md border-b border-divider transition-all duration-300",
+              "fixed top-0 right-0 z-40 flex items-center justify-between px-8 h-16 bg-white/80 backdrop-blur-md border-b border-divider transition-all duration-300",
               isCollapsed ? "left-[72px]" : "left-[260px]"
             )}
           >

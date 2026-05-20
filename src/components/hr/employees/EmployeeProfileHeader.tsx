@@ -21,9 +21,10 @@ import { Employee } from "@/types/hr";
 
 interface EmployeeProfileHeaderProps {
   employee: Employee;
+  onEditClick: () => void;
 }
 
-export function EmployeeProfileHeader({ employee }: EmployeeProfileHeaderProps) {
+export function EmployeeProfileHeader({ employee, onEditClick }: EmployeeProfileHeaderProps) {
   const healthColor =
     employee.profileHealth && employee.profileHealth >= 90
       ? "text-[#10B981] bg-[#ECFDF5] border-[#A7F3D0]"
@@ -73,6 +74,11 @@ export function EmployeeProfileHeader({ employee }: EmployeeProfileHeaderProps) 
               <div className="flex items-center gap-2">
                 <Zap className="w-4 h-4 text-[#10B981]" />
                 <span>{employee.role}</span>
+                {employee.employeeRole && (
+                  <span className="ml-1 px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 text-[9px] font-black uppercase tracking-wider border border-slate-200">
+                    {employee.employeeRole}
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-violet-500" />
@@ -101,7 +107,10 @@ export function EmployeeProfileHeader({ employee }: EmployeeProfileHeaderProps) 
             <button className="p-2.5 rounded-xl border border-[#E2E8F0] text-[#94A3B8] hover:bg-[#F8FAFC] transition-all">
               <Share2 className="w-5 h-5" />
             </button>
-            <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0F172A] text-white text-sm font-bold shadow-lg shadow-[#0F172A]/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+            <button
+              onClick={onEditClick}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0F172A] text-white text-sm font-bold shadow-lg shadow-[#0F172A]/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            >
               <Edit className="w-4 h-4" />
               Edit Profile
             </button>

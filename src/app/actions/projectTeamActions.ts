@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { projectTeam, employees } from "@/lib/db/schema";
+import { projectTeam, employees, employeeRoles } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
@@ -10,11 +10,29 @@ import { revalidatePath } from "next/cache";
  */
 export async function getEmployeesAction() {
   try {
-    const data = await db.query.employees.findMany({
-      where: eq(employees.status, "Active"),
-      orderBy: (employees, { asc }) => [asc(employees.name)],
-    });
-    return { success: true, employees: data };
+    const data = await db
+      .select({
+        id: employees.id,
+        name: employees.name,
+        email: employees.email,
+        role: employees.role,
+        employeeRole: employees.employeeRole,
+        avatar: employees.avatar,
+        status: employees.status,
+        baseRole: employeeRoles.baseRole,
+      })
+      .from(employees)
+      .leftJoin(employeeRoles, eq(employees.employeeRole, employeeRoles.code))
+      .where(eq(employees.status, "Active"))
+      .orderBy(employees.name);
+
+    // Make sure baseRole defaults to "None" if null (due to left join / no matching role)
+    const normalizedData = data.map((emp) => ({
+      ...emp,
+      baseRole: emp.baseRole || "None",
+    }));
+
+    return { success: true, employees: normalizedData };
   } catch (error: any) {
     console.error("Failed to fetch employees:", error);
     return { success: false, error: error.message || "Failed to fetch employees." };

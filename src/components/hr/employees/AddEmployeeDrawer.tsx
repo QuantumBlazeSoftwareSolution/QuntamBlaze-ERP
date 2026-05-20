@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, User, Mail, Phone, Briefcase, Building, CreditCard, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { X, User, Mail, Phone, Briefcase, Building, CreditCard, Loader2, CheckCircle2, AlertCircle, ShieldAlert, ChevronDown } from "lucide-react";
 import { createEmployeeAction } from "@/app/actions/hrActions";
+import { getEmployeeRolesAction } from "@/app/actions/employeeRoleActions";
 import { cn } from "@/lib/utils";
 
 interface AddEmployeeDrawerProps {
@@ -15,6 +16,7 @@ export function AddEmployeeDrawer({ isOpen, onClose }: AddEmployeeDrawerProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [roles, setRoles] = useState<any[]>([]);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -23,9 +25,26 @@ export function AddEmployeeDrawer({ isOpen, onClose }: AddEmployeeDrawerProps) {
     phone: "",
     nic: "",
     role: "",
+    employeeRole: "SE", // default to Software Engineer
     department: "",
     customDepartment: "",
   });
+
+  useEffect(() => {
+    async function loadRoles() {
+      try {
+        const res = await getEmployeeRolesAction();
+        if (res.success && res.roles) {
+          setRoles(res.roles);
+        }
+      } catch (err) {
+        console.error("Failed to load roles:", err);
+      }
+    }
+    if (isOpen) {
+      loadRoles();
+    }
+  }, [isOpen]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -59,6 +78,7 @@ export function AddEmployeeDrawer({ isOpen, onClose }: AddEmployeeDrawerProps) {
             phone: "",
             nic: "",
             role: "",
+            employeeRole: "SE",
             department: "",
             customDepartment: "",
           });
@@ -235,7 +255,7 @@ export function AddEmployeeDrawer({ isOpen, onClose }: AddEmployeeDrawerProps) {
                             required
                             value={formData.department}
                             onChange={handleChange}
-                            className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-emerald-500 outline-none transition-colors appearance-none"
+                            className="w-full pl-9 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-emerald-500 outline-none transition-colors appearance-none cursor-pointer"
                           >
                             <option value="">Select Department</option>
                             <option value="ENGINEERING">Engineering</option>
@@ -247,6 +267,7 @@ export function AddEmployeeDrawer({ isOpen, onClose }: AddEmployeeDrawerProps) {
                             <option value="FINANCE">Finance</option>
                             <option value="OTHER">Other</option>
                           </select>
+                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                         </div>
                         {formData.department === "OTHER" && (
                           <div className="mt-2 relative">
@@ -279,6 +300,33 @@ export function AddEmployeeDrawer({ isOpen, onClose }: AddEmployeeDrawerProps) {
                             className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-emerald-500 outline-none transition-colors"
                           />
                         </div>
+                      </div>
+
+                      <div className="space-y-1.5 col-span-2">
+                        <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                          Functional Employee Role <span className="text-rose-500">*</span>
+                        </label>
+                        <div className="relative">
+                          <ShieldAlert className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                          <select
+                            name="employeeRole"
+                            required
+                            value={formData.employeeRole}
+                            onChange={handleChange}
+                            className="w-full pl-9 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-emerald-500 outline-none transition-colors appearance-none cursor-pointer"
+                          >
+                            <option value="">Select Functional Role</option>
+                            {roles.map((r) => (
+                              <option key={r.id} value={r.code}>
+                                {r.name} ({r.code})
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                        </div>
+                        <p className="text-[10px] text-slate-400">
+                          Governs resource planning and smart filtering in project team slots.
+                        </p>
                       </div>
                     </div>
                   </div>

@@ -110,7 +110,7 @@ export function ProfileDropdown() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute right-0 mt-3 w-64 bg-white/95 backdrop-blur-md border border-border/80 rounded-xl shadow-xl py-2 z-50 origin-top-right overflow-hidden"
+            className="absolute right-0 mt-3 w-64 bg-white/95 backdrop-blur-md border border-border/80 rounded-xl shadow-xl py-2 z-[999] origin-top-right overflow-hidden"
           >
             {/* Dropdown Header */}
             <div className="px-4 py-3 border-b border-divider bg-page-bg/30">
@@ -145,7 +145,7 @@ export function ProfileDropdown() {
               <button
                 onClick={() => {
                   setShowDropdown(false);
-                  router.push("/dashboard/hr/onboarding");
+                  router.push("/dashboard/profile");
                 }}
                 className="w-full px-3 py-2 text-left rounded-lg text-sm text-text-primary hover:bg-page-bg transition-colors flex items-center gap-2.5 cursor-pointer border-0 bg-transparent"
               >

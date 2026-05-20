@@ -1,0 +1,1 @@
+ALTER TABLE "employee_roles" ADD COLUMN "base_role" varchar(50) DEFAULT 'None' NOT NULL;
