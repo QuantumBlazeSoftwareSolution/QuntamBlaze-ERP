@@ -28,3 +28,4 @@ export * from "./authentication";
 export * from "./systemConfig";
 export * from "./chat";
 export * from "./personalTasks";
+export * from "./knowledgeBase";
