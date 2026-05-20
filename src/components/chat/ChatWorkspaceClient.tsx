@@ -597,31 +597,58 @@ export function ChatWorkspaceClient({
                             {/* Attachments List */}
                             {msg.attachments && msg.attachments.length > 0 && (
                               <div className={cn("space-y-2 mt-2", msg.messageText ? "pt-2 border-t border-white/10" : "")}>
-                                {msg.attachments.map((file) => (
-                                  <a
-                                    key={file.id}
-                                    href={file.link}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className={cn(
-                                      "flex items-center justify-between gap-4 p-2.5 rounded-xl border transition-all text-[11px] font-medium leading-none group",
-                                      isSelf
-                                        ? "bg-white/10 border-white/15 text-white hover:bg-white/15"
-                                        : "bg-slate-50 border-border text-text-secondary hover:bg-slate-100"
-                                    )}
-                                  >
-                                    <div className="flex items-center gap-2 truncate">
-                                      {getFileIcon(file.mimeType)}
-                                      <span className="truncate block font-bold max-w-[140px]">
-                                        {file.name}
-                                      </span>
-                                      <span className="opacity-60 text-[9px] font-mono shrink-0">
-                                        ({formatBytes(file.size)})
-                                      </span>
-                                    </div>
-                                    <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 shrink-0 transition-opacity" />
-                                  </a>
-                                ))}
+                                {msg.attachments.map((file) => {
+                                  const isImage = file.mimeType.startsWith("image/");
+                                  
+                                  if (isImage) {
+                                    return (
+                                      <a
+                                        key={file.id}
+                                        href={file.link}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className={cn(
+                                          "block relative rounded-xl overflow-hidden border transition-all hover:opacity-90",
+                                          isSelf ? "border-white/20 shadow-sm" : "border-black/5 shadow-sm"
+                                        )}
+                                      >
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                          src={`https://drive.google.com/thumbnail?id=${file.id}&sz=w800`}
+                                          alt={file.name}
+                                          className="w-full max-w-[280px] h-auto object-cover block bg-slate-100"
+                                          loading="lazy"
+                                        />
+                                      </a>
+                                    );
+                                  }
+
+                                  return (
+                                    <a
+                                      key={file.id}
+                                      href={file.link}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className={cn(
+                                        "flex items-center justify-between gap-4 p-2.5 rounded-xl border transition-all text-[11px] font-medium leading-none group",
+                                        isSelf
+                                          ? "bg-white/10 border-white/15 text-white hover:bg-white/15"
+                                          : "bg-slate-50 border-border text-text-secondary hover:bg-slate-100"
+                                      )}
+                                    >
+                                      <div className="flex items-center gap-2 truncate">
+                                        {getFileIcon(file.mimeType)}
+                                        <span className="truncate block font-bold max-w-[140px]">
+                                          {file.name}
+                                        </span>
+                                        <span className="opacity-60 text-[9px] font-mono shrink-0">
+                                          ({formatBytes(file.size)})
+                                        </span>
+                                      </div>
+                                      <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 shrink-0 transition-opacity" />
+                                    </a>
+                                  );
+                                })}
                               </div>
                             )}
                           </div>
@@ -718,9 +745,6 @@ export function ChatWorkspaceClient({
               {/* Upload limits hints */}
               <div className="flex items-center justify-between text-[10px] text-text-muted font-bold uppercase tracking-wider">
                 <span>Supports PDF, Docs, Images, Zip</span>
-                <span className="flex items-center gap-1 text-accent font-semibold">
-                  <CheckCircle2 className="w-3 h-3" /> Auto-saved in GDrive chat/ folder (Limit: 10MB)
-                </span>
               </div>
             </div>
           </>

@@ -249,3 +249,32 @@ export async function uploadFileToGoogleDrive(
 
   return response.json();
 }
+
+/**
+ * Grants "Anyone with the link can view" permission to a file in Google Drive.
+ */
+export async function grantAnyoneWithLinkPermission(fileId: string): Promise<void> {
+  const token = await getFreshAccessToken();
+  if (!token) throw new Error("Google Drive is not authenticated.");
+
+  const response = await fetch(
+    `https://www.googleapis.com/drive/v3/files/${fileId}/permissions`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        role: "reader",
+        type: "anyone",
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const err = await response.json();
+    console.error("Failed to grant 'Anyone with link' permission:", err);
+    throw new Error(`Permission grant failed: ${err.error?.message || response.statusText}`);
+  }
+}

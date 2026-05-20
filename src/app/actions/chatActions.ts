@@ -5,7 +5,7 @@ import { chatMessages, users, roles } from "@/lib/db/schema";
 import { getPusherInstance } from "@/lib/pusher/server";
 import { getGoogleDriveStatusAction } from "./gdriveActions";
 import { getSession } from "@/lib/session";
-import { uploadFileToGoogleDrive, listGoogleDriveFolders, createGoogleDriveFolder } from "@/lib/services/gdrive";
+import { uploadFileToGoogleDrive, listGoogleDriveFolders, createGoogleDriveFolder, grantAnyoneWithLinkPermission } from "@/lib/services/gdrive";
 import { eq, asc } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { revalidatePath } from "next/cache";
@@ -173,6 +173,9 @@ export async function uploadChatAttachmentAction(projectId: string, formData: Fo
       arrayBuffer,
       projectFolderId
     );
+
+    // 4. Grant "Anyone with the link" access so other users can view it inline
+    await grantAnyoneWithLinkPermission(uploaded.id);
 
     return {
       success: true,
