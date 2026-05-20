@@ -36,5 +36,6 @@ export const projectTeam = pgTable("project_team", {
   employeeId: varchar("employee_id", { length: 255 })
     .references(() => employees.id)
     .notNull(),
+  projectRole: varchar("project_role", { length: 50 }).default("Dev").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

@@ -25,9 +25,22 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     openTasks: 24, // TODO: Wire this up to actual tasks when task schema is finalized
     blockers: 2,   // TODO: Wire this up
     team: projectData.team?.map((pt) => ({
+      id: pt.employeeId,
       initials: pt.employee?.name?.substring(0, 2).toUpperCase() || "??",
       name: pt.employee?.name || "Unknown",
-      color: "bg-blue-500", 
+      avatar: pt.employee?.avatar || null,
+      email: pt.employee?.email || "",
+      role: pt.projectRole || "Dev",
+      employeeRole: pt.employee?.role || "Team Member",
+      color: pt.projectRole === "PM" 
+        ? "bg-purple-500" 
+        : pt.projectRole === "TL" 
+        ? "bg-blue-600" 
+        : pt.projectRole === "QA" 
+        ? "bg-amber-500" 
+        : pt.projectRole === "UI/UX"
+        ? "bg-pink-500"
+        : "bg-emerald-500", 
     })) || [],
     linkedDocuments: [], // TODO: Wire this up
   };

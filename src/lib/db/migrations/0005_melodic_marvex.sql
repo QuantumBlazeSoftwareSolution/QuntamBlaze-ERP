@@ -1,0 +1,1 @@
+ALTER TABLE "project_team" ADD COLUMN "project_role" varchar(50) DEFAULT 'Dev' NOT NULL;

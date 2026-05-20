@@ -10,6 +10,7 @@ import { ProjectDocumentsTab } from "@/components/projects/ProjectDocumentsTab";
 import { ProjectFinancialsTab } from "@/components/projects/ProjectFinancialsTab";
 import { ProjectActivityTab } from "@/components/projects/ProjectActivityTab";
 import { TaskDetailPanel } from "@/components/tasks/TaskDetailPanel";
+import { ProjectTeamTab } from "@/components/projects/ProjectTeamTab";
 
 // Lazy load complex tabs
 const KanbanBoard = React.lazy(() =>
@@ -62,6 +63,7 @@ export function ProjectDetailClient({ project, currentUser }: ProjectDetailClien
               {activeTab === "overview" && <ProjectOverviewTab project={project} />}
               {activeTab === "tasks" && <KanbanBoard />}
               {activeTab === "timeline" && <GanttView />}
+              {activeTab === "team" && <ProjectTeamTab project={project} />}
               {activeTab === "documents" && <ProjectDocumentsTab project={project} />}
               {activeTab === "financials" && <ProjectFinancialsTab />}
               {activeTab === "activity" && <ProjectActivityTab />}
