@@ -66,36 +66,20 @@ export function Sidebar() {
           </div>
         </Link>
 
-        {/* User Profile / Collapse Toggle */}
-        <div
-          className={cn(
-            "bg-white/[0.03] border border-white/5 rounded-xl transition-all",
-            isCollapsed ? "p-2" : "p-3"
-          )}
+        {/* Collapse Sidebar Action */}
+        <button
+          onClick={toggleCollapse}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:text-white hover:bg-white/[0.03] transition-all cursor-pointer border-0 bg-transparent text-left focus:outline-none"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-accent/20 border border-accent/30 flex items-center justify-center text-[10px] font-bold text-accent shrink-0 relative">
-              AM
-              <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-accent border-2 border-sidebar-bg rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-            </div>
-            {!isCollapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-bold text-white truncate">A. Mercer</p>
-                <p className="text-[10px] text-accent font-bold uppercase tracking-widest">Cmdr</p>
-              </div>
-            )}
-            <button
-              onClick={toggleCollapse}
-              className="p-1.5 text-[#3A3A3A] hover:text-text-primary transition-colors"
-            >
-              {isCollapsed ? (
-                <PanelLeftOpen className="w-4 h-4" />
-              ) : (
-                <PanelLeftClose className="w-4 h-4" />
-              )}
-            </button>
-          </div>
-        </div>
+          {isCollapsed ? (
+            <PanelLeftOpen className="w-[18px] h-[18px] shrink-0 mx-auto" />
+          ) : (
+            <>
+              <PanelLeftClose className="w-[18px] h-[18px] shrink-0" />
+              <span className="text-[13px] font-medium">Collapse Sidebar</span>
+            </>
+          )}
+        </button>
       </div>
     </motion.aside>
   );

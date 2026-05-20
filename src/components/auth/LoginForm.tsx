@@ -4,10 +4,11 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
-import { motion, Variants } from "framer-motion";
+import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
+import { motion, Variants, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signInAction } from "@/app/actions/auth";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -32,6 +33,7 @@ const staggerVariants: Variants = {
 export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
 
   const {
@@ -44,21 +46,43 @@ export const LoginForm = () => {
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsSubmitting(true);
+    setErrorMessage(null);
 
     try {
-      // Mock 1.5s authentication delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log(`[QB-AUTH] Session initiated · USR-JD-26-004 · ${new Date().toISOString()}`);
-      // Redirect to dashboard after successful login
-      router.push("/dashboard");
-    } catch (error) {
-      console.error(error);
+      const response = await signInAction(data);
+      if (response.success) {
+        // Redirect to dashboard after successful login
+        router.push("/dashboard");
+      } else {
+        setErrorMessage(response.error || "Invalid email or password");
+        setIsSubmitting(false);
+      }
+    } catch (err: any) {
+      setErrorMessage("A network or system error occurred. Please try again.");
       setIsSubmitting(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 w-full">
+      {/* Error Alert Box */}
+      <AnimatePresence>
+        {errorMessage && (
+          <motion.div
+            initial={{ opacity: 0, height: 0, y: -10 }}
+            animate={{ opacity: 1, height: "auto", y: 0 }}
+            exit={{ opacity: 0, height: 0, y: -10 }}
+            className="bg-red-500/10 border border-red-500/20 rounded-lg p-3.5 flex items-start gap-3 text-red-400 text-sm overflow-hidden"
+          >
+            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-red-300">Access Denied</p>
+              <p className="text-xs text-red-400/90 mt-0.5">{errorMessage}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <motion.div custom={0} initial="hidden" animate="visible" variants={staggerVariants}>
         <label className="block text-text-primary text-sm font-medium mb-1.5">Email</label>
         <div className="relative">
@@ -111,7 +135,14 @@ export const LoginForm = () => {
           disabled={isSubmitting}
           className="bg-accent hover:bg-accent-hover text-white font-semibold rounded-lg h-11 w-full flex items-center justify-center transition-colors mt-2"
         >
-          {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign In"}
+          {isSubmitting ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>Authenticating...</span>
+            </div>
+          ) : (
+            "Sign In"
+          )}
         </button>
       </motion.div>
 

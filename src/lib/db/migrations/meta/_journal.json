@@ -15,6 +15,13 @@
       "when": 1779247270162,
       "tag": "0001_dark_marten_broadcloak",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779252629604,
+      "tag": "0002_little_shape",
+      "breakpoints": true
     }
   ]
 }

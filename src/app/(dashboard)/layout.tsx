@@ -1,6 +1,6 @@
-"use client";
-
 import React from "react";
+import { getSession } from "@/lib/session";
+import { redirect } from "next/navigation";
 
 /**
  * Placeholder Sidebar for Task 4
@@ -29,7 +29,13 @@ const SidebarPlaceholder = () => {
   );
 };
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  // Enforce server-side security redirection
+  const session = await getSession();
+  if (!session) {
+    redirect("/login");
+  }
+
   return (
     <div className="flex min-h-screen bg-page-bg">
       <SidebarPlaceholder />

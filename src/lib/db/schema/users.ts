@@ -9,6 +9,7 @@ export const users = pgTable("users", {
   roleId: varchar("role_id", { length: 255 }).references(() => roles.id),
   status: varchar("status", { length: 50 }).default("Active").notNull(),
   lastActive: timestamp("last_active"),
+  passwordHash: text("password_hash"),
 
   // Luxury standards
   createdAt: timestamp("created_at").defaultNow().notNull(),

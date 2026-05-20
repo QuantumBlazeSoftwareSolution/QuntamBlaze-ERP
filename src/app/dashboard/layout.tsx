@@ -10,6 +10,7 @@ import { useSidebarStore } from "@/store/sidebarStore";
 import { AuditLogDrawer } from "@/components/layout/AuditLogDrawer";
 import { cn } from "@/lib/utils";
 import { Grid } from "lucide-react";
+import { ProfileDropdown } from "@/components/layout/ProfileDropdown";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { isCollapsed } = useSidebarStore();
@@ -37,9 +38,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <button className="text-text-secondary hover:bg-page-bg transition-colors duration-200 p-2 rounded-full">
                 <Grid className="w-5 h-5" />
               </button>
-              <div className="w-8 h-8 rounded-full overflow-hidden border border-border ml-2 bg-accent-light flex items-center justify-center text-xs font-bold text-accent uppercase">
-                AM
-              </div>
+              <ProfileDropdown />
             </div>
           </header>
 
