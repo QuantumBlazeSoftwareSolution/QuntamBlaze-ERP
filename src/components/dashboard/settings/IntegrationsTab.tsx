@@ -20,6 +20,9 @@ import {
   Check,
   Copy,
   HelpCircle,
+  Sparkles,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -36,6 +39,13 @@ import {
   getPusherStatusAction,
   disconnectPusherAction,
 } from "@/app/actions/pusherActions";
+import {
+  saveGeminiConfigAction,
+  getGeminiStatusAction,
+  disconnectGeminiAction,
+  testGeminiConnectionAction,
+  getAvailableGeminiModelsAction,
+} from "@/app/actions/geminiActions";
 
 export function IntegrationsTab() {
   const searchParams = useSearchParams();
@@ -56,7 +66,7 @@ export function IntegrationsTab() {
   const [loadingStatus, setLoadingStatus] = useState(true);
 
   // Drawer & Selection states
-  const [drawerType, setDrawerType] = useState<"gdrive" | "pusher" | null>(null);
+  const [drawerType, setDrawerType] = useState<"gdrive" | "pusher" | "gemini" | null>(null);
   const drawerOpen = !!drawerType;
   const setDrawerOpen = (open: boolean) => {
     if (!open) setDrawerType(null);
@@ -87,6 +97,31 @@ export function IntegrationsTab() {
   const [loadingPusherStatus, setLoadingPusherStatus] = useState(true);
   const [isSavingPusherConfig, setIsSavingPusherConfig] = useState(false);
   const [isDisconnectingPusher, setIsDisconnectingPusher] = useState(false);
+
+  // Gemini AI states
+  const [geminiStatus, setGeminiStatus] = useState<{
+    isConfigured: boolean;
+    maskedApiKey: string;
+    baseModel: string;
+  }>({
+    isConfigured: false,
+    maskedApiKey: "",
+    baseModel: "gemini-2.0-flash",
+  });
+  const [loadingGeminiStatus, setLoadingGeminiStatus] = useState(true);
+  const [isSavingGeminiConfig, setIsSavingGeminiConfig] = useState(false);
+  const [isDisconnectingGemini, setIsDisconnectingGemini] = useState(false);
+  const [isTestingGeminiConnection, setIsTestingGeminiConnection] = useState(false);
+
+  // Gemini inputs
+  const [geminiApiKeyInput, setGeminiApiKeyInput] = useState("");
+  const [geminiBaseModelInput, setGeminiBaseModelInput] = useState("gemini-2.0-flash");
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  
+  // Dynamic Gemini models state
+  const [availableGeminiModels, setAvailableGeminiModels] = useState<{ id: string; displayName: string; description?: string }[]>([]);
+  const [isLoadingGeminiModels, setIsLoadingGeminiModels] = useState(false);
 
   // Form states
   const [clientIdInput, setClientIdInput] = useState("");
@@ -157,9 +192,79 @@ export function IntegrationsTab() {
     }
   };
 
+  const loadGeminiStatus = async () => {
+    try {
+      const res = await getGeminiStatusAction();
+      if (res.success) {
+        setGeminiStatus({
+          isConfigured: res.isConfigured || false,
+          maskedApiKey: res.maskedApiKey || "",
+          baseModel: res.baseModel || "gemini-2.0-flash",
+        });
+        if (res.maskedApiKey) setGeminiApiKeyInput(res.maskedApiKey);
+        if (res.baseModel) setGeminiBaseModelInput(res.baseModel);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingGeminiStatus(false);
+    }
+  };
+
+  const fetchGeminiModels = async (key: string) => {
+    if (!key) {
+      setAvailableGeminiModels([]);
+      return;
+    }
+    setIsLoadingGeminiModels(true);
+    try {
+      const res = await getAvailableGeminiModelsAction(key);
+      if (res.success && res.models) {
+        setAvailableGeminiModels(res.models);
+        if (res.models.length > 0) {
+          // If the currently selected model is not in the fetched models list, auto-select the first active model
+          const modelExists = res.models.some((m: any) => m.id === geminiBaseModelInput);
+          if (!modelExists) {
+            setGeminiBaseModelInput(res.models[0].id);
+          }
+        }
+      } else {
+        console.error("Failed to load Gemini models:", res.error);
+      }
+    } catch (err) {
+      console.error("Failed to fetch Gemini models:", err);
+    } finally {
+      setIsLoadingGeminiModels(false);
+    }
+  };
+
+  // Fetch available models when the Gemini drawer is opened
+  useEffect(() => {
+    if (drawerType === "gemini" && geminiApiKeyInput) {
+      fetchGeminiModels(geminiApiKeyInput);
+    }
+  }, [drawerType]);
+
+  // Debounced model fetch when the user inputs/pastes a new API key manually
+  useEffect(() => {
+    if (
+      geminiApiKeyInput &&
+      geminiApiKeyInput.startsWith("AIzaSy") &&
+      geminiApiKeyInput.length > 25 &&
+      !geminiApiKeyInput.includes("••••")
+    ) {
+      const delayDebounce = setTimeout(() => {
+        fetchGeminiModels(geminiApiKeyInput);
+      }, 800);
+      return () => clearTimeout(delayDebounce);
+    }
+  }, [geminiApiKeyInput]);
+
+
   useEffect(() => {
     loadStatus();
     loadPusherStatus();
+    loadGeminiStatus();
 
     // Check URL query parameters
     const success = searchParams.get("gdrive_success");
@@ -373,6 +478,92 @@ export function IntegrationsTab() {
     }
   };
 
+  const handleSaveGeminiCredentials = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingGeminiConfig(true);
+    setDrawerError("");
+    setDrawerSuccess("");
+    setTestResult(null);
+
+    try {
+      const res = await saveGeminiConfigAction(geminiApiKeyInput, geminiBaseModelInput);
+      if (res.success) {
+        setDrawerSuccess("Google Gemini AI configuration saved successfully!");
+        await loadGeminiStatus();
+      } else {
+        setDrawerError(res.error || "Failed to save Gemini configuration.");
+      }
+    } catch (err: any) {
+      setDrawerError(err.message || "An unexpected error occurred.");
+    } finally {
+      setIsSavingGeminiConfig(false);
+    }
+  };
+
+  const handleDisconnectGemini = async () => {
+    if (!confirm("Are you sure you want to disconnect Google Gemini AI? Custom AI features will stop working.")) {
+      return;
+    }
+    setIsDisconnectingGemini(true);
+    setDrawerError("");
+    setDrawerSuccess("");
+    setTestResult(null);
+    try {
+      const res = await disconnectGeminiAction();
+      if (res.success) {
+        setDrawerSuccess("Google Gemini AI successfully disconnected.");
+        setGeminiApiKeyInput("");
+        setGeminiBaseModelInput("gemini-2.0-flash");
+        await loadGeminiStatus();
+        setTimeout(() => setDrawerType(null), 2000);
+      } else {
+        setDrawerError(res.error || "Failed to disconnect Gemini.");
+      }
+    } catch (err: any) {
+      setDrawerError(err.message || "Disconnection failed.");
+    } finally {
+      setIsDisconnectingGemini(false);
+    }
+  };
+
+  const handleTestGeminiConnection = async () => {
+    if (!geminiApiKeyInput) {
+      setDrawerError("Please provide an API key to test the connection.");
+      return;
+    }
+    setIsTestingGeminiConnection(true);
+    setDrawerError("");
+    setDrawerSuccess("");
+    setTestResult(null);
+
+    try {
+      const res = await testGeminiConnectionAction(geminiApiKeyInput, geminiBaseModelInput);
+      if (res.success) {
+        setTestResult({
+          success: true,
+          message: res.message || "Connection verified successfully!",
+        });
+        setDrawerSuccess("Gemini API connection check passed!");
+        // Fetch active models dynamically as the key is confirmed to be valid
+        await fetchGeminiModels(geminiApiKeyInput);
+      } else {
+        setTestResult({
+          success: false,
+          message: res.error || "Connection check failed.",
+        });
+        setDrawerError(res.error || "Gemini API connection check failed.");
+      }
+    } catch (err: any) {
+      setTestResult({
+        success: false,
+        message: err.message || "An unexpected error occurred.",
+      });
+      setDrawerError(err.message || "Connection check failed.");
+    } finally {
+      setIsTestingGeminiConnection(false);
+    }
+  };
+
   const INTEGRATIONS = [
     {
       id: "slack",
@@ -423,6 +614,20 @@ export function IntegrationsTab() {
       color: "text-amber-500",
       actionLabel: "CONFIGURE HUB",
       onAction: () => {},
+    },
+    {
+      id: "gemini",
+      name: "Google Gemini AI",
+      description: "Configure Google Gemini to activate intelligent context-aware ERP assistance and dynamic suggestions.",
+      icon: Sparkles,
+      status: loadingGeminiStatus
+        ? "Loading..."
+        : geminiStatus.isConfigured
+        ? "Connected"
+        : "Not Connected",
+      color: "text-teal-600",
+      actionLabel: "CONFIGURE HUB",
+      onAction: () => setDrawerType("gemini"),
     },
   ];
 
@@ -511,10 +716,10 @@ export function IntegrationsTab() {
 
             <button
               onClick={integration.onAction}
-              disabled={integration.id !== "gdrive" && integration.id !== "pusher"}
+              disabled={integration.id !== "gdrive" && integration.id !== "pusher" && integration.id !== "gemini"}
               className={cn(
                 "mt-8 flex items-center justify-between w-full p-4 rounded-xl bg-page-bg border border-divider group-hover:border-accent/50 transition-all cursor-pointer",
-                (integration.id !== "gdrive" && integration.id !== "pusher") && "opacity-50 cursor-not-allowed"
+                (integration.id !== "gdrive" && integration.id !== "pusher" && integration.id !== "gemini") && "opacity-50 cursor-not-allowed"
               )}
             >
               <span className="text-[12px] font-bold text-text-secondary group-hover:text-text-primary">
@@ -570,7 +775,7 @@ export function IntegrationsTab() {
                         <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">Cloud Sync Settings</p>
                       </div>
                     </div>
-                  ) : (
+                  ) : drawerType === "pusher" ? (
                     <div className="flex items-center gap-3">
                       <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-xl text-indigo-500">
                         <MessageSquare className="w-6 h-6" />
@@ -588,6 +793,18 @@ export function IntegrationsTab() {
                           </button>
                         </h3>
                         <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">Real-time Web Sync Settings</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-teal-50 border border-teal-100 rounded-xl text-teal-600">
+                        <Sparkles className="w-6 h-6 animate-pulse" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-text-primary flex items-center gap-1.5">
+                          Google Gemini AI
+                        </h3>
+                        <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">Artificial Intelligence Settings</p>
                       </div>
                     </div>
                   )}
@@ -845,7 +1062,7 @@ export function IntegrationsTab() {
                       </div>
                     )}
                   </>
-                ) : (
+                ) : drawerType === "pusher" ? (
                   /* PUSHER DRAWER CONTENT */
                   <form onSubmit={handleSavePusherCredentials} className="space-y-6">
                     <div className="bg-slate-50 border border-border p-5 rounded-2xl space-y-4">
@@ -945,6 +1162,160 @@ export function IntegrationsTab() {
                       )}
                     </button>
                   </form>
+                ) : (
+                  /* GEMINI DRAWER CONTENT */
+                  <div className="space-y-6">
+                    <div className="bg-slate-50 border border-border p-5 rounded-2xl space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-[12px] font-bold text-slate-800 uppercase tracking-wider">
+                          <Sparkles className="w-4 h-4 text-teal-600 animate-pulse" />
+                          Gemini AI Capabilities
+                        </div>
+                        <span className="px-2 py-0.5 bg-teal-50 text-teal-600 border border-teal-100 text-[9px] font-black uppercase tracking-widest rounded-full">
+                          POWERFUL
+                        </span>
+                      </div>
+                      <p className="text-[12px] text-text-secondary leading-relaxed">
+                        Configure your Google Gemini API key to enable secure, lightning-fast intelligence directly within your ERP platform. No third-party servers required.
+                      </p>
+                    </div>
+
+                    <form onSubmit={handleSaveGeminiCredentials} className="space-y-6">
+                      <div className="space-y-4">
+                        {/* API Key Input */}
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center justify-between">
+                            <span className="flex items-center gap-1.5">
+                              <Key className="w-3.5 h-3.5 text-teal-600" />
+                              Gemini API Key
+                            </span>
+                            <span className="text-[9px] text-teal-600 font-bold normal-case">
+                              <a href="https://aistudio.google.com/" target="_blank" rel="noreferrer" className="hover:underline">
+                                Get API Key from Google AI Studio ↗
+                              </a>
+                            </span>
+                          </label>
+                          <div className="relative">
+                            <input
+                              type={showApiKey ? "text" : "password"}
+                              required
+                              value={geminiApiKeyInput}
+                              onChange={(e) => setGeminiApiKeyInput(e.target.value)}
+                              placeholder={geminiStatus.isConfigured ? "••••••••••••••••" : "AIzaSy..."}
+                              className="w-full h-11 pl-4 pr-10 border border-border rounded-xl text-[13px] text-text-primary focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowApiKey(!showApiKey)}
+                              className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-text-primary cursor-pointer border-0 bg-transparent p-0"
+                            >
+                              {showApiKey ? (
+                                <EyeOff className="w-4 h-4" />
+                              ) : (
+                                <Eye className="w-4 h-4" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Model Dropdown Selection */}
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center justify-between gap-1.5 w-full">
+                            <span className="flex items-center gap-1.5">
+                              <Settings className="w-3.5 h-3.5 text-teal-600" />
+                              Baseline AI Model
+                            </span>
+                            {isLoadingGeminiModels && (
+                              <span className="text-[9px] text-teal-600 flex items-center gap-1 normal-case font-semibold animate-pulse">
+                                <RefreshCw className="w-3 h-3 animate-spin" /> Fetching available models...
+                              </span>
+                            )}
+                          </label>
+                          <div className="relative">
+                            <select
+                              value={geminiBaseModelInput}
+                              onChange={(e) => setGeminiBaseModelInput(e.target.value)}
+                              className="w-full bg-white border border-border rounded-xl px-4 h-11 text-[13px] text-text-primary focus:border-teal-500 outline-none appearance-none cursor-pointer"
+                              disabled={isLoadingGeminiModels}
+                            >
+                              {availableGeminiModels.length > 0 ? (
+                                availableGeminiModels.map((m) => (
+                                  <option key={m.id} value={m.id}>
+                                    {m.displayName}
+                                  </option>
+                                ))
+                              ) : (
+                                <>
+                                  <option value="gemini-2.0-flash">gemini-2.0-flash (Recommended, Fast & Smart)</option>
+                                  <option value="gemini-2.5-flash">gemini-2.5-flash (Enhanced Capabilities)</option>
+                                  <option value="gemini-1.5-flash">gemini-1.5-flash (Legacy Lightweight)</option>
+                                  <option value="gemini-1.5-pro">gemini-1.5-pro (Deep Reasoning & Analysis)</option>
+                                </>
+                              )}
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-text-muted">
+                              ▼
+                            </div>
+                          </div>
+                          {availableGeminiModels.length > 0 && (
+                            <p className="text-[10px] text-emerald-600 font-medium">
+                              ✓ Dynamically listed models verified for your specific API key.
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Connection Test Results */}
+                      {testResult && (
+                        <div
+                          className={cn(
+                            "flex items-start gap-3 p-4 rounded-xl text-[12px] font-bold border leading-relaxed",
+                            testResult.success
+                              ? "bg-emerald-50 border-emerald-100 text-emerald-600"
+                              : "bg-danger/10 border-danger/20 text-danger"
+                          )}
+                        >
+                          {testResult.success ? (
+                            <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                          ) : (
+                            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                          )}
+                          <div>
+                            <p className="font-extrabold">{testResult.success ? "Connection Check Passed!" : "Connection Check Failed"}</p>
+                            <p className="text-[11px] font-normal mt-0.5 text-text-secondary">{testResult.message}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Control Action Buttons */}
+                      <div className="flex gap-3">
+                        <button
+                          type="button"
+                          onClick={handleTestGeminiConnection}
+                          disabled={isTestingGeminiConnection || !geminiApiKeyInput}
+                          className="flex-1 flex items-center justify-center gap-2 h-12 border border-border hover:border-text-secondary text-text-primary font-bold rounded-xl text-[11px] uppercase tracking-widest transition-all disabled:opacity-50 cursor-pointer bg-white"
+                        >
+                          {isTestingGeminiConnection ? (
+                            <RefreshCw className="w-4 h-4 animate-spin text-teal-600" />
+                          ) : (
+                            "Test Connection"
+                          )}
+                        </button>
+
+                        <button
+                          type="submit"
+                          disabled={isSavingGeminiConfig || !geminiApiKeyInput}
+                          className="flex-1 flex items-center justify-center gap-2 h-12 bg-teal-600 text-white font-bold rounded-xl text-[11px] uppercase tracking-widest shadow-lg shadow-teal-600/20 hover:bg-teal-700 transition-all disabled:opacity-50 cursor-pointer"
+                        >
+                          {isSavingGeminiConfig ? (
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                          ) : (
+                            "Save Settings"
+                          )}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
                 )}
               </div>
 
@@ -981,6 +1352,25 @@ export function IntegrationsTab() {
                       <>
                         <Trash2 className="w-4 h-4" />
                         Disconnect Pusher Channels
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {drawerType === "gemini" && geminiStatus.isConfigured && (
+                <div className="pt-6 border-t border-divider mt-auto">
+                  <button
+                    onClick={handleDisconnectGemini}
+                    disabled={isDisconnectingGemini}
+                    className="w-full flex items-center justify-center gap-2 h-12 border border-danger/25 text-danger/80 hover:text-white hover:bg-danger hover:border-transparent font-bold rounded-xl text-[12px] uppercase tracking-widest transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {isDisconnectingGemini ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <>
+                        <Trash2 className="w-4 h-4" />
+                        Disconnect Gemini AI
                       </>
                     )}
                   </button>

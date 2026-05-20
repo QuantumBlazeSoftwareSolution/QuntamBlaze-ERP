@@ -25,7 +25,8 @@ export async function getSystemConfigsAction() {
       await db.execute(sql`
         CREATE TABLE IF NOT EXISTS "system_config" (
           "key" varchar(255) PRIMARY KEY NOT NULL,
-          "value" jsonb NOT NULL
+          "value" jsonb NOT NULL,
+          "updated_at" timestamp DEFAULT now() NOT NULL
         );
       `);
     } catch (tableErr) {
@@ -46,6 +47,7 @@ export async function getSystemConfigsAction() {
         await db.insert(systemConfig).values({
           key,
           value: DEFAULT_CONFIGS[key],
+          updatedAt: new Date(),
         }).onConflictDoNothing();
         configs[key] = DEFAULT_CONFIGS[key];
       }
@@ -72,10 +74,10 @@ export async function saveSystemConfigAction(key: string, value: any) {
     // 2. Perform upsert
     await db
       .insert(systemConfig)
-      .values({ key, value })
+      .values({ key, value, updatedAt: new Date() })
       .onConflictDoUpdate({
         target: systemConfig.key,
-        set: { value },
+        set: { value, updatedAt: new Date() },
       });
 
     // 3. Log the system configuration update action
