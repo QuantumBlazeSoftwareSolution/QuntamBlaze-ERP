@@ -4,6 +4,7 @@ import React from "react";
 import { DollarSign, ArrowUpRight, ArrowDownRight, TrendingUp, CreditCard, Download, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { useSystemConfig } from "@/hooks/useSystemConfig";
 
 interface Transaction {
   id: string;
@@ -22,6 +23,7 @@ const MOCK_TRANSACTIONS: Transaction[] = [
 ];
 
 export function ProjectFinancialsTab() {
+  const { formatCurrency } = useSystemConfig();
   const totalBudget = 250000;
   const consumed = 145000;
   const percentage = (consumed / totalBudget) * 100;
@@ -32,28 +34,28 @@ export function ProjectFinancialsTab() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <FinanceCard 
           label="Total Allocation" 
-          value={`$${(totalBudget / 1000).toFixed(0)}k`} 
+          value={formatCurrency(totalBudget, true)} 
           trend="+15% vs baseline" 
           icon={DollarSign} 
           color="bg-[#10B981]" 
         />
         <FinanceCard 
           label="Consumed Budget" 
-          value={`$${(consumed / 1000).toFixed(0)}k`} 
+          value={formatCurrency(consumed, true)} 
           trend="Within threshold" 
           icon={TrendingUp} 
           color="bg-[#3B82F6]" 
         />
         <FinanceCard 
           label="Pending Payouts" 
-          value="$42,500" 
+          value={formatCurrency(42500)} 
           trend="2 Unpaid Invoices" 
           icon={CreditCard} 
           color="bg-[#F59E0B]" 
         />
         <FinanceCard 
           label="Projected Finish" 
-          value="$238k" 
+          value={formatCurrency(238000, true)} 
           trend="On track" 
           icon={TrendingUp} 
           color="bg-[#8B5CF6]" 
@@ -80,9 +82,9 @@ export function ProjectFinancialsTab() {
                    <p className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em]">Current Burn Rate</p>
                    <p className="text-4xl font-black text-[#0F172A] mt-1">58.0<span className="text-xl">%</span></p>
                 </div>
-                <div className="text-right">
+                 <div className="text-right">
                    <p className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em]">Remaining Runway</p>
-                   <p className="text-lg font-black text-[#0F172A]">$105,000</p>
+                   <p className="text-lg font-black text-[#0F172A]">{formatCurrency(105000)}</p>
                 </div>
              </div>
 
@@ -96,9 +98,9 @@ export function ProjectFinancialsTab() {
              </div>
 
              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[#F1F5F9]">
-                <MiniMetric label="Resource Cost" value="$84k" color="bg-[#3B82F6]" />
-                <MiniMetric label="Infra Spend" value="$28k" color="bg-[#8B5CF6]" />
-                <MiniMetric label="Contingency" value="$12k" color="bg-[#F59E0B]" />
+                <MiniMetric label="Resource Cost" value={formatCurrency(84000, true)} color="bg-[#3B82F6]" />
+                <MiniMetric label="Infra Spend" value={formatCurrency(28000, true)} color="bg-[#8B5CF6]" />
+                <MiniMetric label="Contingency" value={formatCurrency(12000, true)} color="bg-[#F59E0B]" />
              </div>
           </div>
         </div>
@@ -176,7 +178,7 @@ export function ProjectFinancialsTab() {
                   </div>
                 </td>
                 <td className="px-8 py-5">
-                  <span className="text-sm font-black text-[#0F172A]">${tx.amount.toLocaleString()}</span>
+                  <span className="text-sm font-black text-[#0F172A]">{formatCurrency(tx.amount)}</span>
                 </td>
                 <td className="px-8 py-5 text-[11px] font-bold text-[#64748B] uppercase tracking-wider">
                   {tx.date}

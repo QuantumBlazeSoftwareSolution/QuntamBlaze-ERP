@@ -4,8 +4,10 @@ import React from "react";
 import { IDChip } from "@/components/ui/IDChip";
 import { ProjectHealth } from "@/lib/mockData/dashboard";
 import Link from "next/link";
+import { useSystemConfig } from "@/hooks/useSystemConfig";
 
 export const ProjectHealthCard = ({ project }: { project: ProjectHealth }) => {
+  const { formatCurrency } = useSystemConfig();
   const budgetPercentage = Math.min((project.budgetSpent / project.budgetTotal) * 100, 100);
 
   return (
@@ -51,7 +53,7 @@ export const ProjectHealthCard = ({ project }: { project: ProjectHealth }) => {
             <div className="flex justify-between text-[11px] font-semibold mb-1.5">
               <span className="text-text-secondary uppercase">Budget Burn</span>
               <span className={budgetPercentage > 80 ? "text-danger" : "text-text-primary"}>
-                ${project.budgetSpent.toLocaleString()} / ${project.budgetTotal.toLocaleString()}
+                {formatCurrency(project.budgetSpent)} / {formatCurrency(project.budgetTotal)}
               </span>
             </div>
             <div className="h-1.5 w-full bg-divider rounded-full overflow-hidden">

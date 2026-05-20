@@ -7,10 +7,12 @@ import { IDConfigTable } from "@/components/dashboard/settings/IDConfigTable";
 import { IntegrationsTab } from "@/components/dashboard/settings/IntegrationsTab";
 import { AuditComplianceTab } from "@/components/dashboard/settings/AuditComplianceTab";
 import { RolesTab } from "@/components/dashboard/settings/RolesTab";
+import { SystemConfigForm } from "@/components/dashboard/settings/SystemConfigForm";
 import { cn } from "@/lib/utils";
 
 const TABS = [
   { id: "general", label: "General" },
+  { id: "system-config", label: "System Configuration" },
   { id: "id-config", label: "ID Configuration" },
   { id: "integrations", label: "Integrations" },
   { id: "audit", label: "Audit & Compliance" },
@@ -60,6 +62,7 @@ export default function SettingsPage() {
         transition={{ duration: 0.3 }}
       >
         {activeTab === "general" && <GeneralSettingsForm />}
+        {activeTab === "system-config" && <SystemConfigForm />}
         {activeTab === "id-config" && <IDConfigTable />}
         {activeTab === "integrations" && <IntegrationsTab />}
         {activeTab === "audit" && <AuditComplianceTab />}

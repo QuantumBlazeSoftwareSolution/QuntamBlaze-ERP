@@ -21,6 +21,17 @@ import { ProjectStatusChip } from "@/components/projects/ProjectStatusChip";
 import { ProjectProgressBar } from "@/components/projects/ProjectProgressBar";
 import { ProjectRowActions } from "@/components/projects/ProjectRowActions";
 
+import { useSystemConfig } from "@/hooks/useSystemConfig";
+
+function BudgetCell({ amount }: { amount: number }) {
+  const { formatCurrency } = useSystemConfig();
+  return (
+    <span className="text-[13px] font-mono text-text-primary">
+      {formatCurrency(amount, true)}
+    </span>
+  );
+}
+
 function SortIcon({ isSorted }: { isSorted: false | "asc" | "desc" }) {
   if (isSorted === "asc") return <ChevronUp className="w-3.5 h-3.5 text-accent" />;
   if (isSorted === "desc") return <ChevronDown className="w-3.5 h-3.5 text-accent" />;
@@ -131,14 +142,7 @@ export const projectColumns: ColumnDef<Project>[] = [
         Budget <SortIcon isSorted={column.getIsSorted()} />
       </button>
     ),
-    cell: ({ row }) => {
-      const budget = row.original.budget;
-      const formatted =
-        budget >= 1000000
-          ? `$${(budget / 1000000).toFixed(1)}M`
-          : `$${(budget / 1000).toFixed(0)}k`;
-      return <span className="text-[13px] font-mono text-text-primary">{formatted}</span>;
-    },
+    cell: ({ row }) => <BudgetCell amount={row.original.budget} />,
   },
   {
     accessorKey: "status",

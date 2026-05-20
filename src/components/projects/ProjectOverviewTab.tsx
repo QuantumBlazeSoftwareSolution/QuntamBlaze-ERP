@@ -13,12 +13,14 @@ import {
 import { cn } from "@/lib/utils";
 import { ProjectDetail, Milestone, LinkedDocument } from "@/types/project";
 import { IDChip } from "@/components/ui/IDChip";
+import { useSystemConfig } from "@/hooks/useSystemConfig";
 
 interface ProjectOverviewTabProps {
   project: ProjectDetail;
 }
 
 export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
+  const { formatCurrency } = useSystemConfig();
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
       {/* Left Column: Summary & Milestones */}
@@ -99,7 +101,7 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
           <div className="mt-10 pt-10 border-t border-[#F1F5F9]">
             <div className="flex items-center justify-between mb-2">
               <p className="text-[10px] font-black text-[#94A3B8] uppercase tracking-widest">
-                Budget Allocation [${(project.budget / 1000000).toFixed(1)}M]
+                Budget Allocation [{formatCurrency(project.budget, true)}]
               </p>
               <span className="text-[10px] font-black text-[#10B981] uppercase tracking-widest">
                 {Math.round((project.budgetSpent / project.budget) * 100)}% Spent

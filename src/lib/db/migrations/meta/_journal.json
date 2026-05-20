@@ -22,6 +22,13 @@
       "when": 1779252629604,
       "tag": "0002_little_shape",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1779256115691,
+      "tag": "0003_strange_ender_wiggin",
+      "breakpoints": true
     }
   ]
 }

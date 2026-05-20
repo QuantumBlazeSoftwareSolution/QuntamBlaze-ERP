@@ -2,6 +2,7 @@
 
 import { GlobalSearchBar } from "@/components/dashboard/GlobalSearchBar";
 import { SearchProvider } from "@/hooks/useSearchOverlay";
+import { SystemConfigProvider } from "@/hooks/useSystemConfig";
 import { GlobalSearchOverlay } from "@/components/search/GlobalSearchOverlay";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { NotificationsPanel } from "@/components/layout/NotificationsPanel";
@@ -16,7 +17,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { isCollapsed } = useSidebarStore();
 
   return (
-    <SearchProvider>
+    <SystemConfigProvider>
+      <SearchProvider>
       <div className="h-screen bg-page-bg font-sans text-text-primary antialiased selection:bg-accent/20 selection:text-accent overflow-hidden flex">
         {/* New Sidebar */}
         <Sidebar />
@@ -57,5 +59,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <NotificationsPanel />
       <AuditLogDrawer />
     </SearchProvider>
+    </SystemConfigProvider>
   );
 }

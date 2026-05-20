@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { projects, projectTeam, employees } from "@/lib/db/schema";
+import { projects, projectTeam, employees, clients } from "@/lib/db/schema";
 import { incrementAndGet, previewNextSequence } from "@/lib/db/idTracker";
 import { generateNextId } from "@/lib/idEngine";
 import { revalidatePath } from "next/cache";
@@ -36,7 +36,7 @@ export async function createProjectAction(data: ProjectFormData) {
 
     // 2. Fetch the client company name to construct the project ID abbreviation
     const client = await db.query.clients.findFirst({
-      where: eq(projects.clientId, parsed.clientId),
+      where: eq(clients.id, parsed.clientId),
     });
     
     const clientName = client?.name || "CORP";
