@@ -474,3 +474,88 @@ export async function checkKnowledgeBaseReadyAction() {
     return { success: false, geminiConfigured: false, docCount: 0, chunkCount: 0 };
   }
 }
+
+// ---------------------------------------------------------------------------
+// Default Knowledge Seeding
+// ---------------------------------------------------------------------------
+
+import fs from "fs";
+import path from "path";
+
+export async function seedDefaultKnowledgeAction() {
+  try {
+    const session = await getCurrentSessionAction();
+    if (!session?.userId) return { success: false, error: "Unauthorized." };
+
+    const geminiCfg = await getGeminiConfig();
+    if (!geminiCfg) {
+      return {
+        success: false,
+        error: "Gemini API is not configured. Please set up your API key in Settings → Integrations first.",
+      };
+    }
+
+    // 1. Read defaultKnowledge.json
+    const filePath = path.join(process.cwd(), "src/lib/data/defaultKnowledge.json");
+    if (!fs.existsSync(filePath)) {
+      return { success: false, error: "Default knowledge file not found at " + filePath };
+    }
+
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+    const defaultDocs = JSON.parse(fileContent);
+
+    if (!Array.isArray(defaultDocs) || defaultDocs.length === 0) {
+      return { success: false, error: "Default knowledge file is empty or invalid." };
+    }
+
+    // 2. Delete existing system documents
+    await db.delete(knowledgeDocuments).where(eq(knowledgeDocuments.sourceType, "system"));
+
+    let seededDocsCount = 0;
+    let totalChunksCount = 0;
+
+    // 3. Insert and embed each document
+    for (const doc of defaultDocs) {
+      const docId = `KBD-SYS-${uuidv4().substring(0, 8).toUpperCase()}`;
+
+      // Insert the document record
+      await db.insert(knowledgeDocuments).values({
+        id: docId,
+        title: doc.title,
+        description: doc.description || null,
+        category: doc.category || "General",
+        sourceType: "system",
+        status: "active",
+        chunkCount: 0,
+        createdBy: session.userId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      // Embed the document content
+      const embedRes = await embedKnowledgeDocumentAction(docId, doc.content);
+      if (embedRes.success) {
+        seededDocsCount++;
+        totalChunksCount += embedRes.chunksEmbedded || 0;
+      } else {
+        // Rollback this document if embedding fails
+        await db.delete(knowledgeDocuments).where(eq(knowledgeDocuments.id, docId));
+        throw new Error(`Failed to embed document "${doc.title}": ${embedRes.error}`);
+      }
+    }
+
+    revalidatePath("/dashboard/knowledge-base");
+    return {
+      success: true,
+      documentsSeeded: seededDocsCount,
+      chunksEmbedded: totalChunksCount,
+    };
+  } catch (err: any) {
+    console.error("[KB] seedDefaultKnowledge:", err);
+    return {
+      success: false,
+      error: err.message || "An unexpected error occurred during seeding.",
+    };
+  }
+}
+

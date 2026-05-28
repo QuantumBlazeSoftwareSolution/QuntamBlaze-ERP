@@ -33,6 +33,7 @@ import {
   deleteKnowledgeDocumentAction,
   embedKnowledgeDocumentAction,
   checkKnowledgeBaseReadyAction,
+  seedDefaultKnowledgeAction,
 } from "@/app/actions/knowledgeBaseActions";
 
 // ---------------------------------------------------------------------------
@@ -519,6 +520,12 @@ export function KnowledgeBaseClient() {
   const [deleteTarget, setDeleteTarget] = useState<KBDocument | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  // Seeding states
+  const [seeding, setSeeding] = useState(false);
+  const [seedingStep, setSeedingStep] = useState("");
+  const [seedingStatus, setSeedingStatus] = useState<"idle" | "seeding" | "success" | "error">("idle");
+  const [seedingError, setSeedingError] = useState("");
+
   // Re-embed from card action
   const [reEmbedTarget, setReEmbedTarget] = useState<KBDocument | null>(null);
 
@@ -549,6 +556,39 @@ export function KnowledgeBaseClient() {
     setDeleting(false);
     setDeleteTarget(null);
     await loadData();
+  };
+
+  const handleSeedDefaultKnowledge = async () => {
+    setSeeding(true);
+    setSeedingStatus("seeding");
+    setSeedingStep("Preparing operational files...");
+
+    const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    try {
+      await delay(800);
+      setSeedingStep("Reading system configurations & default templates...");
+      await delay(800);
+      setSeedingStep("Generating 768-dimensional AI vector embeddings via Gemini...");
+
+      const res = await seedDefaultKnowledgeAction();
+      if (res.success) {
+        await delay(600);
+        setSeedingStep(`Successfully embedded ${res.chunksEmbedded} chunks for ${res.documentsSeeded} operational guides!`);
+        setSeedingStatus("success");
+        await delay(1500);
+        setSeedingStatus("idle");
+        await loadData();
+      } else {
+        setSeedingError(res.error || "Failed to seed knowledge base.");
+        setSeedingStatus("error");
+      }
+    } catch (err: any) {
+      setSeedingError(err.message || "An unexpected error occurred.");
+      setSeedingStatus("error");
+    } finally {
+      setSeeding(false);
+    }
   };
 
   const filtered = documents.filter((d) => {
@@ -655,6 +695,16 @@ export function KnowledgeBaseClient() {
           ))}
         </div>
 
+        {/* Seed button */}
+        <button
+          onClick={handleSeedDefaultKnowledge}
+          disabled={seeding}
+          className="flex items-center gap-2 px-4 h-9 border border-[#6366f1]/30 hover:border-[#6366f1]/60 text-[#6366f1] hover:bg-[#6366f1]/5 rounded-lg text-[12px] font-bold uppercase tracking-wider transition-all shrink-0 disabled:opacity-50"
+        >
+          <Zap className="w-4 h-4" />
+          Seed Default Knowledge
+        </button>
+
         {/* Add button */}
         <button
           onClick={() => { setEditingDoc(null); setDrawerOpen(true); }}
@@ -713,17 +763,27 @@ export function KnowledgeBaseClient() {
             <p className="text-text-muted text-sm">
               {searchQuery || activeCategory !== "All"
                 ? "Try a different search or category filter."
-                : "Add your first document to start building your AI knowledge base."}
+                : "Add your first document or seed system guides to start building your AI knowledge base."}
             </p>
           </div>
           {!searchQuery && activeCategory === "All" && (
-            <button
-              onClick={() => { setEditingDoc(null); setDrawerOpen(true); }}
-              className="flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent-hover text-white rounded-xl text-sm font-bold uppercase tracking-wider transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Add First Document
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleSeedDefaultKnowledge}
+                disabled={seeding}
+                className="flex items-center gap-2 px-5 py-2.5 border border-[#6366f1]/30 hover:border-[#6366f1]/60 text-[#6366f1] hover:bg-[#6366f1]/5 rounded-xl text-sm font-bold uppercase tracking-wider transition-all disabled:opacity-50"
+              >
+                <Zap className="w-4 h-4" />
+                Seed Default Knowledge
+              </button>
+              <button
+                onClick={() => { setEditingDoc(null); setDrawerOpen(true); }}
+                className="flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent-hover text-white rounded-xl text-sm font-bold uppercase tracking-wider transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                Add First Document
+              </button>
+            </div>
           )}
         </div>
       )}
@@ -745,6 +805,82 @@ export function KnowledgeBaseClient() {
           deleting={deleting}
         />
       )}
+
+      {/* Seeding Progress Modal Overlay */}
+      <AnimatePresence>
+        {seedingStatus !== "idle" && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-md px-4"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94 }}
+              className="bg-white/95 backdrop-blur-2xl border border-divider shadow-2xl p-8 rounded-2xl max-w-md w-full text-center relative overflow-hidden"
+              style={{ boxShadow: "0 20px 50px rgba(0,0,0,0.3)" }}
+            >
+              {/* Background accent glow */}
+              <div className="absolute -top-24 -left-24 w-48 h-48 rounded-full bg-accent/10 blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-24 -right-24 w-48 h-48 rounded-full bg-accent/10 blur-3xl pointer-events-none" />
+
+              <div className="flex flex-col items-center gap-5">
+                {/* Visual indicator */}
+                {seedingStatus === "seeding" && (
+                  <div className="relative w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center border border-accent/25">
+                    <Loader2 className="w-8 h-8 text-accent animate-spin" />
+                    <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-accent animate-pulse" />
+                  </div>
+                )}
+
+                {seedingStatus === "success" && (
+                  <motion.div
+                    initial={{ scale: 0.8 }}
+                    animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
+                    className="w-16 h-16 rounded-2xl bg-[#10b981]/15 flex items-center justify-center border border-[#10b981]/30"
+                  >
+                    <Check className="w-8 h-8 text-[#10b981]" />
+                  </motion.div>
+                )}
+
+                {seedingStatus === "error" && (
+                  <div className="w-16 h-16 rounded-2xl bg-danger/15 flex items-center justify-center border border-danger/30">
+                    <AlertCircle className="w-8 h-8 text-danger" />
+                  </div>
+                )}
+
+                <div>
+                  <h3 className="font-bold text-text-primary text-base">
+                    {seedingStatus === "seeding" && "Seeding Operational Knowledge"}
+                    {seedingStatus === "success" && "Knowledge Base Seeded!"}
+                    {seedingStatus === "error" && "Seeding Failed"}
+                  </h3>
+                  <p className="text-xs text-text-muted mt-1.5 uppercase font-bold tracking-widest text-accent">
+                    Quantum Blaze AI Engine
+                  </p>
+                </div>
+
+                <div className="bg-page-bg border border-divider rounded-xl px-4 py-3.5 w-full text-xs text-text-secondary font-medium min-h-[50px] flex items-center justify-center leading-relaxed">
+                  {seedingStatus === "seeding" && seedingStep}
+                  {seedingStatus === "success" && seedingStep}
+                  {seedingStatus === "error" && seedingError}
+                </div>
+
+                {seedingStatus === "error" && (
+                  <button
+                    onClick={() => setSeedingStatus("idle")}
+                    className="mt-2 w-full h-10 bg-accent hover:bg-accent-hover text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-colors"
+                  >
+                    Close
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
