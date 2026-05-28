@@ -280,7 +280,7 @@ export async function embedKnowledgeDocumentAction(
       documentId: string;
       content: string;
       chunkIndex: number;
-      embedding: string;
+      embedding: number[];
       createdAt: Date;
     }> = [];
 
@@ -291,7 +291,7 @@ export async function embedKnowledgeDocumentAction(
         documentId,
         content: chunks[i],
         chunkIndex: i,
-        embedding: toVectorLiteral(vector),
+        embedding: vector,
         createdAt: new Date(),
       });
     }
@@ -307,7 +307,7 @@ export async function embedKnowledgeDocumentAction(
           ${c.documentId},
           ${c.content},
           ${c.chunkIndex},
-          ${c.embedding}::vector,
+          ${toVectorLiteral(c.embedding)}::vector,
           ${c.createdAt}
         )
       `);
@@ -368,15 +368,15 @@ export async function askKnowledgeBaseAction(question: string): Promise<{
         kc.id         AS chunk_id,
         kc.document_id,
         kc.content,
-        1 - (kc.embedding <=> ${vectorLiteral}::vector) AS similarity
+        1 - (kc.embedding <=> ${vectorLiteral}::public.vector) AS similarity
       FROM knowledge_chunks kc
       INNER JOIN knowledge_documents kd ON kd.id = kc.document_id
       WHERE
         kd.status = 'active'
         AND kd.deleted_at IS NULL
         AND kc.embedding IS NOT NULL
-        AND 1 - (kc.embedding <=> ${vectorLiteral}::vector) > 0.35
-      ORDER BY kc.embedding <=> ${vectorLiteral}::vector
+        AND 1 - (kc.embedding <=> ${vectorLiteral}::public.vector) > 0.35
+      ORDER BY kc.embedding <=> ${vectorLiteral}::public.vector
       LIMIT 4
     `);
 
