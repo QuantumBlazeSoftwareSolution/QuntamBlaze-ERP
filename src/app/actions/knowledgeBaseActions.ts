@@ -36,7 +36,14 @@ async function getGeminiConfig(): Promise<{ apiKey: string; baseModel: string } 
  * Tries preferred models first, falls back to any model supporting embedContent.
  */
 async function getEmbeddingModel(apiKey: string): Promise<string> {
-  const preferred = ["text-embedding-004", "embedding-001", "text-embedding-preview-0409"];
+  const preferred = [
+    "text-embedding-004",
+    "gemini-embedding-001",
+    "gemini-embedding-2",
+    "gemini-embedding-2-preview",
+    "embedding-001",
+    "text-embedding-preview-0409"
+  ];
 
   try {
     const res = await fetch(
@@ -73,13 +80,25 @@ async function embedText(text: string, apiKey: string): Promise<number[]> {
   const model = await getEmbeddingModel(apiKey);
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:embedContent?key=${apiKey}`;
 
+  const requestBody: any = {
+    model: `models/${model}`,
+    content: { parts: [{ text }] },
+  };
+
+  // Modern models support custom dimension output via outputDimensionality.
+  // We specify 768 to perfectly align with the database vector(768) column.
+  if (
+    model.includes("gemini-embedding") ||
+    model === "text-embedding-004" ||
+    model.includes("embedding-2")
+  ) {
+    requestBody.outputDimensionality = 768;
+  }
+
   const response = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: `models/${model}`,
-      content: { parts: [{ text }] },
-    }),
+    body: JSON.stringify(requestBody),
   });
 
   if (!response.ok) {

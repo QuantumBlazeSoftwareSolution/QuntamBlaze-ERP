@@ -19,6 +19,7 @@ import {
   askKnowledgeBaseAction,
   checkKnowledgeBaseReadyAction,
 } from "@/app/actions/knowledgeBaseActions";
+import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer";
 
 interface Source {
   documentId: string;
@@ -233,7 +234,14 @@ export function AskAIWidget() {
                             : "bg-page-bg border border-divider text-text-primary rounded-tl-sm"
                           : "bg-accent text-white rounded-tr-sm"
                       )}>
-                        {msg.text}
+                        {msg.sender === "ai" && !msg.isError ? (
+                          <MarkdownRenderer
+                            text={msg.text}
+                            paragraphClassName="text-[12px] text-text-secondary"
+                          />
+                        ) : (
+                          msg.text
+                        )}
                       </div>
 
                       {/* Source citations */}
