@@ -7,7 +7,6 @@ import { eq, sql, isNull, count } from "drizzle-orm";
 import { getCurrentSessionAction } from "./auth";
 import { v4 as uuidv4 } from "uuid";
 import { revalidatePath } from "next/cache";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -33,8 +32,96 @@ async function getGeminiConfig(): Promise<{ apiKey: string; baseModel: string } 
 }
 
 /**
- * Split a long text into chunks of ~500 words, preserving paragraph boundaries
- * where possible. Returns an array of non-empty string chunks.
+ * Discover the best available embedding model for this API key.
+ * Tries preferred models first, falls back to any model supporting embedContent.
+ */
+async function getEmbeddingModel(apiKey: string): Promise<string> {
+  const preferred = ["text-embedding-004", "embedding-001", "text-embedding-preview-0409"];
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`,
+      { method: "GET", headers: { "Content-Type": "application/json" } }
+    );
+    if (!res.ok) throw new Error("Could not list models");
+
+    const data = await res.json() as any;
+    const models: any[] = data?.models || [];
+    const embedModels = models
+      .filter((m: any) => m.supportedGenerationMethods?.includes("embedContent"))
+      .map((m: any) => (m.name as string).replace("models/", ""));
+
+    // Return first preferred model that is available
+    for (const p of preferred) {
+      if (embedModels.includes(p)) return p;
+    }
+    // Fallback: any available embed model
+    if (embedModels.length > 0) return embedModels[0];
+  } catch {
+    // If listing fails, just try the preferred ones
+  }
+
+  return "embedding-001"; // last resort default
+}
+
+/**
+ * Embed a single text string using the Gemini REST API (native fetch).
+ * Dynamically discovers the best embedding model for this API key.
+ * Outputs 768-dimensional vectors.
+ */
+async function embedText(text: string, apiKey: string): Promise<number[]> {
+  const model = await getEmbeddingModel(apiKey);
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:embedContent?key=${apiKey}`;
+
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: `models/${model}`,
+      content: { parts: [{ text }] },
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    const msg = (errorData as any)?.error?.message || `HTTP ${response.status} ${response.statusText}`;
+    throw new Error(`Gemini Embedding API error (model: ${model}): ${msg}`);
+  }
+
+  const data = await response.json() as any;
+  const values: number[] = data?.embedding?.values;
+  if (!values || values.length === 0) {
+    throw new Error("Gemini returned an empty embedding vector.");
+  }
+  return values;
+}
+
+/**
+ * Generate a chat completion using the Gemini REST API (native fetch).
+ */
+async function generateContent(prompt: string, apiKey: string, model: string): Promise<string> {
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    const msg = (errorData as any)?.error?.message || `HTTP ${response.status} ${response.statusText}`;
+    throw new Error(`Gemini Chat API error: ${msg}`);
+  }
+
+  const data = await response.json() as any;
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+}
+
+/**
+ * Split a long text into chunks of ~500 words, preserving paragraph boundaries.
  */
 function splitIntoChunks(text: string, wordsPerChunk = 500): string[] {
   const paragraphs = text.split(/\n{2,}/).filter((p) => p.trim().length > 0);
@@ -44,7 +131,6 @@ function splitIntoChunks(text: string, wordsPerChunk = 500): string[] {
 
   for (const para of paragraphs) {
     const paraWords = para.trim().split(/\s+/).length;
-
     if (wordCount + paraWords > wordsPerChunk && current.trim()) {
       chunks.push(current.trim());
       current = para;
@@ -54,10 +140,8 @@ function splitIntoChunks(text: string, wordsPerChunk = 500): string[] {
       wordCount += paraWords;
     }
   }
-
   if (current.trim()) chunks.push(current.trim());
 
-  // Fall back: if no paragraph breaks, just split by word count
   if (chunks.length === 0) {
     const words = text.trim().split(/\s+/);
     for (let i = 0; i < words.length; i += wordsPerChunk) {
@@ -68,10 +152,6 @@ function splitIntoChunks(text: string, wordsPerChunk = 500): string[] {
   return chunks.filter((c) => c.length > 0);
 }
 
-/**
- * Serialize a number[] as a Postgres vector literal string.
- * e.g. [0.1, 0.2, ...] → "[0.1,0.2,...]"
- */
 function toVectorLiteral(vec: number[]): string {
   return `[${vec.join(",")}]`;
 }
@@ -87,7 +167,6 @@ export async function getKnowledgeDocumentsAction() {
       .from(knowledgeDocuments)
       .where(isNull(knowledgeDocuments.deletedAt))
       .orderBy(sql`${knowledgeDocuments.updatedAt} DESC`);
-
     return { success: true, documents: docs };
   } catch (err: any) {
     console.error("[KB] getKnowledgeDocuments:", err);
@@ -104,7 +183,6 @@ export async function createKnowledgeDocumentAction(data: {
   try {
     const session = await getCurrentSessionAction();
     if (!session?.userId) return { success: false, error: "Unauthorized." };
-
     if (!data.title?.trim()) return { success: false, error: "Title is required." };
     if (!data.content?.trim()) return { success: false, error: "Content is required." };
 
@@ -145,10 +223,7 @@ export async function updateKnowledgeDocumentAction(
     if (data.category !== undefined) updates.category = data.category;
     if (data.status !== undefined) updates.status = data.status;
 
-    await db
-      .update(knowledgeDocuments)
-      .set(updates)
-      .where(eq(knowledgeDocuments.id, id));
+    await db.update(knowledgeDocuments).set(updates).where(eq(knowledgeDocuments.id, id));
 
     revalidatePath("/dashboard/knowledge-base");
     return { success: true };
@@ -163,7 +238,6 @@ export async function deleteKnowledgeDocumentAction(id: string) {
     const session = await getCurrentSessionAction();
     if (!session?.userId) return { success: false, error: "Unauthorized." };
 
-    // Hard delete — cascade removes all associated chunks via FK constraint
     await db.delete(knowledgeDocuments).where(eq(knowledgeDocuments.id, id));
 
     revalidatePath("/dashboard/knowledge-base");
@@ -178,28 +252,11 @@ export async function deleteKnowledgeDocumentAction(id: string) {
 // Embedding Pipeline
 // ---------------------------------------------------------------------------
 
-/**
- * Main embedding pipeline:
- * 1. Split fullText into ~500-word chunks
- * 2. For each chunk: call Gemini text-embedding-004 → get 768-dim vector
- * 3. Delete old chunks for this document
- * 4. Batch insert new knowledge_chunks rows
- * 5. Update knowledge_documents.chunkCount
- *
- * Returns an async generator that yields progress strings so the UI can show
- * live progress without SSE/WebSocket infrastructure.
- * For simplicity the server action returns a final status after completion.
- */
 export async function embedKnowledgeDocumentAction(
   documentId: string,
   fullText: string
-): Promise<{
-  success: boolean;
-  chunksEmbedded?: number;
-  error?: string;
-}> {
+): Promise<{ success: boolean; chunksEmbedded?: number; error?: string }> {
   try {
-    // 1. Load Gemini credentials
     const geminiCfg = await getGeminiConfig();
     if (!geminiCfg) {
       return {
@@ -212,46 +269,36 @@ export async function embedKnowledgeDocumentAction(
       return { success: false, error: "No content provided for embedding." };
     }
 
-    const genAI = new GoogleGenerativeAI(geminiCfg.apiKey);
-    const embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
-
-    // 2. Split text into chunks
     const chunks = splitIntoChunks(fullText, 500);
     if (chunks.length === 0) {
       return { success: false, error: "Could not extract any content chunks from the provided text." };
     }
 
-    // 3. Embed each chunk sequentially (rate-limit safe)
+    // Embed each chunk via native fetch (no SDK dependency)
     const embeddedChunks: Array<{
       id: string;
       documentId: string;
       content: string;
       chunkIndex: number;
-      embedding: string; // vector literal for Postgres
+      embedding: string;
       createdAt: Date;
     }> = [];
 
     for (let i = 0; i < chunks.length; i++) {
-      const chunk = chunks[i];
-      const result = await embeddingModel.embedContent(chunk);
-      const vector = result.embedding.values; // number[768]
-
+      const vector = await embedText(chunks[i], geminiCfg.apiKey);
       embeddedChunks.push({
         id: `KBC-${uuidv4().substring(0, 8).toUpperCase()}`,
         documentId,
-        content: chunk,
+        content: chunks[i],
         chunkIndex: i,
         embedding: toVectorLiteral(vector),
         createdAt: new Date(),
       });
     }
 
-    // 4. Delete existing chunks for this document (re-embed support)
-    await db
-      .delete(knowledgeChunks)
-      .where(eq(knowledgeChunks.documentId, documentId));
+    // Delete old chunks then insert new ones
+    await db.delete(knowledgeChunks).where(eq(knowledgeChunks.documentId, documentId));
 
-    // 5. Batch insert new chunks using raw SQL for the vector literal
     for (const c of embeddedChunks) {
       await db.execute(sql`
         INSERT INTO knowledge_chunks (id, document_id, content, chunk_index, embedding, created_at)
@@ -266,18 +313,12 @@ export async function embedKnowledgeDocumentAction(
       `);
     }
 
-    // 6. Update document chunkCount + updatedAt
     await db
       .update(knowledgeDocuments)
-      .set({
-        chunkCount: embeddedChunks.length,
-        status: "active",
-        updatedAt: new Date(),
-      })
+      .set({ chunkCount: embeddedChunks.length, status: "active", updatedAt: new Date() })
       .where(eq(knowledgeDocuments.id, documentId));
 
     revalidatePath("/dashboard/knowledge-base");
-
     return { success: true, chunksEmbedded: embeddedChunks.length };
   } catch (err: any) {
     console.error("[KB] embedKnowledgeDocument:", err);
@@ -304,27 +345,19 @@ export async function askKnowledgeBaseAction(question: string): Promise<{
       return { success: false, error: "Please provide a question." };
     }
 
-    // 1. Load Gemini credentials
     const geminiCfg = await getGeminiConfig();
     if (!geminiCfg) {
       return {
         success: false,
-        error: "Gemini AI is not configured. Please add your API key in Settings → Integrations → Google Gemini AI.",
+        error: "Gemini AI is not configured. Please add your API key in Settings → Integrations.",
       };
     }
 
-    const genAI = new GoogleGenerativeAI(geminiCfg.apiKey);
-
-    // 2. Embed the user's question
-    const embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
-    const embedResult = await embeddingModel.embedContent(question.trim());
-    const questionVector = embedResult.embedding.values; // number[768]
+    // Embed question via native fetch
+    const questionVector = await embedText(question.trim(), geminiCfg.apiKey);
     const vectorLiteral = toVectorLiteral(questionVector);
 
-    // 3. pgvector cosine similarity search — find top 4 matching chunks
-    const similarityThreshold = 0.35;
-    const matchCount = 4;
-
+    // pgvector cosine similarity search
     const matchingChunks = await db.execute<{
       chunk_id: string;
       document_id: string;
@@ -342,9 +375,9 @@ export async function askKnowledgeBaseAction(question: string): Promise<{
         kd.status = 'active'
         AND kd.deleted_at IS NULL
         AND kc.embedding IS NOT NULL
-        AND 1 - (kc.embedding <=> ${vectorLiteral}::vector) > ${similarityThreshold}
+        AND 1 - (kc.embedding <=> ${vectorLiteral}::vector) > 0.35
       ORDER BY kc.embedding <=> ${vectorLiteral}::vector
-      LIMIT ${matchCount}
+      LIMIT 4
     `);
 
     const rows = (matchingChunks as any).rows ?? matchingChunks;
@@ -359,7 +392,7 @@ export async function askKnowledgeBaseAction(question: string): Promise<{
       };
     }
 
-    // 4. Fetch document titles for source citations
+    // Fetch document titles
     const docIds = [...new Set(rows.map((r: any) => r.document_id as string))];
     const docRecords = await db
       .select({ id: knowledgeDocuments.id, title: knowledgeDocuments.title })
@@ -368,15 +401,12 @@ export async function askKnowledgeBaseAction(question: string): Promise<{
 
     const docTitleMap = Object.fromEntries(docRecords.map((d) => [d.id, d.title]));
 
-    // 5. Assemble context for RAG prompt
+    // Build RAG context
     const contextText = rows
       .map((r: any, i: number) => `[Source ${i + 1}: ${docTitleMap[r.document_id] || "Unknown"}]\n${r.content}`)
       .join("\n\n---\n\n");
 
-    // 6. Call Gemini chat model with structured RAG system prompt
-    const chatModel = genAI.getGenerativeModel({ model: geminiCfg.baseModel });
-
-    const ragPrompt = `You are QuantumBlaze ERP's intelligent Knowledge Base Assistant. 
+    const ragPrompt = `You are QuantumBlaze ERP's intelligent Knowledge Base Assistant.
 Your ONLY job is to answer questions strictly based on the provided context from the knowledge base.
 
 STRICT RULES:
@@ -395,10 +425,9 @@ USER QUESTION: ${question}
 
 ANSWER:`;
 
-    const result = await chatModel.generateContent(ragPrompt);
-    const answer = result.response.text()?.trim() || "I was unable to generate a response.";
+    // Generate answer via native fetch
+    const answer = await generateContent(ragPrompt, geminiCfg.apiKey, geminiCfg.baseModel);
 
-    // 7. Build source citations
     const sources = rows.map((r: any) => ({
       documentId: r.document_id,
       title: docTitleMap[r.document_id] || "Unknown Document",
@@ -406,7 +435,7 @@ ANSWER:`;
       similarity: Math.round((r.similarity as number) * 100),
     }));
 
-    return { success: true, answer, sources };
+    return { success: true, answer: answer || "I was unable to generate a response.", sources };
   } catch (err: any) {
     console.error("[KB] askKnowledgeBase:", err);
     return {

@@ -9,6 +9,7 @@ import {
   Zap,
   BarChart3,
   MessageSquare,
+  BookOpen,
 } from "lucide-react";
 import { NavSection } from "@/types/navigation";
 
@@ -19,6 +20,7 @@ export const NAV_CONFIG: NavSection[] = [
       { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
       { label: "Operations", href: "/dashboard/operations", icon: Zap },
       { label: "Intelligence", href: "/dashboard/intelligence", icon: Shield },
+      { label: "Knowledge Base", href: "/dashboard/knowledge-base", icon: BookOpen },
     ],
   },
   {

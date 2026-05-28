@@ -59,13 +59,6 @@ export function Sidebar() {
 
       {/* Footer Actions */}
       <div className="p-3 border-t border-sidebar-border space-y-2">
-        <Link href="/dashboard/settings" className="block">
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:text-white hover:bg-white/[0.03] transition-all">
-            <Settings className="w-[18px] h-[18px] shrink-0" />
-            {!isCollapsed && <span className="text-[13px] font-medium">System Settings</span>}
-          </div>
-        </Link>
-
         {/* Collapse Sidebar Action */}
         <button
           onClick={toggleCollapse}
@@ -80,6 +73,13 @@ export function Sidebar() {
             </>
           )}
         </button>
+
+        <Link href="/dashboard/settings" className="block">
+          <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-text hover:text-white hover:bg-white/[0.03] transition-all">
+            <Settings className="w-[18px] h-[18px] shrink-0" />
+            {!isCollapsed && <span className="text-[13px] font-medium">System Settings</span>}
+          </div>
+        </Link>
       </div>
     </motion.aside>
   );

@@ -46,6 +46,7 @@ import {
   testGeminiConnectionAction,
   getAvailableGeminiModelsAction,
 } from "@/app/actions/geminiActions";
+import { checkKnowledgeBaseReadyAction } from "@/app/actions/knowledgeBaseActions";
 
 export function IntegrationsTab() {
   const searchParams = useSearchParams();
@@ -122,6 +123,9 @@ export function IntegrationsTab() {
   // Dynamic Gemini models state
   const [availableGeminiModels, setAvailableGeminiModels] = useState<{ id: string; displayName: string; description?: string }[]>([]);
   const [isLoadingGeminiModels, setIsLoadingGeminiModels] = useState(false);
+
+  // Knowledge Base stats (shown inside Gemini drawer)
+  const [kbStats, setKbStats] = useState<{ docCount: number; chunkCount: number } | null>(null);
 
   // Form states
   const [clientIdInput, setClientIdInput] = useState("");
@@ -242,6 +246,14 @@ export function IntegrationsTab() {
   useEffect(() => {
     if (drawerType === "gemini" && geminiApiKeyInput) {
       fetchGeminiModels(geminiApiKeyInput);
+    }
+    // Also load KB stats when the Gemini drawer opens
+    if (drawerType === "gemini") {
+      checkKnowledgeBaseReadyAction().then((res) => {
+        if (res.success !== false) {
+          setKbStats({ docCount: res.docCount, chunkCount: res.chunkCount });
+        }
+      });
     }
   }, [drawerType]);
 
@@ -1359,7 +1371,31 @@ export function IntegrationsTab() {
               )}
 
               {drawerType === "gemini" && geminiStatus.isConfigured && (
-                <div className="pt-6 border-t border-divider mt-auto">
+                <div className="pt-6 border-t border-divider mt-auto space-y-4">
+                  {/* Knowledge Base Stats */}
+                  <div className="bg-page-bg border border-divider rounded-xl p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[11px] font-bold text-text-muted uppercase tracking-wider flex items-center gap-1.5">
+                        <span>📚</span> Knowledge Base
+                      </p>
+                      <a
+                        href="/dashboard/knowledge-base"
+                        className="text-[10px] font-bold text-accent hover:underline uppercase tracking-wider flex items-center gap-1"
+                      >
+                        Manage →
+                      </a>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-white border border-divider rounded-lg p-3 text-center">
+                        <p className="text-xl font-bold text-text-primary">{kbStats?.docCount ?? "—"}</p>
+                        <p className="text-[10px] text-text-muted uppercase tracking-wider">Documents</p>
+                      </div>
+                      <div className="bg-white border border-divider rounded-lg p-3 text-center">
+                        <p className="text-xl font-bold text-text-primary">{kbStats?.chunkCount ?? "—"}</p>
+                        <p className="text-[10px] text-text-muted uppercase tracking-wider">Vector Chunks</p>
+                      </div>
+                    </div>
+                  </div>
                   <button
                     onClick={handleDisconnectGemini}
                     disabled={isDisconnectingGemini}

@@ -12,6 +12,7 @@ import { AuditLogDrawer } from "@/components/layout/AuditLogDrawer";
 import { cn } from "@/lib/utils";
 import { Grid } from "lucide-react";
 import { ProfileDropdown } from "@/components/layout/ProfileDropdown";
+import { AskAIWidget } from "@/components/layout/AskAIWidget";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { isCollapsed } = useSidebarStore();
@@ -58,6 +59,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <GlobalSearchOverlay />
       <NotificationsPanel />
       <AuditLogDrawer />
+      <AskAIWidget />
     </SearchProvider>
     </SystemConfigProvider>
   );
