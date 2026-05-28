@@ -29,3 +29,4 @@ export * from "./systemConfig";
 export * from "./chat";
 export * from "./personalTasks";
 export * from "./knowledgeBase";
+export * from "./github";

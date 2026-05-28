@@ -10,6 +10,7 @@ import {
   BarChart3,
   MessageSquare,
   BookOpen,
+  GitBranch,
 } from "lucide-react";
 import { NavSection } from "@/types/navigation";
 
@@ -46,6 +47,7 @@ export const NAV_CONFIG: NavSection[] = [
       },
       { label: "Chat", href: "/dashboard/chat", icon: MessageSquare },
       { label: "Documents", href: "/dashboard/documents", icon: FileText },
+      { label: "Development", href: "/dashboard/development", icon: GitBranch },
     ],
   },
   {

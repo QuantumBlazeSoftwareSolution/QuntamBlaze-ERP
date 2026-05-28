@@ -23,6 +23,7 @@ import {
   Sparkles,
   Eye,
   EyeOff,
+  GitBranch,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -47,6 +48,12 @@ import {
   getAvailableGeminiModelsAction,
 } from "@/app/actions/geminiActions";
 import { checkKnowledgeBaseReadyAction } from "@/app/actions/knowledgeBaseActions";
+import {
+  saveGithubConfigAction,
+  getGithubStatusAction,
+  disconnectGithubAction,
+  listAppInstalledOrganizationsAction,
+} from "@/app/actions/githubActions";
 
 export function IntegrationsTab() {
   const searchParams = useSearchParams();
@@ -67,7 +74,7 @@ export function IntegrationsTab() {
   const [loadingStatus, setLoadingStatus] = useState(true);
 
   // Drawer & Selection states
-  const [drawerType, setDrawerType] = useState<"gdrive" | "pusher" | "gemini" | null>(null);
+  const [drawerType, setDrawerType] = useState<"gdrive" | "pusher" | "gemini" | "github" | null>(null);
   const drawerOpen = !!drawerType;
   const setDrawerOpen = (open: boolean) => {
     if (!open) setDrawerType(null);
@@ -127,6 +134,30 @@ export function IntegrationsTab() {
   // Knowledge Base stats (shown inside Gemini drawer)
   const [kbStats, setKbStats] = useState<{ docCount: number; chunkCount: number } | null>(null);
 
+  // GitHub states
+  const [githubStatus, setGithubStatus] = useState<{
+    isConfigured: boolean;
+    appId: string;
+    clientId: string;
+    orgName: string;
+  }>({
+    isConfigured: false,
+    appId: "",
+    clientId: "",
+    orgName: "",
+  });
+  const [loadingGithubStatus, setLoadingGithubStatus] = useState(true);
+  const [githubAppIdInput, setGithubAppIdInput] = useState("");
+  const [githubClientIdInput, setGithubClientIdInput] = useState("");
+  const [githubClientSecretInput, setGithubClientSecretInput] = useState("");
+  const [githubPrivateKeyInput, setGithubPrivateKeyInput] = useState("");
+  const [githubOrgNameInput, setGithubOrgNameInput] = useState("");
+  const [showGithubClientSecret, setShowGithubClientSecret] = useState(false);
+  const [showGithubPrivateKey, setShowGithubPrivateKey] = useState(false);
+  const [isSavingGithubConfig, setIsSavingGithubConfig] = useState(false);
+  const [isDisconnectingGithub, setIsDisconnectingGithub] = useState(false);
+  const [githubInstalledOrgs, setGithubInstalledOrgs] = useState<string[]>([]);
+
   // Form states
   const [clientIdInput, setClientIdInput] = useState("");
   const [clientSecretInput, setClientSecretInput] = useState("");
@@ -146,7 +177,15 @@ export function IntegrationsTab() {
   // Setup Instruction Modal States
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [showPusherSetupModal, setShowPusherSetupModal] = useState(false);
+  const [showGithubSetupModal, setShowGithubSetupModal] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [clientOrigin, setClientOrigin] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setClientOrigin(window.location.origin);
+    }
+  }, []);
 
   const copyRedirectUri = () => {
     navigator.clipboard.writeText(`${window.location.origin}/api/auth/callback/google-drive`);
@@ -215,6 +254,88 @@ export function IntegrationsTab() {
     }
   };
 
+  const loadGithubStatus = async () => {
+    try {
+      const res = await getGithubStatusAction();
+      if (res.success) {
+        setGithubStatus({
+          isConfigured: res.isConfigured || false,
+          appId: res.appId || "",
+          clientId: res.clientId || "",
+          orgName: res.orgName || "",
+        });
+        if (res.appId) setGithubAppIdInput(res.appId);
+        if (res.clientId) setGithubClientIdInput(res.clientId);
+        if (res.orgName) setGithubOrgNameInput(res.orgName);
+      }
+      if (res.isConfigured) {
+        const orgRes = await listAppInstalledOrganizationsAction();
+        if (orgRes.success && orgRes.organizations) {
+          setGithubInstalledOrgs(orgRes.organizations);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingGithubStatus(false);
+    }
+  };
+
+  const handleSaveGithubCredentials = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingGithubConfig(true);
+    setDrawerError("");
+    setDrawerSuccess("");
+    try {
+      const res = await saveGithubConfigAction(
+        githubAppIdInput,
+        githubClientIdInput,
+        githubClientSecretInput,
+        githubPrivateKeyInput,
+        githubOrgNameInput
+      );
+      if (res.success) {
+        setDrawerSuccess("GitHub Suite App configuration saved successfully!");
+        await loadGithubStatus();
+      } else {
+        setDrawerError(res.error || "Failed to save configuration.");
+      }
+    } catch (err: any) {
+      setDrawerError(err.message || "An unexpected error occurred.");
+    } finally {
+      setIsSavingGithubConfig(false);
+    }
+  };
+
+  const handleDisconnectGithub = async () => {
+    if (!confirm("Are you sure you want to disconnect GitHub Developer Suite? This will wipe the global App settings.")) {
+      return;
+    }
+    setIsDisconnectingGithub(true);
+    setDrawerError("");
+    setDrawerSuccess("");
+    try {
+      const res = await disconnectGithubAction();
+      if (res.success) {
+        setDrawerSuccess("GitHub integration successfully disconnected.");
+        setGithubAppIdInput("");
+        setGithubClientIdInput("");
+        setGithubClientSecretInput("");
+        setGithubPrivateKeyInput("");
+        setGithubOrgNameInput("");
+        setGithubInstalledOrgs([]);
+        await loadGithubStatus();
+        setTimeout(() => setDrawerType(null), 2000);
+      } else {
+        setDrawerError(res.error || "Failed to disconnect GitHub.");
+      }
+    } catch (err: any) {
+      setDrawerError(err.message || "Disconnection failed.");
+    } finally {
+      setIsDisconnectingGithub(false);
+    }
+  };
+
   const fetchGeminiModels = async (key: string) => {
     if (!key) {
       setAvailableGeminiModels([]);
@@ -277,6 +398,7 @@ export function IntegrationsTab() {
     loadStatus();
     loadPusherStatus();
     loadGeminiStatus();
+    loadGithubStatus();
 
     // Check URL query parameters
     const success = searchParams.get("gdrive_success");
@@ -319,10 +441,16 @@ export function IntegrationsTab() {
   };
 
   useEffect(() => {
-    if (drawerOpen && gdriveStatus.isConnected) {
+    if (drawerType === "gdrive" && gdriveStatus.isConnected) {
       loadFolders();
     }
-  }, [drawerOpen, gdriveStatus.isConnected]);
+  }, [drawerType, gdriveStatus.isConnected]);
+
+  // Clear drawer error/success state on drawer selection changes to prevent cross-bleeding
+  useEffect(() => {
+    setDrawerError("");
+    setDrawerSuccess("");
+  }, [drawerType]);
 
   // Handle Client Credentials saving
   const handleSaveCredentials = async (e: React.FormEvent) => {
@@ -641,6 +769,20 @@ export function IntegrationsTab() {
       actionLabel: "CONFIGURE HUB",
       onAction: () => setDrawerType("gemini"),
     },
+    {
+      id: "github",
+      name: "GitHub Developer Suite",
+      description: "Manage repository creation, branch setups, collaborator sync, and Pull Requests.",
+      icon: GitBranch,
+      status: loadingGithubStatus
+        ? "Loading..."
+        : githubStatus.isConfigured
+        ? "Connected"
+        : "Not Connected",
+      color: "text-neutral-800",
+      actionLabel: "CONFIGURE HUB",
+      onAction: () => setDrawerType("github"),
+    },
   ];
 
   return (
@@ -659,11 +801,7 @@ export function IntegrationsTab() {
                 : "bg-danger/10 border-danger/20 text-danger"
             )}
           >
-            {urlNotification.type === "success" ? (
-              <Check className="w-5 h-5 flex-shrink-0" />
-            ) : (
-              <AlertCircle className="w-5 h-5 flex-shrink-0" />
-            )}
+            <Check className="w-5 h-5 flex-shrink-0" />
             <span className="flex-1">{urlNotification.message}</span>
             <button
               onClick={() => setUrlNotification(null)}
@@ -728,10 +866,10 @@ export function IntegrationsTab() {
 
             <button
               onClick={integration.onAction}
-              disabled={integration.id !== "gdrive" && integration.id !== "pusher" && integration.id !== "gemini"}
+              disabled={integration.id !== "gdrive" && integration.id !== "pusher" && integration.id !== "gemini" && integration.id !== "github"}
               className={cn(
                 "mt-8 flex items-center justify-between w-full p-4 rounded-xl bg-page-bg border border-divider group-hover:border-accent/50 transition-all cursor-pointer",
-                (integration.id !== "gdrive" && integration.id !== "pusher" && integration.id !== "gemini") && "opacity-50 cursor-not-allowed"
+                (integration.id !== "gdrive" && integration.id !== "pusher" && integration.id !== "gemini" && integration.id !== "github") && "opacity-50 cursor-not-allowed"
               )}
             >
               <span className="text-[12px] font-bold text-text-secondary group-hover:text-text-primary">
@@ -805,6 +943,26 @@ export function IntegrationsTab() {
                           </button>
                         </h3>
                         <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">Real-time Web Sync Settings</p>
+                      </div>
+                    </div>
+                  ) : drawerType === "github" ? (
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-neutral-100 border border-neutral-200 rounded-xl text-neutral-800">
+                        <GitBranch className="w-6 h-6 animate-pulse" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-text-primary flex items-center gap-1.5">
+                          GitHub Developer Suite
+                          <button
+                            type="button"
+                            onClick={() => setShowGithubSetupModal(true)}
+                            title="View Setup Guide"
+                            className="text-text-muted hover:text-accent transition-colors border-0 bg-transparent p-0 cursor-pointer"
+                          >
+                            <HelpCircle className="w-4 h-4" />
+                          </button>
+                        </h3>
+                        <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">Repository Sync Settings</p>
                       </div>
                     </div>
                   ) : (
@@ -1174,6 +1332,143 @@ export function IntegrationsTab() {
                       )}
                     </button>
                   </form>
+                ) : drawerType === "github" ? (
+                  /* GITHUB DRAWER CONTENT */
+                  <form onSubmit={handleSaveGithubCredentials} className="space-y-6">
+                    <div className="bg-slate-50 border border-border p-5 rounded-2xl space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-[12px] font-bold text-slate-800 uppercase tracking-wider">
+                          <Settings className="w-4 h-4 text-accent" />
+                          GitHub Integration Guide
+                        </div>
+                        <span className="px-2 py-0.5 bg-neutral-100 text-neutral-800 border border-neutral-200 text-[9px] font-black uppercase tracking-widest rounded-full">
+                          RECOMMENDED
+                        </span>
+                      </div>
+                      <p className="text-[12px] text-text-secondary leading-relaxed">
+                        To enable the GitHub Developer Suite, create a dedicated GitHub App in your target organization and copy your App ID, Client ID, Client Secret, Org name, and Private Key. We've built a step-by-step setup guide to make this easy.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setShowGithubSetupModal(true)}
+                        className="w-full flex items-center justify-center gap-2 h-11 border border-accent/20 hover:border-accent bg-accent/5 hover:bg-accent/10 text-accent font-bold rounded-xl text-[12px] uppercase tracking-widest transition-all cursor-pointer"
+                      >
+                        <HelpCircle className="w-4 h-4" />
+                        View Setup Instructions
+                      </button>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1.5">
+                          <Key className="w-3 h-3 text-accent" />
+                          GitHub App ID
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={githubAppIdInput}
+                          onChange={(e) => setGithubAppIdInput(e.target.value)}
+                          placeholder="e.g. 1042315"
+                          className="w-full h-11 px-4 border border-border rounded-xl text-[13px] text-text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1.5">
+                          <Key className="w-3 h-3 text-accent" />
+                          App Client ID
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={githubClientIdInput}
+                          onChange={(e) => setGithubClientIdInput(e.target.value)}
+                          placeholder="e.g. Iv1.abcdef0123"
+                          className="w-full h-11 px-4 border border-border rounded-xl text-[13px] text-text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1.5">
+                          <Key className="w-3 h-3 text-accent" />
+                          App Client Secret
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showGithubClientSecret ? "text" : "password"}
+                            required
+                            value={githubClientSecretInput}
+                            onChange={(e) => setGithubClientSecretInput(e.target.value)}
+                            placeholder="Enter GitHub App Client Secret"
+                            className="w-full h-11 pl-4 pr-10 border border-border rounded-xl text-[13px] text-text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowGithubClientSecret(!showGithubClientSecret)}
+                            className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-text-primary transition-colors border-0 bg-transparent p-0 cursor-pointer"
+                          >
+                            {showGithubClientSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1.5">
+                          <Key className="w-3 h-3 text-accent" />
+                          GitHub Organization / Owner Name
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={githubOrgNameInput}
+                          onChange={(e) => setGithubOrgNameInput(e.target.value)}
+                          placeholder="e.g. QuantumBlazeSoftwareSolution"
+                          className="w-full h-11 px-4 border border-border rounded-xl text-[13px] text-text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1.5">
+                          <Key className="w-3 h-3 text-accent" />
+                          Private Key (PEM block)
+                        </label>
+                        <div className="relative">
+                          <textarea
+                            required
+                            value={githubPrivateKeyInput}
+                            onChange={(e) => setGithubPrivateKeyInput(e.target.value)}
+                            placeholder="-----BEGIN RSA PRIVATE KEY-----&#10;...&#10;-----END RSA PRIVATE KEY-----"
+                            rows={5}
+                            className="w-full p-4 border border-border rounded-xl text-[12px] font-mono text-text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none resize-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {githubInstalledOrgs.length > 0 && (
+                      <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-[12px] space-y-1">
+                        <p className="font-bold text-emerald-800">✓ App Installed & Verified on Orgs:</p>
+                        <ul className="list-disc pl-5 text-emerald-700 font-semibold">
+                          {githubInstalledOrgs.map((org) => (
+                            <li key={org}>{org}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={isSavingGithubConfig}
+                      className="w-full flex items-center justify-center gap-2 h-12 bg-slate-900 text-white font-bold rounded-xl text-[12px] uppercase tracking-widest shadow-lg shadow-slate-950/20 hover:scale-[1.01] transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                      {isSavingGithubConfig ? (
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                      ) : (
+                        "Save GitHub Suite Configuration"
+                      )}
+                    </button>
+                  </form>
                 ) : (
                   /* GEMINI DRAWER CONTENT */
                   <div className="space-y-6">
@@ -1412,6 +1707,25 @@ export function IntegrationsTab() {
                   </button>
                 </div>
               )}
+
+              {drawerType === "github" && githubStatus.isConfigured && (
+                <div className="pt-6 border-t border-divider mt-auto">
+                  <button
+                    onClick={handleDisconnectGithub}
+                    disabled={isDisconnectingGithub}
+                    className="w-full flex items-center justify-center gap-2 h-12 border border-danger/25 text-danger/80 hover:text-white hover:bg-danger hover:border-transparent font-bold rounded-xl text-[12px] uppercase tracking-widest transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {isDisconnectingGithub ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <>
+                        <Trash2 className="w-4 h-4" />
+                        Disconnect GitHub Developer Suite
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </motion.div>
           </>
         )}
@@ -1538,7 +1852,7 @@ export function IntegrationsTab() {
                         </button>
                       </div>
                       <div className="p-3 bg-white border border-border rounded-xl text-[11px] font-mono text-text-primary break-all select-all">
-                        {window.location.origin}/api/auth/callback/google-drive
+                        {clientOrigin || "http://localhost:3000"}/api/auth/callback/google-drive
                       </div>
                       <p className="text-[10px] text-text-muted">
                         Paste the exact link above into the <strong>"Authorized redirect URIs"</strong> section in your Google Cloud Console.
@@ -1697,6 +2011,206 @@ export function IntegrationsTab() {
                 <button
                   type="button"
                   onClick={() => setShowPusherSetupModal(false)}
+                  className="px-6 h-11 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[12px] uppercase tracking-widest rounded-xl hover:scale-[1.01] transition-all cursor-pointer border-0"
+                >
+                  Got It, Let's Setup!
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* GitHub Setup Instructions Popup Modal */}
+      <AnimatePresence>
+        {showGithubSetupModal && (
+          <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
+            {/* Modal Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowGithubSetupModal(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            />
+
+            {/* Modal Container Panel */}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="relative max-w-2xl w-full bg-white border border-border rounded-3xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden z-[2001]"
+            >
+              {/* Header */}
+              <div className="p-6 md:p-8 border-b border-divider flex items-center justify-between bg-slate-50/50">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-neutral-100 border border-neutral-200 rounded-2xl text-neutral-800">
+                    <GitBranch className="w-5 h-5 animate-pulse" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-text-primary">GitHub App Developer Suite</h3>
+                    <p className="text-[11px] text-text-muted uppercase tracking-widest font-black">Step-by-Step Setup Guide</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowGithubSetupModal(false)}
+                  className="p-2 rounded-xl hover:bg-page-bg text-text-muted hover:text-text-primary transition-all cursor-pointer border-0 bg-transparent"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Steps Scroll Area */}
+              <div className="p-6 md:p-8 overflow-y-auto space-y-6 custom-scrollbar flex-1 text-[13px] text-text-secondary leading-relaxed">
+                {/* Step 1 */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-800 font-bold text-sm shrink-0">
+                    1
+                  </div>
+                  <div className="space-y-1.5 pt-0.5">
+                    <h4 className="font-bold text-text-primary text-[14px]">Create a New GitHub App</h4>
+                    <p>
+                      Navigate to your GitHub organization's developer settings page (e.g. <code>https://github.com/organizations/YOUR_ORG/settings/apps</code>) or your personal developer settings if running individually. Click **"New GitHub App"**.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 2 */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-800 font-bold text-sm shrink-0">
+                    2
+                  </div>
+                  <div className="space-y-1.5 pt-0.5">
+                    <h4 className="font-bold text-text-primary text-[14px]">Set App Name & Homepage URL</h4>
+                    <p>
+                      Choose a descriptive name for your application (e.g. <code>QuantumBlaze ERP Suite</code>). Set the **Homepage URL** to your ERP instance domain or <code>http://localhost:3000</code> for local developer environments.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 3 */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-800 font-bold text-sm shrink-0">
+                    3
+                  </div>
+                  <div className="space-y-3 pt-0.5 w-full">
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-text-primary text-[14px]">Configure OAuth & Callback URL</h4>
+                      <p>
+                        Enable **"User authorization response (OAuth)"**. Set the **Callback URL** to the exact authorization callback below:
+                      </p>
+                    </div>
+
+                    {/* Copy Box */}
+                    <div className="bg-neutral-50 border border-neutral-200 p-4 rounded-2xl space-y-2">
+                      <div className="flex items-center justify-between text-[11px] font-black text-neutral-700 uppercase tracking-widest">
+                        GitHub OAuth Callback URL
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(`${clientOrigin || window.location.origin}/api/auth/github/callback`);
+                            setCopied(true);
+                            setTimeout(() => setCopied(false), 2000);
+                          }}
+                          className="text-[10px] font-bold bg-white border border-neutral-300 hover:border-neutral-400 text-neutral-800 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer"
+                        >
+                          {copied ? (
+                            <>
+                              <Check className="w-3.5 h-3.5" />
+                              Copied!
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5" />
+                              Copy Link
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <div className="p-3 bg-white border border-border rounded-xl text-[11px] font-mono text-text-primary break-all select-all">
+                        {clientOrigin || "http://localhost:3000"}/api/auth/github/callback
+                      </div>
+                      <p className="text-[10px] text-text-muted">
+                        Check the box for <strong>"Request user authorization (OAuth) during installation"</strong> right below the callback URL.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 4 */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-800 font-bold text-sm shrink-0">
+                    4
+                  </div>
+                  <div className="space-y-1.5 pt-0.5">
+                    <h4 className="font-bold text-text-primary text-[14px]">Set Permissions & Webhook Events</h4>
+                    <p>
+                      Under **"Permissions & events"**, set the following access scopes:
+                    </p>
+                    <ul className="list-disc pl-5 mt-2 space-y-2 text-text-secondary font-medium">
+                      <li>
+                        <strong>Repository Permissions</strong>:
+                        <ul className="list-circle pl-5 mt-1 text-text-muted space-y-0.5">
+                          <li><strong>Administration</strong>: <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded text-[11px]">Read & Write</code> (for repository provisioning & collaborator management)</li>
+                          <li><strong>Contents</strong>: <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded text-[11px]">Read & Write</code> (for git branch operations & code commits)</li>
+                          <li><strong>Issues</strong>: <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded text-[11px]">Read & Write</code> (for task ticket syncing)</li>
+                          <li><strong>Pull Requests</strong>: <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded text-[11px]">Read & Write</code> (for PR merges)</li>
+                        </ul>
+                      </li>
+                      <li>
+                        <strong>Organization Permissions</strong>:
+                        <ul className="list-circle pl-5 mt-1 text-text-muted space-y-0.5">
+                          <li><strong>Members</strong>: <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded text-[11px]">Read-only</code> (to fetch collaborator profiles)</li>
+                        </ul>
+                      </li>
+                      <li>
+                        <strong>Webhook Events (at the bottom)</strong>:
+                        <ul className="list-circle pl-5 mt-1 text-text-muted space-y-0.5">
+                          <li>Check <strong>"Push"</strong>, <strong>"Pull request"</strong>, and <strong>"Issues"</strong> events to receive real-time webhook timeline logs.</li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Step 5 */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-800 font-bold text-sm shrink-0">
+                    5
+                  </div>
+                  <div className="space-y-1.5 pt-0.5">
+                    <h4 className="font-bold text-text-primary text-[14px]">Generate and Download Private Credentials</h4>
+                    <p>
+                      Click **"Create GitHub App"**. On your new App dashboard page, save these credentials:
+                    </p>
+                    <ul className="list-disc pl-5 mt-2 space-y-1 text-text-muted">
+                      <li>Copy the <strong>App ID</strong> and <strong>Client ID</strong>.</li>
+                      <li>Click <strong>"Generate a new client secret"</strong> and copy the generated secret key.</li>
+                      <li>Scroll down, click <strong>"Generate a private key"</strong>. Open the downloaded <code>.pem</code> file in a text editor, and copy the full text starting with <code>-----BEGIN RSA PRIVATE KEY-----</code>.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Step 6 */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-800 font-bold text-sm shrink-0">
+                    6
+                  </div>
+                  <div className="space-y-1.5 pt-0.5">
+                    <h4 className="font-bold text-text-primary text-[14px]">Install the App onto your Organization</h4>
+                    <p>
+                      In the left side panel of your GitHub App settings, click **"Install App"**, and install it onto your target Organization. Finally, enter your Organization name as the <strong>Organization / Owner Name</strong> in this configuration form alongside your credentials. You are all set!
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="p-6 border-t border-divider bg-slate-50 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowGithubSetupModal(false)}
                   className="px-6 h-11 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[12px] uppercase tracking-widest rounded-xl hover:scale-[1.01] transition-all cursor-pointer border-0"
                 >
                   Got It, Let's Setup!

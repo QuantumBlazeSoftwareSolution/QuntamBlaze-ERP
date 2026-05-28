@@ -36,7 +36,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation Scroll Area */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 custom-scrollbar space-y-8">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 custom-scrollbar space-y-8">
         {NAV_CONFIG.map((section) => (
           <div key={section.label} className="space-y-1">
             {!isCollapsed && (

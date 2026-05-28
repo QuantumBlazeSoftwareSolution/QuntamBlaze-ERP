@@ -58,7 +58,7 @@ export function SidebarNavItem({ item }: { item: NavItem }) {
 
         {/* Collapsed Tooltip */}
         {isCollapsed && (
-          <div className="absolute left-full ml-4 px-3 py-1.5 bg-bg-card border border-border rounded-lg text-[12px] font-semibold text-text-primary whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-50 shadow-xl">
+          <div className="fixed left-[88px] px-3 py-1.5 bg-bg-card border border-border rounded-lg text-[12px] font-semibold text-text-primary whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-50 shadow-xl">
             {item.label}
             {item.badge && ` (${item.badge.count})`}
           </div>
