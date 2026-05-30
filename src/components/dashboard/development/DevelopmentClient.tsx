@@ -21,6 +21,8 @@ import {
   Loader2,
   BookOpen,
   X,
+  Globe,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -35,6 +37,8 @@ import {
   getGithubOAuthUrlAction,
   disconnectPersonalGithubAction,
   getDevelopmentDashboardDataAction,
+  getOrganizationMembersAction,
+  inviteOrganizationMemberAction,
 } from "@/app/actions/githubActions";
 
 interface DevelopmentClientProps {
@@ -62,7 +66,7 @@ export function DevelopmentClient({
   // Primary states
   const [data, setData] = useState(initialData);
   const [loadingFeed, setLoadingFeed] = useState(false);
-  const [activeTab, setActiveTab] = useState<"repos" | "issues" | "prs">("repos");
+  const [activeTab, setActiveTab] = useState<"repos" | "issues" | "prs" | "org">("repos");
 
   // Notifications
   const [notification, setNotification] = useState<{
@@ -118,6 +122,14 @@ export function DevelopmentClient({
   // Copied command CLI
   const [copiedTask, setCopiedTask] = useState<string | null>(null);
 
+  // Organization Team Management States
+  const [orgMembers, setOrgMembers] = useState<
+    { login: string; avatarUrl: string; htmlUrl: string }[]
+  >([]);
+  const [loadingOrgMembers, setLoadingOrgMembers] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [isInvitingOrg, setIsInvitingOrg] = useState(false);
+
   // Read search parameter notifications on mount
   useEffect(() => {
     const success = searchParams.get("success");
@@ -164,6 +176,8 @@ export function DevelopmentClient({
   // Load branches & collaborators when viewing repository details
   useEffect(() => {
     if (selectedRepoId) {
+      setBranchRepoId(selectedRepoId);
+      setBaseBranch("main");
       const loadDetails = async () => {
         setLoadingRepoDetails(true);
         try {
@@ -264,7 +278,11 @@ export function DevelopmentClient({
     setIsCreatingRepo(true);
     setNotification(null);
     try {
-      const res = await createRepositoryAction(selectedProjectId, repoNameInput.trim(), repoDescInput);
+      const res = await createRepositoryAction(
+        selectedProjectId,
+        repoNameInput.trim(),
+        repoDescInput
+      );
       if (res.success) {
         setNotification({
           type: "success",
@@ -292,7 +310,11 @@ export function DevelopmentClient({
     setIsInviting(true);
     setNotification(null);
     try {
-      const res = await inviteCollaboratorAction(inviteRepoId, inviteUsername.trim(), invitePermission);
+      const res = await inviteCollaboratorAction(
+        inviteRepoId,
+        inviteUsername.trim(),
+        invitePermission
+      );
       if (res.success) {
         setNotification({
           type: "success",
@@ -409,7 +431,13 @@ export function DevelopmentClient({
     setIsCreatingPr(true);
     setNotification(null);
     try {
-      const res = await createPullRequestAction(prRepoId, prTitle.trim(), prHead.trim(), prBase, prBody);
+      const res = await createPullRequestAction(
+        prRepoId,
+        prTitle.trim(),
+        prHead.trim(),
+        prBase,
+        prBody
+      );
       if (res.success) {
         setNotification({
           type: "success",
@@ -453,6 +481,60 @@ export function DevelopmentClient({
     }
   };
 
+  // Load organization members dynamically when "org" tab is active
+  useEffect(() => {
+    if (activeTab === "org") {
+      const loadOrgMembers = async () => {
+        setLoadingOrgMembers(true);
+        setNotification(null);
+        try {
+          const res = await getOrganizationMembersAction();
+          if (res.success && res.members) {
+            setOrgMembers(res.members);
+          } else {
+            setNotification({
+              type: "error",
+              message: res.error || "Failed to load organization members.",
+            });
+          }
+        } catch (err: any) {
+          setNotification({ type: "error", message: err.message });
+        } finally {
+          setLoadingOrgMembers(false);
+        }
+      };
+      loadOrgMembers();
+    }
+  }, [activeTab]);
+
+  // Invite organization member by email
+  const handleInviteOrgMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inviteEmail.trim()) return;
+
+    setIsInvitingOrg(true);
+    setNotification(null);
+    try {
+      const res = await inviteOrganizationMemberAction(inviteEmail.trim());
+      if (res.success) {
+        setNotification({
+          type: "success",
+          message: `GitHub Organization invitation successfully sent to "${inviteEmail.trim()}"!`,
+        });
+        setInviteEmail("");
+        // Reload list
+        const mRes = await getOrganizationMembersAction();
+        if (mRes.success && mRes.members) setOrgMembers(mRes.members);
+      } else {
+        setNotification({ type: "error", message: res.error || "Failed to send invitation." });
+      }
+    } catch (err: any) {
+      setNotification({ type: "error", message: err.message });
+    } finally {
+      setIsInvitingOrg(false);
+    }
+  };
+
   if (!isConfigured) {
     return (
       <div className="bg-white border border-border rounded-2xl p-12 text-center max-w-2xl mx-auto space-y-6 shadow-md backdrop-blur-md bg-white/70">
@@ -461,7 +543,9 @@ export function DevelopmentClient({
         </div>
         <h3 className="text-xl font-bold text-text-primary">GitHub App Suite Not Configured</h3>
         <p className="text-sm text-text-secondary leading-relaxed">
-          The global GitHub Application setup is missing. To enable developers to create repositories, sync branches, track tickets, and link collaborative codebases, please ask an administrator to set up the App integration card.
+          The global GitHub Application setup is missing. To enable developers to create
+          repositories, sync branches, track tickets, and link collaborative codebases, please ask
+          an administrator to set up the App integration card.
         </p>
         <button
           onClick={() => router.push("/dashboard/settings?tab=integrations")}
@@ -547,6 +631,18 @@ export function DevelopmentClient({
               <GitPullRequest className="w-4 h-4" />
               Dynamic PR Merges
             </button>
+            <button
+              onClick={() => setActiveTab("org")}
+              className={cn(
+                "flex-1 py-3 px-4 rounded-xl text-[12px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2",
+                activeTab === "org"
+                  ? "bg-slate-900 text-white shadow-md shadow-slate-950/20"
+                  : "bg-page-bg text-text-secondary hover:text-text-primary"
+              )}
+            >
+              <Globe className="w-4 h-4" />
+              Organization Team
+            </button>
           </div>
 
           <AnimatePresence mode="wait">
@@ -566,10 +662,15 @@ export function DevelopmentClient({
                       Provision Project Repository
                     </h3>
                     <p className="text-[12px] text-text-secondary leading-relaxed">
-                      Initialize a private, tenant-isolated repository under your target organization. We will automatically configure task timelines and push webhooks.
+                      Initialize a private, tenant-isolated repository under your target
+                      organization. We will automatically configure task timelines and push
+                      webhooks.
                     </p>
 
-                    <form onSubmit={handleCreateRepo} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <form
+                      onSubmit={handleCreateRepo}
+                      className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                    >
                       <div className="space-y-2">
                         <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">
                           Select ERP Project
@@ -649,7 +750,9 @@ export function DevelopmentClient({
                       disabled={loadingFeed}
                       className="p-2 rounded-lg bg-page-bg hover:bg-border transition-colors cursor-pointer border-0"
                     >
-                      <RefreshCw className={cn("w-4 h-4 text-text-secondary", loadingFeed && "animate-spin")} />
+                      <RefreshCw
+                        className={cn("w-4 h-4 text-text-secondary", loadingFeed && "animate-spin")}
+                      />
                     </button>
                   </div>
 
@@ -695,7 +798,10 @@ export function DevelopmentClient({
 
                           {/* Expanded detail section inside list item */}
                           {selectedRepoId === repo.projectId && (
-                            <div className="pt-4 border-t border-divider grid grid-cols-1 md:grid-cols-2 gap-6" onClick={(e) => e.stopPropagation()}>
+                            <div
+                              className="pt-4 border-t border-divider grid grid-cols-1 md:grid-cols-2 gap-6"
+                              onClick={(e) => e.stopPropagation()}
+                            >
                               {/* Branches column */}
                               <div className="space-y-3">
                                 <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1">
@@ -704,7 +810,8 @@ export function DevelopmentClient({
                                 </p>
                                 {loadingRepoDetails ? (
                                   <div className="flex items-center gap-2 text-[12px] text-text-muted">
-                                    <Loader2 className="w-4 h-4 animate-spin text-accent" /> Loading branches...
+                                    <Loader2 className="w-4 h-4 animate-spin text-accent" /> Loading
+                                    branches...
                                   </div>
                                 ) : branches.length === 0 ? (
                                   <p className="text-[12px] text-text-muted">No branches found.</p>
@@ -727,24 +834,71 @@ export function DevelopmentClient({
                                 )}
 
                                 {/* Quick branch creator */}
-                                <form onSubmit={handleCreateBranch} className="pt-2 space-y-2">
-                                  <input
-                                    type="text"
-                                    required
-                                    value={branchRepoId === repo.projectId ? newBranchName : ""}
-                                    onChange={(e) => {
-                                      setBranchRepoId(repo.projectId);
-                                      setNewBranchName(e.target.value);
-                                    }}
-                                    placeholder="New branch name..."
-                                    className="w-full h-9 px-3 border border-border rounded-xl text-[12px] outline-none"
-                                  />
+                                <form
+                                  onSubmit={handleCreateBranch}
+                                  className="pt-3 border-t border-divider/60 space-y-3"
+                                >
+                                  <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-0.5">
+                                    Create New Branch (නව ශාඛාවක් සාදන්න)
+                                  </p>
+
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1">
+                                      <label className="text-[9px] font-bold text-text-muted uppercase tracking-widest px-0.5">
+                                        Base Branch (පදනම)
+                                      </label>
+                                      <select
+                                        value={
+                                          branchRepoId === repo.projectId ? baseBranch : "main"
+                                        }
+                                        onChange={(e) => {
+                                          setBranchRepoId(repo.projectId);
+                                          setBaseBranch(e.target.value);
+                                        }}
+                                        className="w-full h-9 px-2 border border-border rounded-xl text-[11px] bg-white outline-none cursor-pointer text-slate-800 font-semibold"
+                                      >
+                                        {branches.length === 0 ? (
+                                          <option value="main">main</option>
+                                        ) : (
+                                          branches.map((b) => (
+                                            <option key={b.name} value={b.name}>
+                                              {b.name} {b.protected ? "🔒" : ""}
+                                            </option>
+                                          ))
+                                        )}
+                                      </select>
+                                    </div>
+
+                                    <div className="space-y-1">
+                                      <label className="text-[9px] font-bold text-text-muted uppercase tracking-widest px-0.5">
+                                        Branch Name (නම)
+                                      </label>
+                                      <input
+                                        type="text"
+                                        required
+                                        value={branchRepoId === repo.projectId ? newBranchName : ""}
+                                        onChange={(e) => {
+                                          setBranchRepoId(repo.projectId);
+                                          setNewBranchName(e.target.value);
+                                        }}
+                                        placeholder="e.g. feature/auth"
+                                        className="w-full h-9 px-3 border border-border rounded-xl text-[11px] outline-none text-slate-800 font-semibold"
+                                      />
+                                    </div>
+                                  </div>
+
                                   <button
                                     type="submit"
-                                    disabled={isCreatingBranch || branchRepoId !== repo.projectId}
+                                    disabled={
+                                      isCreatingBranch ||
+                                      !newBranchName.trim() ||
+                                      branchRepoId !== repo.projectId
+                                    }
                                     className="w-full h-9 bg-slate-900 text-white font-bold text-[10px] uppercase tracking-widest rounded-xl hover:scale-[1.01] transition-all disabled:opacity-50 cursor-pointer"
                                   >
-                                    {isCreatingBranch && branchRepoId === repo.projectId ? "Creating..." : "Create Branch"}
+                                    {isCreatingBranch && branchRepoId === repo.projectId
+                                      ? "Creating..."
+                                      : "Create Branch"}
                                   </button>
                                 </form>
                               </div>
@@ -753,14 +907,18 @@ export function DevelopmentClient({
                               <div className="space-y-3">
                                 <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center gap-1">
                                   <Users className="w-3.5 h-3.5 text-accent" />
-                                  Paired Developers ({loadingRepoDetails ? "..." : collaborators.length})
+                                  Paired Developers (
+                                  {loadingRepoDetails ? "..." : collaborators.length})
                                 </p>
                                 {loadingRepoDetails ? (
                                   <div className="flex items-center gap-2 text-[12px] text-text-muted">
-                                    <Loader2 className="w-4 h-4 animate-spin text-accent" /> Loading collaborators...
+                                    <Loader2 className="w-4 h-4 animate-spin text-accent" /> Loading
+                                    collaborators...
                                   </div>
                                 ) : collaborators.length === 0 ? (
-                                  <p className="text-[12px] text-text-muted">No collaborators linked.</p>
+                                  <p className="text-[12px] text-text-muted">
+                                    No collaborators linked.
+                                  </p>
                                 ) : (
                                   <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto pr-2">
                                     {collaborators.map((c) => (
@@ -782,7 +940,10 @@ export function DevelopmentClient({
                                 )}
 
                                 {/* Quick invite form */}
-                                <form onSubmit={handleInviteCollaborator} className="pt-2 space-y-2">
+                                <form
+                                  onSubmit={handleInviteCollaborator}
+                                  className="pt-2 space-y-2"
+                                >
                                   <input
                                     type="text"
                                     required
@@ -799,7 +960,9 @@ export function DevelopmentClient({
                                     disabled={isInviting || inviteRepoId !== repo.projectId}
                                     className="w-full h-9 bg-slate-900 text-white font-bold text-[10px] uppercase tracking-widest rounded-xl hover:scale-[1.01] transition-all disabled:opacity-50 cursor-pointer"
                                   >
-                                    {isInviting && inviteRepoId === repo.projectId ? "Inviting..." : "Invite Collaborator"}
+                                    {isInviting && inviteRepoId === repo.projectId
+                                      ? "Inviting..."
+                                      : "Invite Collaborator"}
                                   </button>
                                 </form>
                               </div>
@@ -827,7 +990,8 @@ export function DevelopmentClient({
                     Collaborator Issue Tracker
                   </h3>
                   <p className="text-[12px] text-text-secondary leading-relaxed mt-1">
-                    Directly spawn issues and coding tasks on GitHub, with the ability to assign active, paired developers collaborating on the project repository.
+                    Directly spawn issues and coding tasks on GitHub, with the ability to assign
+                    active, paired developers collaborating on the project repository.
                   </p>
                 </div>
 
@@ -1044,7 +1208,8 @@ export function DevelopmentClient({
                         Merge Pull Request
                       </h3>
                       <p className="text-[11px] text-text-secondary leading-relaxed mt-0.5">
-                        Instantly deploy code changes dynamically. This triggers global webhooks to update client task feeds in real-time.
+                        Instantly deploy code changes dynamically. This triggers global webhooks to
+                        update client task feeds in real-time.
                       </p>
                     </div>
 
@@ -1095,7 +1260,132 @@ export function DevelopmentClient({
                   <div className="bg-slate-50 border border-border p-4 rounded-xl text-[11px] text-text-muted leading-relaxed flex items-start gap-2.5">
                     <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
                     <span>
-                      <strong>Warning:</strong> Merges are immediate and permanent. Make sure CI checks are passing before confirming deployment.
+                      <strong>Warning:</strong> Merges are immediate and permanent. Make sure CI
+                      checks are passing before confirming deployment.
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === "org" && (
+              <motion.div
+                key="org"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="grid grid-cols-1 md:grid-cols-2 gap-6"
+              >
+                {/* Organization Members List */}
+                <div className="bg-white border border-border rounded-2xl p-6 shadow-sm space-y-4">
+                  <div>
+                    <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                      <Users className="w-5 h-5 text-accent" />
+                      GitHub Org Members ({orgName})
+                    </h3>
+                    <p className="text-[11px] text-text-secondary leading-relaxed mt-0.5">
+                      Live developers currently paired to your GitHub Organization.
+                    </p>
+                  </div>
+
+                  {loadingOrgMembers ? (
+                    <div className="flex items-center gap-2 text-[12px] text-text-muted py-8 justify-center">
+                      <Loader2 className="w-5 h-5 animate-spin text-accent" /> Loading organization
+                      team...
+                    </div>
+                  ) : orgMembers.length === 0 ? (
+                    <div className="text-center py-8 text-text-muted text-[12px]">
+                      No active members found for organization <strong>{orgName}</strong>.
+                    </div>
+                  ) : (
+                    <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-2 custom-scrollbar">
+                      {orgMembers.map((m) => (
+                        <div
+                          key={m.login}
+                          className="flex items-center justify-between p-3.5 bg-[#F8FAFC] border border-border hover:border-slate-300 hover:bg-white rounded-xl transition-all group"
+                        >
+                          <div className="flex items-center gap-3">
+                            {m.avatarUrl ? (
+                              <img
+                                src={m.avatarUrl}
+                                className="w-8 h-8 rounded-full border border-border"
+                                alt=""
+                              />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[12px] font-bold text-slate-500 border border-border">
+                                {m.login.substring(0, 2).toUpperCase()}
+                              </div>
+                            )}
+                            <span className="font-bold text-[13px] text-text-primary group-hover:text-accent transition-colors font-mono">
+                              {m.login}
+                            </span>
+                          </div>
+
+                          <a
+                            href={m.htmlUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-3 py-1 bg-white border border-border hover:border-slate-400 text-[#64748B] hover:text-[#475569] font-bold text-[10px] rounded-lg transition-all"
+                          >
+                            Profile
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Organization Member Invites */}
+                <div className="bg-white border border-border rounded-2xl p-6 shadow-sm space-y-4 flex flex-col justify-between">
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                        <Mail className="w-5 h-5 text-accent animate-pulse" />
+                        Invite Organization Member
+                      </h3>
+                      <p className="text-[11px] text-text-secondary leading-relaxed mt-0.5">
+                        Send email invitations to developers to join the <strong>{orgName}</strong>{" "}
+                        organization.
+                      </p>
+                    </div>
+
+                    <form onSubmit={handleInviteOrgMember} className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-0.5">
+                          Invitee Email Address (ආරාධිත ඊමේල් ලිපිනය)
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          value={inviteEmail}
+                          onChange={(e) => setInviteEmail(e.target.value)}
+                          placeholder="developer@company.com"
+                          className="w-full h-11 px-4 border border-border bg-page-bg rounded-xl text-[13px] text-text-primary outline-none focus:border-slate-400 transition-colors font-semibold"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={isInvitingOrg || !inviteEmail.trim()}
+                        className="w-full flex items-center justify-center gap-2 h-11 bg-slate-900 text-white font-bold rounded-xl text-[11px] uppercase tracking-widest shadow-lg shadow-slate-950/20 hover:scale-[1.01] transition-all disabled:opacity-50 cursor-pointer border-0"
+                      >
+                        {isInvitingOrg ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" /> Inviting Developer...
+                          </>
+                        ) : (
+                          "Send Invite Link"
+                        )}
+                      </button>
+                    </form>
+                  </div>
+
+                  <div className="bg-slate-50 border border-border p-4 rounded-xl text-[11px] text-text-muted leading-relaxed flex items-start gap-2.5 mt-4">
+                    <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <span>
+                      <strong>Notice:</strong> Invited members will receive an email invitation
+                      containing a confirmation link. Once accepted, they will instantly appear in
+                      the active members list and gain team workspace privileges.
                     </span>
                   </div>
                 </div>
@@ -1113,7 +1403,8 @@ export function DevelopmentClient({
               Personal Developer Link
             </h3>
             <p className="text-[12px] text-text-secondary leading-relaxed">
-              Every employee must pair their individual GitHub developer account so repository actions and issues created in ERP are mapped to their GitHub handle.
+              Every employee must pair their individual GitHub developer account so repository
+              actions and issues created in ERP are mapped to their GitHub handle.
             </p>
 
             {isPersonalConnected ? (
@@ -1121,7 +1412,9 @@ export function DevelopmentClient({
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600">
                   <CheckCircle className="w-5 h-5 flex-shrink-0" />
                   <div>
-                    <p className="font-extrabold text-[12px] uppercase tracking-wide">PAIRED ACCOUNT</p>
+                    <p className="font-extrabold text-[12px] uppercase tracking-wide">
+                      PAIRED ACCOUNT
+                    </p>
                     <p className="text-[13px] font-bold mt-0.5">@{personalUsername}</p>
                   </div>
                 </div>
@@ -1136,7 +1429,10 @@ export function DevelopmentClient({
               <div className="space-y-4">
                 <div className="flex items-center gap-2.5 p-4 rounded-xl bg-amber-50 border border-amber-100 text-amber-700 text-[11px] font-medium leading-relaxed">
                   <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-                  <span>Your GitHub profile is not paired. Actions will be logged using the global App installation token instead.</span>
+                  <span>
+                    Your GitHub profile is not paired. Actions will be logged using the global App
+                    installation token instead.
+                  </span>
                 </div>
                 <button
                   onClick={handleOAuthConnect}
@@ -1155,7 +1451,8 @@ export function DevelopmentClient({
               One-Click Branching Center
             </h3>
             <p className="text-[12px] text-text-secondary leading-relaxed">
-              Instantly spin up code branches on GitHub directly next to active task tickets assigned to your project team.
+              Instantly spin up code branches on GitHub directly next to active task tickets
+              assigned to your project team.
             </p>
 
             {data.activeTasks.length === 0 ? (
@@ -1189,7 +1486,7 @@ export function DevelopmentClient({
                         <GitBranch className="w-3.5 h-3.5" />
                         Spin Branch
                       </button>
-                      
+
                       {copiedTask === task.id ? (
                         <button className="px-3 h-9 bg-emerald-50 border border-emerald-100 text-emerald-600 font-bold text-[9px] uppercase tracking-widest rounded-lg flex items-center gap-1">
                           <Check className="w-3.5 h-3.5" /> Copied
@@ -1201,7 +1498,9 @@ export function DevelopmentClient({
                               .toLowerCase()
                               .replace(/[^a-z0-9]+/g, "-")
                               .substring(0, 20)}`;
-                            navigator.clipboard.writeText(`git fetch origin && git checkout ${branchName}`);
+                            navigator.clipboard.writeText(
+                              `git fetch origin && git checkout ${branchName}`
+                            );
                             setCopiedTask(task.id);
                             setTimeout(() => setCopiedTask(null), 3000);
                           }}

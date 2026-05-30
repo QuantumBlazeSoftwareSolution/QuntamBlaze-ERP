@@ -583,7 +583,7 @@ export async function getCollaboratorsAction(projectId: string) {
 
     const { headers } = await getAuthorizedHeaders();
     const res = await fetch(
-      `https://api.github.com/repos/${repoLink[0].repoOwner}/${repoLink[0].repoName}/collaborators`,
+      `https://api.github.com/repos/${repoLink[0].repoOwner}/${repoLink[0].repoName}/collaborators?affiliation=direct`,
       { headers }
     );
 
@@ -793,6 +793,61 @@ export async function getDevelopmentDashboardDataAction() {
       unlinkedProjects,
       activeTasks,
     };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+/** Get all members in the GitHub Organization */
+export async function getOrganizationMembersAction() {
+  try {
+    const { headers, owner } = await getAuthorizedHeaders();
+    
+    const res = await fetch(`https://api.github.com/orgs/${owner}/members`, { headers });
+    if (!res.ok) throw new Error("Failed to load organization members");
+    
+    const data = await res.json() as any[];
+    return {
+      success: true,
+      members: data.map((m) => ({
+        login: m.login,
+        avatarUrl: m.avatar_url,
+        htmlUrl: m.html_url,
+      })),
+    };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+/** Invite a member to the GitHub Organization by Email */
+export async function inviteOrganizationMemberAction(email: string, role = "direct_member") {
+  try {
+    const { headers, owner } = await getAuthorizedHeaders();
+    
+    const res = await fetch(`https://api.github.com/orgs/${owner}/invitations`, {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        role,
+      }),
+    });
+    
+    if (!res.ok) {
+      const errText = await res.text();
+      try {
+        const parsed = JSON.parse(errText);
+        if (parsed.message) throw new Error(parsed.message);
+      } catch {}
+      throw new Error(`Invitation failed: ${errText || res.statusText}`);
+    }
+    
+    const data = await res.json();
+    return { success: true, invitation: data };
   } catch (err: any) {
     return { success: false, error: err.message };
   }
