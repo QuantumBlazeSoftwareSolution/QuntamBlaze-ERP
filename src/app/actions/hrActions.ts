@@ -336,6 +336,8 @@ export async function getRecruitmentDashboardDataAction() {
       phone: c.phone || undefined,
       source: c.source,
       currentStage: c.currentStage,
+      expectedSalary: c.expectedSalary || undefined,
+      noticePeriodDays: c.noticePeriodDays || undefined,
       assignee: c.assignedToId
         ? { id: c.assignedToId, name: c.assigneeName || "Unknown Recruiter" }
         : undefined,

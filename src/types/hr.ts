@@ -61,6 +61,8 @@ export interface Candidate {
   score?: number;
   nextInterviewDate?: string;
   daysInStage: number;
+  expectedSalary?: number;
+  noticePeriodDays?: number;
   assignee?: {
     id: string;
     name: string;

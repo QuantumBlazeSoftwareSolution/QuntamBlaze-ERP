@@ -13,6 +13,7 @@ import {
   DragOverEvent,
   DragEndEvent,
   defaultDropAnimationSideEffects,
+  useDroppable,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -160,13 +161,7 @@ export function RecruitmentPipeline({ candidates: initialCandidates }: Recruitme
               </div>
 
               {/* Column Content */}
-              <div
-                className={cn(
-                  "flex-1 bg-white/50 border border-[#E2E8F0] rounded-xl p-3 space-y-3 overflow-y-auto scrollbar-hide transition-colors",
-                  stage === "Hired" && "bg-emerald-50/30 border-emerald-100",
-                  stage === "Rejected" && "bg-slate-50/50"
-                )}
-              >
+              <PipelineColumn stage={stage}>
                 <SortableContext
                   id={stage}
                   items={stageCandidates.map((c) => c.id)}
@@ -178,11 +173,11 @@ export function RecruitmentPipeline({ candidates: initialCandidates }: Recruitme
                 </SortableContext>
 
                 {stageCandidates.length === 0 && (
-                  <div className="h-24 flex flex-col items-center justify-center border-2 border-dashed border-[#E2E8F0] rounded-xl text-[#94A3B8]">
-                    <span className="text-[11px] font-medium">Drop here</span>
+                  <div className="h-24 flex flex-col items-center justify-center border-2 border-dashed border-[#E2E8F0] rounded-xl text-[#94A3B8] bg-[#F8FAFC]/50">
+                    <span className="text-[11px] font-bold">Drop here</span>
                   </div>
                 )}
-              </div>
+              </PipelineColumn>
             </div>
           );
         })}
@@ -202,5 +197,31 @@ export function RecruitmentPipeline({ candidates: initialCandidates }: Recruitme
         {activeCandidate ? <CandidateCard candidate={activeCandidate} /> : null}
       </DragOverlay>
     </DndContext>
+  );
+}
+
+function PipelineColumn({
+  stage,
+  children,
+}: {
+  stage: PipelineStage;
+  children: React.ReactNode;
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: stage,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={cn(
+        "flex-1 bg-white/50 border border-[#E2E8F0] rounded-xl p-3 space-y-3 overflow-y-auto scrollbar-hide transition-all duration-200 min-h-[200px] flex flex-col justify-start",
+        isOver && "bg-slate-50 border-slate-300 ring-2 ring-[#10B981]/10 shadow-inner",
+        stage === "Hired" && "bg-emerald-50/30 border-emerald-100",
+        stage === "Rejected" && "bg-slate-50/50"
+      )}
+    >
+      {children}
+    </div>
   );
 }

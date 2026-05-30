@@ -102,6 +102,8 @@ export function DevelopmentClient({
   const [prBase, setPrBase] = useState("main");
   const [prBody, setPrBody] = useState("");
   const [isCreatingPr, setIsCreatingPr] = useState(false);
+  const [prBranches, setPrBranches] = useState<any[]>([]);
+  const [loadingPrBranches, setLoadingPrBranches] = useState(false);
 
   const [mergeRepoId, setMergeRepoId] = useState("");
   const [mergePrNumber, setMergePrNumber] = useState("");
@@ -172,6 +174,54 @@ export function DevelopmentClient({
       setRepoCollaborators([]);
     }
   }, [issueRepoId]);
+
+  // Load branches when selecting repository for Pull Requests
+  useEffect(() => {
+    if (prRepoId) {
+      const loadPrBranches = async () => {
+        setLoadingPrBranches(true);
+        try {
+          const res = await getBranchesAction(prRepoId);
+          if (res.success) {
+            const list = res.branches || [];
+            setPrBranches(list);
+            
+            // Auto-detect base branch (e.g. main/master)
+            const mainBranch = list.find((b: any) => b.name === "main" || b.name === "master");
+            if (mainBranch) {
+              setPrBase(mainBranch.name);
+            } else if (list.length > 0) {
+              setPrBase(list[0].name);
+            } else {
+              setPrBase("main");
+            }
+
+            // Auto-detect a head branch that is different from base
+            const otherBranch = list.find((b: any) => b.name !== "main" && b.name !== "master" && !b.protected);
+            if (otherBranch) {
+              setPrHead(otherBranch.name);
+            } else if (list.length > 0) {
+              const headCandidate = list.find((b: any) => b.name !== (mainBranch?.name || ""));
+              setPrHead(headCandidate?.name || "");
+            } else {
+              setPrHead("");
+            }
+          } else {
+            console.error("Failed to load PR branches:", res.error);
+            setPrBranches([]);
+          }
+        } catch (err) {
+          console.error(err);
+          setPrBranches([]);
+        } finally {
+          setLoadingPrBranches(false);
+        }
+      };
+      loadPrBranches();
+    } else {
+      setPrBranches([]);
+    }
+  }, [prRepoId]);
 
   // Load branches & collaborators when viewing repository details
   useEffect(() => {
@@ -839,13 +889,13 @@ export function DevelopmentClient({
                                   className="pt-3 border-t border-divider/60 space-y-3"
                                 >
                                   <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-0.5">
-                                    Create New Branch (නව ශාඛාවක් සාදන්න)
+                                    Create New Branch
                                   </p>
 
                                   <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-1">
                                       <label className="text-[9px] font-bold text-text-muted uppercase tracking-widest px-0.5">
-                                        Base Branch (පදනම)
+                                        Base Branch
                                       </label>
                                       <select
                                         value={
@@ -871,7 +921,7 @@ export function DevelopmentClient({
 
                                     <div className="space-y-1">
                                       <label className="text-[9px] font-bold text-text-muted uppercase tracking-widest px-0.5">
-                                        Branch Name (නම)
+                                        Branch Name
                                       </label>
                                       <input
                                         type="text"
@@ -1136,29 +1186,83 @@ export function DevelopmentClient({
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-2">
                         <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">
-                          Head (Source)
+                          Head (Source Branch)
                         </label>
-                        <input
-                          type="text"
-                          required
-                          value={prHead}
-                          onChange={(e) => setPrHead(e.target.value)}
-                          placeholder="e.g. feature/api-auth"
-                          className="w-full h-11 px-4 border border-border bg-page-bg rounded-xl text-[13px] text-text-primary outline-none"
-                        />
+                        {loadingPrBranches ? (
+                          <div className="w-full h-11 border border-border bg-page-bg rounded-xl flex items-center px-4 gap-2 text-[13px] text-text-muted">
+                            <Loader2 className="w-4 h-4 animate-spin text-accent" /> Loading...
+                          </div>
+                        ) : !prRepoId ? (
+                          <select
+                            disabled
+                            className="w-full bg-page-bg border border-border rounded-xl px-4 h-11 text-[13px] text-text-muted outline-none opacity-60 cursor-not-allowed"
+                          >
+                            <option>Select Repository First</option>
+                          </select>
+                        ) : prBranches.length === 0 ? (
+                          <input
+                            type="text"
+                            required
+                            value={prHead}
+                            onChange={(e) => setPrHead(e.target.value)}
+                            placeholder="e.g. dev"
+                            className="w-full h-11 px-4 border border-border bg-page-bg rounded-xl text-[13px] text-text-primary outline-none"
+                          />
+                        ) : (
+                          <select
+                            required
+                            value={prHead}
+                            onChange={(e) => setPrHead(e.target.value)}
+                            className="w-full bg-page-bg border border-border rounded-xl px-4 h-11 text-[13px] text-text-primary outline-none cursor-pointer font-semibold text-slate-800"
+                          >
+                            <option value="">-- Select Source --</option>
+                            {prBranches.map((b) => (
+                              <option key={b.name} value={b.name}>
+                                {b.name}
+                              </option>
+                            ))}
+                          </select>
+                        )}
                       </div>
+
                       <div className="space-y-2">
                         <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">
-                          Base (Target)
+                          Base (Target Branch)
                         </label>
-                        <input
-                          type="text"
-                          required
-                          value={prBase}
-                          onChange={(e) => setPrBase(e.target.value)}
-                          placeholder="main"
-                          className="w-full h-11 px-4 border border-border bg-page-bg rounded-xl text-[13px] text-text-primary outline-none"
-                        />
+                        {loadingPrBranches ? (
+                          <div className="w-full h-11 border border-border bg-page-bg rounded-xl flex items-center px-4 gap-2 text-[13px] text-text-muted">
+                            <Loader2 className="w-4 h-4 animate-spin text-accent" /> Loading...
+                          </div>
+                        ) : !prRepoId ? (
+                          <select
+                            disabled
+                            className="w-full bg-page-bg border border-border rounded-xl px-4 h-11 text-[13px] text-text-muted outline-none opacity-60 cursor-not-allowed"
+                          >
+                            <option>Select Repository First</option>
+                          </select>
+                        ) : prBranches.length === 0 ? (
+                          <input
+                            type="text"
+                            required
+                            value={prBase}
+                            onChange={(e) => setPrBase(e.target.value)}
+                            placeholder="main"
+                            className="w-full h-11 px-4 border border-border bg-page-bg rounded-xl text-[13px] text-text-primary outline-none"
+                          />
+                        ) : (
+                          <select
+                            required
+                            value={prBase}
+                            onChange={(e) => setPrBase(e.target.value)}
+                            className="w-full bg-page-bg border border-border rounded-xl px-4 h-11 text-[13px] text-text-primary outline-none cursor-pointer font-semibold text-slate-800"
+                          >
+                            {prBranches.map((b) => (
+                              <option key={b.name} value={b.name}>
+                                {b.name} {b.protected ? "🔒" : ""}
+                              </option>
+                            ))}
+                          </select>
+                        )}
                       </div>
                     </div>
 
@@ -1352,7 +1456,7 @@ export function DevelopmentClient({
                     <form onSubmit={handleInviteOrgMember} className="space-y-4">
                       <div className="space-y-2">
                         <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-0.5">
-                          Invitee Email Address (ආරාධිත ඊමේල් ලිපිනය)
+                          Invitee Email Address
                         </label>
                         <input
                           type="email"

@@ -58,8 +58,24 @@ export function CandidateOverview({ candidate }: CandidateOverviewProps) {
             <DetailItem icon={MapPin} label="Location" value="Colombo, Sri Lanka" />
             <DetailItem icon={Building2} label="Current Company" value="TechNova Solutions" />
             <DetailItem icon={Briefcase} label="Current Role" value="Full Stack Developer" />
-            <DetailItem icon={Clock} label="Notice Period" value="30 Days" />
-            <DetailItem icon={DollarSign} label="Expected Salary" value="$4,500 / month" />
+            <DetailItem
+              icon={Clock}
+              label="Notice Period"
+              value={
+                candidate.noticePeriodDays
+                  ? `${candidate.noticePeriodDays} Days`
+                  : "30 Days"
+              }
+            />
+            <DetailItem
+              icon={DollarSign}
+              label="Expected Salary"
+              value={
+                candidate.expectedSalary
+                  ? `$${(candidate.expectedSalary / 100).toLocaleString()} / month`
+                  : "$4,500 / month"
+              }
+            />
           </div>
 
           <div className="mt-8 pt-6 border-t border-[#F1F5F9]">

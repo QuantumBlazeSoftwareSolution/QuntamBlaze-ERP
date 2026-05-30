@@ -355,13 +355,13 @@ export function NewCandidateModal({
                 <div className="grid grid-cols-2 gap-5">
                   <div className="space-y-1.5 relative">
                     <label className="text-[11px] font-bold text-[#94A3B8] uppercase tracking-widest px-1">
-                      Expected Annual Salary
+                      Expected Monthly Salary
                     </label>
                     <div className="relative">
                       <DollarSign className="absolute left-3 top-3.5 w-4 h-4 text-[#94A3B8]" />
                       <input
                         type="number"
-                        placeholder="e.g. 85000"
+                        placeholder="e.g. 5000"
                         value={expectedSalary}
                         onChange={(e) => setExpectedSalary(e.target.value)}
                         className="w-full h-11 pl-9 pr-4 rounded-xl border border-[#E2E8F0] text-sm focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition-all"
