@@ -2,7 +2,17 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Briefcase, Plus, MapPin, DollarSign, Users, Info, AlertCircle, Check } from "lucide-react";
+import {
+  X,
+  Briefcase,
+  Plus,
+  MapPin,
+  DollarSign,
+  Users,
+  Info,
+  AlertCircle,
+  Check,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Department, SeniorityLevel, WorkLocationType, Employee } from "@/types/hr";
 import { createJobAction } from "@/app/actions/hrActions";

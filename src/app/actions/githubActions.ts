@@ -202,32 +202,41 @@ async function getGithubAppInstallationToken(cfg: any): Promise<string> {
     throw new Error(`Failed to list installations: ${await installationsRes.text()}`);
   }
 
-  const installations = await installationsRes.json() as any[];
+  const installations = (await installationsRes.json()) as any[];
   // Match installation with the target Organization name
-  const inst = installations.find((i) => i.account?.login?.toLowerCase() === cfg.orgName?.toLowerCase());
+  const inst = installations.find(
+    (i) => i.account?.login?.toLowerCase() === cfg.orgName?.toLowerCase()
+  );
   if (!inst) {
-    throw new Error(`App installation not found for Organization: ${cfg.orgName}. Please install the GitHub App first.`);
+    throw new Error(
+      `App installation not found for Organization: ${cfg.orgName}. Please install the GitHub App first.`
+    );
   }
 
   // 2. Request installation access token
-  const tokenRes = await fetch(`https://api.github.com/app/installations/${inst.id}/access_tokens`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${jwt}`,
-      Accept: "application/vnd.github+json",
-      "User-Agent": "QuantumBlaze-ERP",
-    },
-  });
+  const tokenRes = await fetch(
+    `https://api.github.com/app/installations/${inst.id}/access_tokens`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+        Accept: "application/vnd.github+json",
+        "User-Agent": "QuantumBlaze-ERP",
+      },
+    }
+  );
 
   if (!tokenRes.ok) {
     throw new Error(`Failed to fetch installation access token: ${await tokenRes.text()}`);
   }
 
-  const tokenData = await tokenRes.json() as any;
+  const tokenData = (await tokenRes.json()) as any;
   return tokenData.token;
 }
 
-async function getAuthorizedHeaders(userId?: string): Promise<{ headers: HeadersInit; owner: string; isUserAccount: boolean }> {
+async function getAuthorizedHeaders(
+  userId?: string
+): Promise<{ headers: HeadersInit; owner: string; isUserAccount: boolean }> {
   const record = await db
     .select()
     .from(systemConfig)
@@ -315,7 +324,7 @@ export async function createRepositoryAction(
       return { success: false, error: `GitHub creation failed: ${errText}` };
     }
 
-    const repoData = await repoRes.json() as any;
+    const repoData = (await repoRes.json()) as any;
 
     // 2. Fetch project's assigned team developers who linked their GitHub accounts
     // Invite PM and collaborators
@@ -325,19 +334,26 @@ export async function createRepositoryAction(
       })
       .from(userGithubAccounts)
       .innerJoin(employees, eq(employees.id, userGithubAccounts.userId))
-      .where(sql`EXISTS (SELECT 1 FROM project_team WHERE project_team.project_id = ${projectId} AND project_team.employee_id = ${employees.id})`);
+      .where(
+        sql`EXISTS (SELECT 1 FROM project_team WHERE project_team.project_id = ${projectId} AND project_team.employee_id = ${employees.id})`
+      );
 
-    console.log(`Inviting ${projectTeamList.length} linked project team members as collaborators...`);
+    console.log(
+      `Inviting ${projectTeamList.length} linked project team members as collaborators...`
+    );
     for (const member of projectTeamList) {
       try {
-        await fetch(`https://api.github.com/repos/${owner}/${repoName}/collaborators/${member.username}`, {
-          method: "PUT",
-          headers: {
-            ...headers,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ permission: "push" }),
-        });
+        await fetch(
+          `https://api.github.com/repos/${owner}/${repoName}/collaborators/${member.username}`,
+          {
+            method: "PUT",
+            headers: {
+              ...headers,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ permission: "push" }),
+          }
+        );
       } catch (collabErr) {
         console.error(`Failed to invite collaborator ${member.username}:`, collabErr);
       }
@@ -369,7 +385,7 @@ export async function createRepositoryAction(
       });
 
       if (hookRes.ok) {
-        const hookData = await hookRes.json() as any;
+        const hookData = (await hookRes.json()) as any;
         webhookId = hookData.id.toString();
       }
     } catch (hookErr) {
@@ -396,7 +412,11 @@ export async function createRepositoryAction(
 }
 
 /** Invite a collaborator via their GitHub username or email directly */
-export async function inviteCollaboratorAction(projectId: string, collaboratorName: string, permission: "push" | "admin" | "pull") {
+export async function inviteCollaboratorAction(
+  projectId: string,
+  collaboratorName: string,
+  permission: "push" | "admin" | "pull"
+) {
   try {
     const session = await getCurrentSessionAction();
     if (!session?.userId) return { success: false, error: "Unauthorized." };
@@ -407,7 +427,8 @@ export async function inviteCollaboratorAction(projectId: string, collaboratorNa
       .where(eq(projectRepositories.projectId, projectId))
       .limit(1);
 
-    if (repoLink.length === 0) return { success: false, error: "Linked repository not found for this project." };
+    if (repoLink.length === 0)
+      return { success: false, error: "Linked repository not found for this project." };
 
     const { headers } = await getAuthorizedHeaders(session.userId);
 
@@ -452,7 +473,7 @@ export async function getBranchesAction(projectId: string) {
     );
 
     if (!res.ok) throw new Error("Could not fetch branches from GitHub");
-    const branchesData = await res.json() as any[];
+    const branchesData = (await res.json()) as any[];
 
     return {
       success: true,
@@ -467,7 +488,11 @@ export async function getBranchesAction(projectId: string) {
 }
 
 /** Create a new branch for a task ticket */
-export async function createBranchAction(projectId: string, branchName: string, baseBranch = "main") {
+export async function createBranchAction(
+  projectId: string,
+  branchName: string,
+  baseBranch = "main"
+) {
   try {
     const session = await getCurrentSessionAction();
     if (!session?.userId) return { success: false, error: "Unauthorized." };
@@ -478,7 +503,8 @@ export async function createBranchAction(projectId: string, branchName: string, 
       .where(eq(projectRepositories.projectId, projectId))
       .limit(1);
 
-    if (repoLink.length === 0) return { success: false, error: "No repository linked to this project." };
+    if (repoLink.length === 0)
+      return { success: false, error: "No repository linked to this project." };
 
     const { headers } = await getAuthorizedHeaders(session.userId);
 
@@ -488,7 +514,7 @@ export async function createBranchAction(projectId: string, branchName: string, 
       { headers }
     );
     if (!baseRes.ok) throw new Error(`Could not find base branch heads: ${baseBranch}`);
-    const baseData = await baseRes.json() as any;
+    const baseData = (await baseRes.json()) as any;
     const sha = baseData.object.sha;
 
     // 2. POST ref heads
@@ -535,7 +561,8 @@ export async function createGithubIssueAction(
       .where(eq(projectRepositories.projectId, projectId))
       .limit(1);
 
-    if (repoLink.length === 0) return { success: false, error: "No repository linked to this project." };
+    if (repoLink.length === 0)
+      return { success: false, error: "No repository linked to this project." };
 
     const { headers } = await getAuthorizedHeaders(session.userId);
 
@@ -563,7 +590,7 @@ export async function createGithubIssueAction(
       return { success: false, error: `GitHub issue failed: ${await res.text()}` };
     }
 
-    const issueData = await res.json() as any;
+    const issueData = (await res.json()) as any;
     return { success: true, number: issueData.number, url: issueData.html_url };
   } catch (err: any) {
     return { success: false, error: err.message };
@@ -588,7 +615,7 @@ export async function getCollaboratorsAction(projectId: string) {
     );
 
     if (!res.ok) throw new Error("Failed to load collaborators");
-    const data = await res.json() as any[];
+    const data = (await res.json()) as any[];
 
     return {
       success: true,
@@ -620,7 +647,8 @@ export async function createPullRequestAction(
       .where(eq(projectRepositories.projectId, projectId))
       .limit(1);
 
-    if (repoLink.length === 0) return { success: false, error: "No repository linked to this project." };
+    if (repoLink.length === 0)
+      return { success: false, error: "No repository linked to this project." };
 
     const { headers } = await getAuthorizedHeaders(session.userId);
 
@@ -645,7 +673,7 @@ export async function createPullRequestAction(
       return { success: false, error: `GitHub PR failed: ${await res.text()}` };
     }
 
-    const prData = await res.json() as any;
+    const prData = (await res.json()) as any;
     revalidatePath("/dashboard/development");
     return { success: true, number: prData.number, url: prData.html_url };
   } catch (err: any) {
@@ -665,7 +693,8 @@ export async function mergePullRequestAction(projectId: string, prNumber: number
       .where(eq(projectRepositories.projectId, projectId))
       .limit(1);
 
-    if (repoLink.length === 0) return { success: false, error: "No repository linked to this project." };
+    if (repoLink.length === 0)
+      return { success: false, error: "No repository linked to this project." };
 
     const { headers } = await getAuthorizedHeaders(session.userId);
 
@@ -730,7 +759,7 @@ export async function listAppInstalledOrganizationsAction() {
 
     if (!installationsRes.ok) return { success: true, organizations: [cfg.orgName] };
 
-    const installations = await installationsRes.json() as any[];
+    const installations = (await installationsRes.json()) as any[];
     const orgs = installations.map((inst) => inst.account?.login).filter(Boolean);
 
     return { success: true, organizations: orgs };
@@ -784,7 +813,9 @@ export async function getDevelopmentDashboardDataAction() {
       })
       .from(tasks)
       .innerJoin(projects, eq(projects.id, tasks.projectId))
-      .where(sql`EXISTS (SELECT 1 FROM project_repositories WHERE project_repositories.project_id = ${tasks.projectId})`)
+      .where(
+        sql`EXISTS (SELECT 1 FROM project_repositories WHERE project_repositories.project_id = ${tasks.projectId})`
+      )
       .limit(10);
 
     return {
@@ -802,11 +833,11 @@ export async function getDevelopmentDashboardDataAction() {
 export async function getOrganizationMembersAction() {
   try {
     const { headers, owner } = await getAuthorizedHeaders();
-    
+
     const res = await fetch(`https://api.github.com/orgs/${owner}/members`, { headers });
     if (!res.ok) throw new Error("Failed to load organization members");
-    
-    const data = await res.json() as any[];
+
+    const data = (await res.json()) as any[];
     return {
       success: true,
       members: data.map((m) => ({
@@ -824,7 +855,7 @@ export async function getOrganizationMembersAction() {
 export async function inviteOrganizationMemberAction(email: string, role = "direct_member") {
   try {
     const { headers, owner } = await getAuthorizedHeaders();
-    
+
     const res = await fetch(`https://api.github.com/orgs/${owner}/invitations`, {
       method: "POST",
       headers: {
@@ -836,7 +867,7 @@ export async function inviteOrganizationMemberAction(email: string, role = "dire
         role,
       }),
     });
-    
+
     if (!res.ok) {
       const errText = await res.text();
       try {
@@ -845,7 +876,7 @@ export async function inviteOrganizationMemberAction(email: string, role = "dire
       } catch {}
       throw new Error(`Invitation failed: ${errText || res.statusText}`);
     }
-    
+
     const data = await res.json();
     return { success: true, invitation: data };
   } catch (err: any) {

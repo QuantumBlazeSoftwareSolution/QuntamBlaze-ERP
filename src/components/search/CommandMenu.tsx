@@ -4,16 +4,16 @@ import React, { useState, useEffect } from "react";
 import { Command } from "cmdk";
 import { motion, AnimatePresence } from "framer-motion";
 import { IDChip } from "@/components/ui/IDChip";
-import { 
-  Search, 
-  Folder, 
-  Users, 
-  Receipt, 
-  Target, 
-  Briefcase, 
+import {
+  Search,
+  Folder,
+  Users,
+  Receipt,
+  Target,
+  Briefcase,
   UserCircle,
   Loader2,
-  ChevronRight
+  ChevronRight,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { globalSearch, SearchResult } from "@/app/actions/search";
@@ -60,12 +60,36 @@ export const CommandMenu = ({ onClose }: CommandMenuProps) => {
   };
 
   const categories = {
-    project: { label: "Projects", icon: <Folder className="w-4 h-4" />, color: "text-accent bg-accent/10" },
-    client: { label: "Clients", icon: <Users className="w-4 h-4" />, color: "text-blue-500 bg-blue-500/10" },
-    invoice: { label: "Invoices", icon: <Receipt className="w-4 h-4" />, color: "text-amber-500 bg-amber-500/10" },
-    lead: { label: "Leads", icon: <Target className="w-4 h-4" />, color: "text-rose-500 bg-rose-500/10" },
-    employee: { label: "Employees", icon: <UserCircle className="w-4 h-4" />, color: "text-emerald-500 bg-emerald-500/10" },
-    task: { label: "Tasks", icon: <Briefcase className="w-4 h-4" />, color: "text-violet-500 bg-violet-500/10" },
+    project: {
+      label: "Projects",
+      icon: <Folder className="w-4 h-4" />,
+      color: "text-accent bg-accent/10",
+    },
+    client: {
+      label: "Clients",
+      icon: <Users className="w-4 h-4" />,
+      color: "text-blue-500 bg-blue-500/10",
+    },
+    invoice: {
+      label: "Invoices",
+      icon: <Receipt className="w-4 h-4" />,
+      color: "text-amber-500 bg-amber-500/10",
+    },
+    lead: {
+      label: "Leads",
+      icon: <Target className="w-4 h-4" />,
+      color: "text-rose-500 bg-rose-500/10",
+    },
+    employee: {
+      label: "Employees",
+      icon: <UserCircle className="w-4 h-4" />,
+      color: "text-emerald-500 bg-emerald-500/10",
+    },
+    task: {
+      label: "Tasks",
+      icon: <Briefcase className="w-4 h-4" />,
+      color: "text-violet-500 bg-violet-500/10",
+    },
   };
 
   return (
@@ -129,18 +153,22 @@ export const CommandMenu = ({ onClose }: CommandMenuProps) => {
                     </div>
                     <div className="flex-1 flex items-center justify-between min-w-0">
                       <div className="flex items-center gap-3 min-w-0">
-                        <IDChip id={result.id} size="xs" variant={type === "project" ? "accent" : "muted"} />
+                        <IDChip
+                          id={result.id}
+                          size="xs"
+                          variant={type === "project" ? "accent" : "muted"}
+                        />
                         <span className="text-sm font-bold text-slate-700 truncate">
                           {result.name}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 opacity-0 group-aria-selected:opacity-100 transition-opacity shrink-0">
-                         {result.metadata && (
-                           <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-slate-100 text-slate-500 rounded">
-                             {result.metadata}
-                           </span>
-                         )}
-                         <ChevronRight className="w-4 h-4 text-accent" />
+                        {result.metadata && (
+                          <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-slate-100 text-slate-500 rounded">
+                            {result.metadata}
+                          </span>
+                        )}
+                        <ChevronRight className="w-4 h-4 text-accent" />
                       </div>
                     </div>
                   </Command.Item>

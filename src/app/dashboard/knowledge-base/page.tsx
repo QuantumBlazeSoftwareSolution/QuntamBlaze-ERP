@@ -4,7 +4,8 @@ import { KnowledgeBaseClient } from "@/components/dashboard/knowledge-base/Knowl
 
 export const metadata = {
   title: "Knowledge Base | QuantumBlaze ERP",
-  description: "Manage your AI-powered knowledge base. Add documents, embed them as vectors, and power the Ask AI assistant.",
+  description:
+    "Manage your AI-powered knowledge base. Add documents, embed them as vectors, and power the Ask AI assistant.",
 };
 
 function LoadingSkeleton() {
@@ -62,7 +63,9 @@ export default function KnowledgeBasePage() {
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 bg-accent/8 border border-accent/20 rounded-full">
           <Sparkles className="w-3.5 h-3.5 text-accent" />
-          <span className="text-[11px] font-bold text-accent uppercase tracking-wider">RAG Powered</span>
+          <span className="text-[11px] font-bold text-accent uppercase tracking-wider">
+            RAG Powered
+          </span>
         </div>
       </div>
 

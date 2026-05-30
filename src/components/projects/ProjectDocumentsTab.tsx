@@ -118,7 +118,10 @@ export function ProjectDocumentsTab({ project }: ProjectDocumentsTabProps) {
         if (docsRes.success && docsRes.files) {
           setDocuments(docsRes.files as Document[]);
         } else {
-          console.warn("Could not retrieve real drive assets, falling back to mock:", docsRes.error);
+          console.warn(
+            "Could not retrieve real drive assets, falling back to mock:",
+            docsRes.error
+          );
           setDocuments(MOCK_DOCS);
         }
       } else {
@@ -197,7 +200,9 @@ export function ProjectDocumentsTab({ project }: ProjectDocumentsTabProps) {
 
       if (!initRes.ok) {
         const initErr = await initRes.json();
-        throw new Error(initErr.error?.message || "Failed to initialize Google Drive upload session.");
+        throw new Error(
+          initErr.error?.message || "Failed to initialize Google Drive upload session."
+        );
       }
 
       const uploadUrl = initRes.headers.get("Location");
@@ -231,10 +236,10 @@ export function ProjectDocumentsTab({ project }: ProjectDocumentsTabProps) {
         type: "success",
         message: `Successfully uploaded "${file.name}" to Google Drive!`,
       });
-      
+
       // Clear input value
       if (fileInputRef.current) fileInputRef.current.value = "";
-      
+
       // Refresh list
       await loadContent();
     } catch (err: any) {
@@ -250,28 +255,25 @@ export function ProjectDocumentsTab({ project }: ProjectDocumentsTabProps) {
   };
 
   // Filter documents by search query
-  const filteredDocs = documents.filter((doc) =>
-    doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    doc.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    doc.type.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredDocs = documents.filter(
+    (doc) =>
+      doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.type.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Statistics calculations
   const totalCount = documents.length;
   const totalCountStr = totalCount < 10 ? `0${totalCount}` : `${totalCount}`;
-  const totalSize = gdriveStatus.isConnected && gdriveStatus.baseFolder 
-    ? `${totalCount} active cloud objects`
-    : "3.4 GB total storage";
+  const totalSize =
+    gdriveStatus.isConnected && gdriveStatus.baseFolder
+      ? `${totalCount} active cloud objects`
+      : "3.4 GB total storage";
 
   return (
     <div className="space-y-6">
       {/* Hidden File Input for Triggering Upload */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        className="hidden"
-      />
+      <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
 
       {/* Cloud Status Notifications */}
       <AnimatePresence>
@@ -319,7 +321,10 @@ export function ProjectDocumentsTab({ project }: ProjectDocumentsTabProps) {
                 Google Drive Storage Offline
               </h4>
               <p className="text-[12px] text-text-secondary leading-relaxed max-w-2xl">
-                Dynamic cloud storage is not connected. Connect Google Drive in the Settings Integration panel to automatically generate project workspaces, allocate directory permissions, and stream physical documents in real-time. Showing local simulated blueprints.
+                Dynamic cloud storage is not connected. Connect Google Drive in the Settings
+                Integration panel to automatically generate project workspaces, allocate directory
+                permissions, and stream physical documents in real-time. Showing local simulated
+                blueprints.
               </p>
             </div>
           </div>
@@ -435,7 +440,9 @@ export function ProjectDocumentsTab({ project }: ProjectDocumentsTabProps) {
             {filteredDocs.length === 0 ? (
               <tr>
                 <td colSpan={5} className="text-center py-16 text-text-muted text-[13px] font-bold">
-                  {searchQuery ? "No matching assets found." : "No documents uploaded yet in this workspace."}
+                  {searchQuery
+                    ? "No matching assets found."
+                    : "No documents uploaded yet in this workspace."}
                 </td>
               </tr>
             ) : (
@@ -448,7 +455,15 @@ export function ProjectDocumentsTab({ project }: ProjectDocumentsTabProps) {
                   className="group hover:bg-[#F8FAFC] transition-colors"
                 >
                   <td className="px-8 py-5">
-                    <IDChip id={doc.id.startsWith("0") || doc.id.length > 15 ? doc.id.slice(0, 12) + "..." : doc.id} size="xs" variant="accent" />
+                    <IDChip
+                      id={
+                        doc.id.startsWith("0") || doc.id.length > 15
+                          ? doc.id.slice(0, 12) + "..."
+                          : doc.id
+                      }
+                      size="xs"
+                      variant="accent"
+                    />
                   </td>
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-3">
@@ -469,7 +484,8 @@ export function ProjectDocumentsTab({ project }: ProjectDocumentsTabProps) {
                     <span
                       className={cn(
                         "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
-                        doc.status === "Approved" && "bg-emerald-50 text-emerald-600 border-emerald-100",
+                        doc.status === "Approved" &&
+                          "bg-emerald-50 text-emerald-600 border-emerald-100",
                         doc.status === "Signed" && "bg-blue-50 text-blue-600 border-blue-100",
                         doc.status === "Review" && "bg-amber-50 text-amber-600 border-amber-100",
                         doc.status === "Draft" && "bg-slate-50 text-slate-400 border-slate-200"
@@ -531,7 +547,10 @@ function DocStatCard({
         >
           {value}
         </span>
-        <span className="text-[11px] font-bold text-[#64748B] max-w-[200px] truncate" title={subValue}>
+        <span
+          className="text-[11px] font-bold text-[#64748B] max-w-[200px] truncate"
+          title={subValue}
+        >
           {subValue}
         </span>
       </div>

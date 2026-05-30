@@ -14,7 +14,10 @@ export async function previewClientIdAction(companyName: string) {
   }
 
   // Same logic as in generateClientId / generateNextId
-  let abbr = companyName.replace(/[^a-zA-Z0-9]/g, "").slice(0, 4).toUpperCase();
+  let abbr = companyName
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .slice(0, 4)
+    .toUpperCase();
   if (abbr.length === 0) {
     abbr = "NEWX";
   } else if (abbr.length < 4) {
@@ -23,7 +26,7 @@ export async function previewClientIdAction(companyName: string) {
 
   // The id is "CLIENT" for the global client counter in idTracker
   const nextSeq = await previewNextSequence("CLIENT");
-  
+
   // Format the ID using our idEngine
   return generateNextId("CLI", nextSeq, { compAbbr: abbr });
 }
@@ -32,28 +35,31 @@ export async function createClientAction(formData: FormData) {
   const name = formData.get("name") as string;
   let industry = formData.get("industry") as string;
   const customIndustry = formData.get("customIndustry") as string;
-  
+
   if (!name || name.trim() === "") {
     return { success: false, error: "Company name is required." };
   }
-  
+
   if (industry === "Other" && customIndustry && customIndustry.trim() !== "") {
     industry = customIndustry.trim();
   } else if (industry === "Other") {
     industry = "Unknown";
   }
-  
-  let abbr = name.replace(/[^a-zA-Z0-9]/g, "").slice(0, 4).toUpperCase();
+
+  let abbr = name
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .slice(0, 4)
+    .toUpperCase();
   if (abbr.length === 0) abbr = "NEWX";
   else if (abbr.length < 4) abbr = abbr.padEnd(4, "X");
 
   try {
     // 1. Get the authoritative, transaction-safe sequence ID
     const nextSeq = await incrementAndGet("CLIENT", "CLI");
-    
+
     // 2. Generate final ID
     const clientId = generateNextId("CLI", nextSeq, { compAbbr: abbr });
-    
+
     // 3. Insert into DB
     await db.insert(clients).values({
       id: clientId,
@@ -81,11 +87,11 @@ export async function updateClientAction(clientId: string, formData: FormData) {
   const billingAddress = formData.get("billingAddress") as string;
   const paymentTerms = formData.get("paymentTerms") as string;
   const status = formData.get("status") as string;
-  
+
   if (!name || name.trim() === "") {
     return { success: false, error: "Company name is required." };
   }
-  
+
   if (industry === "Other" && customIndustry && customIndustry.trim() !== "") {
     industry = customIndustry.trim();
   } else if (industry === "Other") {
@@ -95,7 +101,7 @@ export async function updateClientAction(clientId: string, formData: FormData) {
   try {
     // Fetch previous values for logging
     const previousClient = await db.query.clients.findFirst({
-      where: eq(clients.id, clientId)
+      where: eq(clients.id, clientId),
     });
 
     if (!previousClient) {

@@ -69,13 +69,15 @@ export function ProjectDetailClient({ project, currentUser }: ProjectDetailClien
               {activeTab === "activity" && <ProjectActivityTab />}
               {activeTab === "chat" && (
                 <ChatWorkspaceClient
-                  initialProjects={[{
-                    id: project.id,
-                    name: project.name,
-                    status: project.status,
-                    progress: project.progress || 0,
-                    description: project.description,
-                  }]}
+                  initialProjects={[
+                    {
+                      id: project.id,
+                      name: project.name,
+                      status: project.status,
+                      progress: project.progress || 0,
+                      description: project.description,
+                    },
+                  ]}
                   currentUser={currentUser}
                   initialSelectedProjectId={project.id}
                   hideSidebar={true}

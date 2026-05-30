@@ -203,7 +203,7 @@ export async function requestPasswordResetAction(formData: any) {
 
     // 4. Verify user exists (to write simulated email)
     const userResult = await db.select().from(users).where(eq(users.email, email));
-    
+
     if (userResult.length > 0) {
       const user = userResult[0];
 
@@ -333,7 +333,9 @@ export async function requestPasswordResetAction(formData: any) {
       console.log("🔐 [QB-AUTH] PASSWORD RESET SIMULATOR");
       console.log(`👤 Recipient: ${user.name} (${email})`);
       console.log(`🔑 Secure Code: [ ${otpCode} ]`);
-      console.log(`🔗 Reset Link: http://localhost:3000/forgot-password?email=${encodeURIComponent(email)}&otp=${otpCode}`);
+      console.log(
+        `🔗 Reset Link: http://localhost:3000/forgot-password?email=${encodeURIComponent(email)}&otp=${otpCode}`
+      );
       console.log("📂 E-Mail saved to: public/emails/last-reset-email.html");
       console.log("═".repeat(60) + "\n");
     } else {
@@ -375,7 +377,10 @@ export async function verifyOtpAndResetPasswordAction(formData: any) {
       );
 
     if (activeRecords.length === 0) {
-      return { success: false, error: "The verification code is invalid, expired, or has already been used" };
+      return {
+        success: false,
+        error: "The verification code is invalid, expired, or has already been used",
+      };
     }
 
     // 3. Match code
@@ -399,10 +404,7 @@ export async function verifyOtpAndResetPasswordAction(formData: any) {
 
     // 6. Encrypt and update the user's password
     const newPasswordHash = hashPassword(newPassword);
-    await db
-      .update(users)
-      .set({ passwordHash: newPasswordHash })
-      .where(eq(users.id, user.id));
+    await db.update(users).set({ passwordHash: newPasswordHash }).where(eq(users.id, user.id));
 
     // 7. Log reset action
     await logAction(user.id, "USER", {
@@ -427,4 +429,3 @@ export async function verifyOtpAndResetPasswordAction(formData: any) {
 export async function getCurrentSessionAction() {
   return await getSession();
 }
-

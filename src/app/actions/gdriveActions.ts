@@ -198,7 +198,10 @@ export async function createBaseFolderAction(folderName: string) {
 /**
  * Resolves project specific subfolder or creates one if not existing.
  */
-async function getOrCreateProjectSubfolder(projectId: string, baseFolderId: string): Promise<string> {
+async function getOrCreateProjectSubfolder(
+  projectId: string,
+  baseFolderId: string
+): Promise<string> {
   const folders = await listGoogleDriveFolders(baseFolderId);
   const targetName = `Project-${projectId}`;
   const existingFolder = folders.find((f: any) => f.name === targetName);
@@ -208,7 +211,9 @@ async function getOrCreateProjectSubfolder(projectId: string, baseFolderId: stri
   }
 
   // Create subfolder dynamically
-  console.log(`Creating project subfolder dynamically: ${targetName} under parent: ${baseFolderId}`);
+  console.log(
+    `Creating project subfolder dynamically: ${targetName} under parent: ${baseFolderId}`
+  );
   const newFolder = await createGoogleDriveFolder(targetName, baseFolderId);
   return newFolder.id;
 }
@@ -229,10 +234,7 @@ async function getOrCreateSubfolderByName(name: string, parentId: string): Promi
 /**
  * Generates temporary access token and targets the correct Google Drive folder ID for client upload.
  */
-export async function getGDriveUploadContextAction(
-  projectId: string,
-  type: "chat" | "project"
-) {
+export async function getGDriveUploadContextAction(projectId: string, type: "chat" | "project") {
   try {
     const session = await getSession();
     if (!session || !session.userId) {
@@ -304,19 +306,29 @@ export async function getProjectDocumentsAction(projectId: string) {
   }
 }
 
-
-
 /**
  * Maps standard Google mimeTypes to readable UI formats
  */
 function getFriendlyMimeType(mimeType: string): string {
   if (mimeType === "application/pdf") return "PDF Document";
-  if (mimeType.includes("word") || mimeType.includes("officedocument.wordprocessing")) return "Word Document";
-  if (mimeType.includes("excel") || mimeType.includes("officedocument.spreadsheet")) return "Spreadsheet";
-  if (mimeType.includes("presentation") || mimeType.includes("powerpoint") || mimeType.includes("officedocument.presentation")) return "Presentation";
+  if (mimeType.includes("word") || mimeType.includes("officedocument.wordprocessing"))
+    return "Word Document";
+  if (mimeType.includes("excel") || mimeType.includes("officedocument.spreadsheet"))
+    return "Spreadsheet";
+  if (
+    mimeType.includes("presentation") ||
+    mimeType.includes("powerpoint") ||
+    mimeType.includes("officedocument.presentation")
+  )
+    return "Presentation";
   if (mimeType.startsWith("image/")) return "Image Asset";
   if (mimeType.includes("json")) return "JSON Config";
-  if (mimeType.includes("markdown") || mimeType === "text/markdown" || mimeType === "text/x-markdown") return "Markdown";
+  if (
+    mimeType.includes("markdown") ||
+    mimeType === "text/markdown" ||
+    mimeType === "text/x-markdown"
+  )
+    return "Markdown";
   if (mimeType.startsWith("text/")) return "Text Document";
   return "Digital Asset";
 }

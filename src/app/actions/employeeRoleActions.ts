@@ -59,7 +59,6 @@ export async function updateEmployeeRoleAction(
   try {
     await employeeRolesCrud.update(id, data);
 
-
     revalidatePath("/dashboard/hr/roles");
     revalidatePath("/dashboard/hr/employees");
 

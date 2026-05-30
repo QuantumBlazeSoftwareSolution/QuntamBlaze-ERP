@@ -22,7 +22,7 @@ import {
   Briefcase,
   SlidersHorizontal,
   Loader2,
-  GripVertical
+  GripVertical,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SessionData } from "@/lib/session";
@@ -31,7 +31,7 @@ import {
   updatePersonalTaskAction,
   deletePersonalTaskAction,
   PersonalTaskData,
-  ChecklistItem
+  ChecklistItem,
 } from "@/app/actions/personalTaskActions";
 
 // dnd-kit imports
@@ -60,14 +60,9 @@ interface SortableChecklistItemProps {
 }
 
 function SortableChecklistItem({ id, item, onToggle }: SortableChecklistItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -96,10 +91,7 @@ function SortableChecklistItem({ id, item, onToggle }: SortableChecklistItemProp
         </div>
 
         {/* Checkbox & Text Wrapper */}
-        <div
-          onClick={onToggle}
-          className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
-        >
+        <div onClick={onToggle} className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer">
           <div
             className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
               item.completed
@@ -148,7 +140,7 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
       const stored = localStorage.getItem("qb-checklist-order");
       if (stored) {
         const orderMap = JSON.parse(stored);
-        
+
         setTasks((prevTasks) => {
           return prevTasks.map((task) => {
             const savedOrder = orderMap[task.id];
@@ -189,11 +181,7 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
     const newChecklist = arrayMove(currentChecklist, oldIndex, newIndex);
 
     // 1. Optimistically update local state
-    setTasks(
-      tasks.map((t) =>
-        t.id === taskId ? { ...t, checklist: newChecklist } : t
-      )
-    );
+    setTasks(tasks.map((t) => (t.id === taskId ? { ...t, checklist: newChecklist } : t)));
 
     // 2. Persist new checklist order to localStorage mapping task ID -> checklist item ID array
     try {
@@ -215,7 +203,7 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any | null>(null);
-  
+
   // Loading states
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [actionTaskId, setActionTaskId] = useState<string | null>(null);
@@ -259,7 +247,8 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
   const totalTasksCount = tasks.length;
   const completedTasksCount = tasks.filter((t) => t.status === "Completed").length;
   const pendingTasksCount = totalTasksCount - completedTasksCount;
-  const completionPercentage = totalTasksCount > 0 ? Math.round((completedTasksCount / totalTasksCount) * 100) : 0;
+  const completionPercentage =
+    totalTasksCount > 0 ? Math.round((completedTasksCount / totalTasksCount) * 100) : 0;
 
   // ─── Filter & Sort Logic ───────────────────────────────────────────────────
   const filteredTasks = tasks.filter((task) => {
@@ -320,7 +309,7 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
   };
 
   // ─── Server Action Invocations ─────────────────────────────────────────────
-  
+
   // Toggle a single checklist item in the list directly
   const handleToggleChecklist = async (taskId: string, itemId: string) => {
     const task = tasks.find((t) => t.id === taskId);
@@ -346,7 +335,10 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
   };
 
   // Change task status directly from dropdown
-  const handleStatusChange = async (taskId: string, newStatus: "Todo" | "In Progress" | "Completed") => {
+  const handleStatusChange = async (
+    taskId: string,
+    newStatus: "Todo" | "In Progress" | "Completed"
+  ) => {
     setActionTaskId(taskId);
     try {
       const res = await updatePersonalTaskAction(taskId, { status: newStatus });
@@ -402,7 +394,7 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
         } catch (err) {
           console.error("Failed to save initial checklist order to localStorage:", err);
         }
-        
+
         // Reset form
         setNewTitle("");
         setNewDescription("");
@@ -553,7 +545,7 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
             <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight font-outfit">
               {displayName}
             </h1>
-            
+
             {/* Dynamic Role Pill */}
             <div className="flex items-center justify-center gap-1.5 self-center">
               <span
@@ -597,8 +589,12 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
             <ListTodo className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs text-text-muted font-bold uppercase tracking-wider">Total Tasks</p>
-            <p className="text-2xl font-black text-text-primary mt-1 font-outfit">{totalTasksCount}</p>
+            <p className="text-xs text-text-muted font-bold uppercase tracking-wider">
+              Total Tasks
+            </p>
+            <p className="text-2xl font-black text-text-primary mt-1 font-outfit">
+              {totalTasksCount}
+            </p>
           </div>
         </div>
 
@@ -607,8 +603,12 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
             <Clock className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs text-text-muted font-bold uppercase tracking-wider">Pending Tasks</p>
-            <p className="text-2xl font-black text-text-primary mt-1 font-outfit">{pendingTasksCount}</p>
+            <p className="text-xs text-text-muted font-bold uppercase tracking-wider">
+              Pending Tasks
+            </p>
+            <p className="text-2xl font-black text-text-primary mt-1 font-outfit">
+              {pendingTasksCount}
+            </p>
           </div>
         </div>
 
@@ -618,13 +618,17 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
           </div>
           <div>
             <p className="text-xs text-text-muted font-bold uppercase tracking-wider">Completed</p>
-            <p className="text-2xl font-black text-text-primary mt-1 font-outfit">{completedTasksCount}</p>
+            <p className="text-2xl font-black text-text-primary mt-1 font-outfit">
+              {completedTasksCount}
+            </p>
           </div>
         </div>
 
         <div className="bg-white border border-border/80 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs text-text-muted font-bold uppercase tracking-wider">Productivity Rate</span>
+            <span className="text-xs text-text-muted font-bold uppercase tracking-wider">
+              Productivity Rate
+            </span>
             <span className="text-xs font-extrabold text-emerald-500">{completionPercentage}%</span>
           </div>
           {/* Custom sleek progress bar */}
@@ -634,7 +638,9 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
               style={{ width: `${completionPercentage}%` }}
             />
           </div>
-          <p className="text-[10px] text-text-muted mt-2 leading-none">Overall completed checklist ratio</p>
+          <p className="text-[10px] text-text-muted mt-2 leading-none">
+            Overall completed checklist ratio
+          </p>
         </div>
       </div>
 
@@ -646,7 +652,9 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
               <CheckSquare className="w-5 h-5 text-accent" />
               <span>Personal Action Center</span>
             </h2>
-            <p className="text-xs text-text-muted mt-1">Manage private checklists, daily tasks, and agenda items safely</p>
+            <p className="text-xs text-text-muted mt-1">
+              Manage private checklists, daily tasks, and agenda items safely
+            </p>
           </div>
 
           <button
@@ -716,8 +724,12 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
           {sortedTasks.length === 0 ? (
             <div className="text-center py-16 border border-dashed border-border rounded-2xl bg-page-bg/10 flex flex-col items-center justify-center">
               <AlertCircle className="w-8 h-8 text-text-muted mb-2.5" />
-              <p className="text-sm font-bold text-text-secondary">No personal tasks matched the filters</p>
-              <p className="text-xs text-text-muted mt-1">Get started by creating a task or adjusting active criteria.</p>
+              <p className="text-sm font-bold text-text-secondary">
+                No personal tasks matched the filters
+              </p>
+              <p className="text-xs text-text-muted mt-1">
+                Get started by creating a task or adjusting active criteria.
+              </p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -726,7 +738,8 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
                   const items = (task.checklist as ChecklistItem[]) || [];
                   const doneCount = items.filter((item) => item.completed).length;
                   const checklistTotal = items.length;
-                  const ratio = checklistTotal > 0 ? Math.round((doneCount / checklistTotal) * 100) : 0;
+                  const ratio =
+                    checklistTotal > 0 ? Math.round((doneCount / checklistTotal) * 100) : 0;
                   const isExpanded = expandedTaskId === task.id;
 
                   return (
@@ -737,7 +750,9 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
                       className={`border rounded-2xl bg-white transition-all overflow-hidden ${
-                        isExpanded ? "border-accent/30 shadow-md" : "border-border/80 hover:border-border-hover shadow-sm"
+                        isExpanded
+                          ? "border-accent/30 shadow-md"
+                          : "border-border/80 hover:border-border-hover shadow-sm"
                       }`}
                     >
                       {/* Main Task Card Header */}
@@ -748,7 +763,10 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
                             onClick={() => {
                               // Fast checklist item toggle if only 1 checklist item exists
                               if (checklistTotal === 0) {
-                                handleStatusChange(task.id, task.status === "Completed" ? "Todo" : "Completed");
+                                handleStatusChange(
+                                  task.id,
+                                  task.status === "Completed" ? "Todo" : "Completed"
+                                );
                               } else {
                                 setExpandedTaskId(isExpanded ? null : task.id);
                               }
@@ -766,7 +784,9 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
                             <h3
                               onClick={() => setExpandedTaskId(isExpanded ? null : task.id)}
                               className={`text-sm font-bold tracking-tight cursor-pointer font-outfit select-none ${
-                                task.status === "Completed" ? "line-through text-text-muted" : "text-text-primary hover:text-accent"
+                                task.status === "Completed"
+                                  ? "line-through text-text-muted"
+                                  : "text-text-primary hover:text-accent"
                               }`}
                             >
                               {task.title}
@@ -782,7 +802,9 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
                         {/* Metadata Badges & Trigger Options */}
                         <div className="flex flex-wrap items-center gap-3 sm:shrink-0">
                           {/* Priority Badge */}
-                          <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded ${getPriorityStyle(task.priority)}`}>
+                          <span
+                            className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded ${getPriorityStyle(task.priority)}`}
+                          >
                             {task.priority}
                           </span>
 
@@ -850,7 +872,9 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
                               {/* Task Long Description */}
                               {task.description && (
                                 <div className="space-y-1.5">
-                                  <h4 className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Description</h4>
+                                  <h4 className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                                    Description
+                                  </h4>
                                   <p className="text-xs text-text-secondary bg-white p-3 border border-border/60 rounded-xl leading-relaxed whitespace-pre-line">
                                     {task.description}
                                   </p>
@@ -861,12 +885,17 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
                               <div className="space-y-2">
                                 <h4 className="text-[10px] font-bold text-text-muted uppercase tracking-wider flex items-center gap-1">
                                   <span>Task Checklist</span>
-                                  {checklistTotal > 0 && <span className="font-mono text-accent">({ratio}% Completed)</span>}
+                                  {checklistTotal > 0 && (
+                                    <span className="font-mono text-accent">
+                                      ({ratio}% Completed)
+                                    </span>
+                                  )}
                                 </h4>
 
                                 {checklistTotal === 0 ? (
                                   <p className="text-xs text-text-muted italic bg-white p-3 border border-border/60 rounded-xl">
-                                    No checklist items defined. You can edit this task to add sub-items.
+                                    No checklist items defined. You can edit this task to add
+                                    sub-items.
                                   </p>
                                 ) : (
                                   <DndContext
@@ -895,7 +924,9 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
 
                               {/* Expanded Footer / Actions */}
                               <div className="flex items-center justify-between border-t border-divider/60 pt-4 text-[10px] text-text-muted">
-                                <span className="font-mono">Created: {new Date(task.createdAt).toLocaleString()}</span>
+                                <span className="font-mono">
+                                  Created: {new Date(task.createdAt).toLocaleString()}
+                                </span>
 
                                 <div className="flex items-center gap-2">
                                   <button
@@ -951,8 +982,12 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
             >
               <div className="px-6 py-5 border-b border-divider bg-page-bg/10 flex items-center justify-between">
                 <div>
-                  <h3 className="font-bold text-text-primary font-outfit text-sm">Create New Personal Task</h3>
-                  <p className="text-[10px] text-text-muted mt-0.5">Define checklists, set schedules, and flag priority weights</p>
+                  <h3 className="font-bold text-text-primary font-outfit text-sm">
+                    Create New Personal Task
+                  </h3>
+                  <p className="text-[10px] text-text-muted mt-0.5">
+                    Define checklists, set schedules, and flag priority weights
+                  </p>
                 </div>
                 <button
                   onClick={() => setShowAddModal(false)}
@@ -963,9 +998,14 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
               </div>
 
               {/* Form Content scrollable */}
-              <form onSubmit={handleCreateTask} className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+              <form
+                onSubmit={handleCreateTask}
+                className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar"
+              >
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Task Title *</label>
+                  <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+                    Task Title *
+                  </label>
                   <input
                     type="text"
                     required
@@ -977,7 +1017,9 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Description</label>
+                  <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+                    Description
+                  </label>
                   <textarea
                     value={newDescription}
                     onChange={(e) => setNewDescription(e.target.value)}
@@ -989,7 +1031,9 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Priority</label>
+                    <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+                      Priority
+                    </label>
                     <select
                       value={newPriority}
                       onChange={(e) => setNewPriority(e.target.value as any)}
@@ -1002,7 +1046,9 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Initial Status</label>
+                    <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+                      Initial Status
+                    </label>
                     <select
                       value={newStatus}
                       onChange={(e) => setNewStatus(e.target.value as any)}
@@ -1015,7 +1061,9 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Due Date</label>
+                    <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+                      Due Date
+                    </label>
                     <input
                       type="date"
                       value={newDueDate}
@@ -1027,8 +1075,10 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
 
                 {/* Checklist Creator Panel */}
                 <div className="space-y-3 border-t border-divider/60 pt-4">
-                  <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider block">Add Checklist Items</label>
-                  
+                  <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider block">
+                    Add Checklist Items
+                  </label>
+
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -1056,7 +1106,10 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
                   {newChecklist.length > 0 && (
                     <div className="border border-border rounded-xl bg-page-bg/25 divide-y divide-divider/40">
                       {newChecklist.map((item) => (
-                        <div key={item.id} className="flex items-center justify-between px-3 py-2 text-xs">
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between px-3 py-2 text-xs"
+                        >
                           <span className="text-text-primary leading-tight">{item.text}</span>
                           <button
                             type="button"
@@ -1126,7 +1179,9 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
             >
               <div className="px-6 py-5 border-b border-divider bg-page-bg/10 flex items-center justify-between">
                 <div>
-                  <h3 className="font-bold text-text-primary font-outfit text-sm">Edit Personal Task</h3>
+                  <h3 className="font-bold text-text-primary font-outfit text-sm">
+                    Edit Personal Task
+                  </h3>
                   <p className="text-[10px] text-text-muted mt-0.5">Task ID: {selectedTask.id}</p>
                 </div>
                 <button
@@ -1141,9 +1196,14 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
               </div>
 
               {/* Form Content scrollable */}
-              <form onSubmit={handleEditTask} className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+              <form
+                onSubmit={handleEditTask}
+                className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar"
+              >
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Task Title *</label>
+                  <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+                    Task Title *
+                  </label>
                   <input
                     type="text"
                     required
@@ -1155,7 +1215,9 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Description</label>
+                  <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+                    Description
+                  </label>
                   <textarea
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
@@ -1167,7 +1229,9 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Priority</label>
+                    <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+                      Priority
+                    </label>
                     <select
                       value={editPriority}
                       onChange={(e) => setEditPriority(e.target.value as any)}
@@ -1180,7 +1244,9 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Status</label>
+                    <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+                      Status
+                    </label>
                     <select
                       value={editStatus}
                       onChange={(e) => setEditStatus(e.target.value as any)}
@@ -1193,7 +1259,9 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Due Date</label>
+                    <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+                      Due Date
+                    </label>
                     <input
                       type="date"
                       value={editDueDate}
@@ -1205,8 +1273,10 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
 
                 {/* Checklist Creator Panel */}
                 <div className="space-y-3 border-t border-divider/60 pt-4">
-                  <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider block">Add Checklist Items</label>
-                  
+                  <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider block">
+                    Add Checklist Items
+                  </label>
+
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -1234,26 +1304,35 @@ export default function ProfileClient({ session, initialTasks }: ProfileClientPr
                   {editChecklist.length > 0 && (
                     <div className="border border-border rounded-xl bg-page-bg/25 divide-y divide-divider/40">
                       {editChecklist.map((item) => (
-                        <div key={item.id} className="flex items-center justify-between px-3 py-2 text-xs">
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between px-3 py-2 text-xs"
+                        >
                           <div className="flex items-center gap-2">
                             <button
                               type="button"
                               onClick={() => {
                                 setEditChecklist(
-                                  editChecklist.map((c) => (c.id === item.id ? { ...c, completed: !c.completed } : c))
+                                  editChecklist.map((c) =>
+                                    c.id === item.id ? { ...c, completed: !c.completed } : c
+                                  )
                                 );
                               }}
                               className={`w-3.5 h-3.5 border rounded flex items-center justify-center cursor-pointer transition-colors border-border/80 ${
-                                item.completed ? "bg-indigo-500 border-indigo-600 text-white" : "bg-white text-transparent"
+                                item.completed
+                                  ? "bg-indigo-500 border-indigo-600 text-white"
+                                  : "bg-white text-transparent"
                               }`}
                             >
                               <Check className="w-2.5 h-2.5 stroke-[3]" />
                             </button>
-                            <span className={`text-text-primary leading-tight ${item.completed ? "line-through text-text-muted" : ""}`}>
+                            <span
+                              className={`text-text-primary leading-tight ${item.completed ? "line-through text-text-muted" : ""}`}
+                            >
                               {item.text}
                             </span>
                           </div>
-                          
+
                           <button
                             type="button"
                             onClick={() => removeEditChecklistItem(item.id)}

@@ -12,7 +12,7 @@ export const personalTasks = pgTable("personal_tasks", {
   dueDate: timestamp("due_date"),
   priority: varchar("priority", { length: 20 }).default("Medium").notNull(), // Low, Medium, High
   status: varchar("status", { length: 50 }).default("Todo").notNull(), // Todo, In Progress, Completed
-  
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

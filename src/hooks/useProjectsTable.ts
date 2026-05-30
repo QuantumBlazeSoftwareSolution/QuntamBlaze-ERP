@@ -13,11 +13,7 @@ import {
 import { useState, useEffect } from "react";
 import { projectColumns } from "@/lib/tableColumns/projectColumns";
 
-export function useProjectsTable(
-  statusFilter?: string,
-  clientFilter?: string,
-  data: any[] = []
-) {
+export function useProjectsTable(statusFilter?: string, clientFilter?: string, data: any[] = []) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [pagination, setPagination] = useState<PaginationState>({

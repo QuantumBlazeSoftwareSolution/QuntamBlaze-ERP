@@ -11,22 +11,22 @@ export function AddClientButton() {
   const [industry, setIndustry] = useState("Technology");
   const [customIndustry, setCustomIndustry] = useState("");
   const [name, setName] = useState("");
-  
+
   const [previewId, setPreviewId] = useState("CLI-NEW-XX-0XX");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const router = useRouter();
 
   // Debounced effect to fetch preview ID
   useEffect(() => {
     if (!isOpen) return;
-    
+
     const timeoutId = setTimeout(async () => {
       const id = await previewClientIdAction(name);
       setPreviewId(id);
     }, 500); // 500ms debounce
-    
+
     return () => clearTimeout(timeoutId);
   }, [name, isOpen]);
 
@@ -36,19 +36,19 @@ export function AddClientButton() {
       setError("Company name is required.");
       return;
     }
-    
+
     setIsSubmitting(true);
     setError(null);
-    
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("industry", industry);
     if (customIndustry) {
       formData.append("customIndustry", customIndustry);
     }
-    
+
     const result = await createClientAction(formData);
-    
+
     if (result.success) {
       // Reset and close
       setIsOpen(false);
@@ -59,7 +59,7 @@ export function AddClientButton() {
     } else {
       setError(result.error || "An error occurred");
     }
-    
+
     setIsSubmitting(false);
   };
 
@@ -112,7 +112,7 @@ export function AddClientButton() {
                       {error}
                     </div>
                   )}
-                  
+
                   {/* ID Preview */}
                   <div className="flex items-center gap-4 p-4 rounded-xl bg-accent-light border border-accent-border">
                     <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent">
@@ -146,7 +146,7 @@ export function AddClientButton() {
                       <label className="text-[11px] font-bold text-text-secondary uppercase tracking-widest">
                         Industry
                       </label>
-                      <select 
+                      <select
                         value={industry}
                         onChange={(e) => setIndustry(e.target.value)}
                         className="w-full bg-page-bg border border-border rounded-lg p-3 text-sm text-text-primary focus:border-accent focus:ring-1 focus:ring-accent transition-colors outline-none appearance-none"
@@ -158,10 +158,10 @@ export function AddClientButton() {
                         <option value="Other">Other</option>
                       </select>
                     </div>
-                    
+
                     <AnimatePresence>
                       {industry === "Other" && (
-                        <motion.div 
+                        <motion.div
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: "auto" }}
                           exit={{ opacity: 0, height: 0 }}
@@ -193,7 +193,7 @@ export function AddClientButton() {
                   >
                     Cancel
                   </button>
-                  <button 
+                  <button
                     type="submit"
                     disabled={isSubmitting}
                     className="flex-1 px-4 py-3 rounded-lg bg-accent text-white font-bold text-[13px] hover:bg-accent-hover transition-all flex items-center justify-center disabled:opacity-70 gap-2"

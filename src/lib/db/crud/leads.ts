@@ -31,9 +31,6 @@ export const leadsCrud = {
   },
 
   delete: async (id: string) => {
-    return db
-      .update(leads)
-      .set({ deletedAt: new Date() })
-      .where(eq(leads.id, id));
+    return db.update(leads).set({ deletedAt: new Date() }).where(eq(leads.id, id));
   },
 };

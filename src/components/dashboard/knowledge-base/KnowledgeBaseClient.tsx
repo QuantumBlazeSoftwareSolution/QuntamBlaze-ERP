@@ -66,12 +66,12 @@ interface KBStatus {
 const CATEGORIES = ["All", "General", "Projects", "HR", "Finance", "Operations", "Technical"];
 
 const CATEGORY_COLORS: Record<string, string> = {
-  General:    "bg-[#64748b]/10 text-[#64748b] border-[#64748b]/20",
-  Projects:   "bg-[#6366f1]/10 text-[#6366f1] border-[#6366f1]/20",
-  HR:         "bg-[#10b981]/10 text-[#10b981] border-[#10b981]/20",
-  Finance:    "bg-[#f59e0b]/10 text-[#f59e0b] border-[#f59e0b]/20",
+  General: "bg-[#64748b]/10 text-[#64748b] border-[#64748b]/20",
+  Projects: "bg-[#6366f1]/10 text-[#6366f1] border-[#6366f1]/20",
+  HR: "bg-[#10b981]/10 text-[#10b981] border-[#10b981]/20",
+  Finance: "bg-[#f59e0b]/10 text-[#f59e0b] border-[#f59e0b]/20",
   Operations: "bg-[#ef4444]/10 text-[#ef4444] border-[#ef4444]/20",
-  Technical:  "bg-[#0ea5e9]/10 text-[#0ea5e9] border-[#0ea5e9]/20",
+  Technical: "bg-[#0ea5e9]/10 text-[#0ea5e9] border-[#0ea5e9]/20",
 };
 
 const containerVariants = {
@@ -104,7 +104,10 @@ function DocumentDrawer({
   const [content, setContent] = useState("");
   const [saving, setSaving] = useState(false);
   const [embedding, setEmbedding] = useState(false);
-  const [embedStatus, setEmbedStatus] = useState<{ type: "idle" | "success" | "error"; msg: string }>({
+  const [embedStatus, setEmbedStatus] = useState<{
+    type: "idle" | "success" | "error";
+    msg: string;
+  }>({
     type: "idle",
     msg: "",
   });
@@ -124,8 +127,14 @@ function DocumentDrawer({
   }, [open, doc]);
 
   const handleSave = async () => {
-    if (!title.trim()) { setError("Title is required."); return; }
-    if (!content.trim() && !doc) { setError("Content is required."); return; }
+    if (!title.trim()) {
+      setError("Title is required.");
+      return;
+    }
+    if (!content.trim() && !doc) {
+      setError("Content is required.");
+      return;
+    }
     setError("");
     setSaving(true);
     try {
@@ -135,7 +144,10 @@ function DocumentDrawer({
         docId = doc.id;
       } else {
         const res = await createKnowledgeDocumentAction({ title, description, category, content });
-        if (!res.success) { setError(res.error || "Failed to save."); return; }
+        if (!res.success) {
+          setError(res.error || "Failed to save.");
+          return;
+        }
         docId = res.documentId!;
         setSavedDocId(docId);
       }
@@ -156,7 +168,10 @@ function DocumentDrawer({
     const res = await embedKnowledgeDocumentAction(docId, text);
     setEmbedding(false);
     if (res.success) {
-      setEmbedStatus({ type: "success", msg: `✓ ${res.chunksEmbedded} chunk${res.chunksEmbedded === 1 ? "" : "s"} embedded successfully!` });
+      setEmbedStatus({
+        type: "success",
+        msg: `✓ ${res.chunksEmbedded} chunk${res.chunksEmbedded === 1 ? "" : "s"} embedded successfully!`,
+      });
       onSaved();
     } else {
       setEmbedStatus({ type: "error", msg: res.error || "Embedding failed." });
@@ -194,10 +209,15 @@ function DocumentDrawer({
                   <h3 className="font-bold text-text-primary text-sm">
                     {doc ? "Edit Document" : "Add Knowledge Document"}
                   </h3>
-                  <p className="text-[11px] text-text-muted">The content will be split into chunks and embedded</p>
+                  <p className="text-[11px] text-text-muted">
+                    The content will be split into chunks and embedded
+                  </p>
                 </div>
               </div>
-              <button onClick={onClose} className="p-2 rounded-lg hover:bg-white text-text-muted hover:text-text-primary transition-colors">
+              <button
+                onClick={onClose}
+                className="p-2 rounded-lg hover:bg-white text-text-muted hover:text-text-primary transition-colors"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -206,7 +226,9 @@ function DocumentDrawer({
             <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-6 space-y-5">
               {/* Title */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider">Title *</label>
+                <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider">
+                  Title *
+                </label>
                 <input
                   type="text"
                   value={title}
@@ -218,7 +240,9 @@ function DocumentDrawer({
 
               {/* Category */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider">Category</label>
+                <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider">
+                  Category
+                </label>
                 <div className="flex flex-wrap gap-2">
                   {CATEGORIES.filter((c) => c !== "All").map((cat) => (
                     <button
@@ -239,7 +263,9 @@ function DocumentDrawer({
 
               {/* Description */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider">Description (optional)</label>
+                <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider">
+                  Description (optional)
+                </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -255,7 +281,8 @@ function DocumentDrawer({
                   Knowledge Content *
                 </label>
                 <p className="text-[11px] text-text-muted">
-                  Paste or type the full knowledge content. It will be automatically split into chunks and embedded as vectors.
+                  Paste or type the full knowledge content. It will be automatically split into
+                  chunks and embedded as vectors.
                 </p>
                 <textarea
                   value={content}
@@ -266,7 +293,9 @@ function DocumentDrawer({
                 />
                 {content.trim() && (
                   <p className="text-[11px] text-text-muted">
-                    ~{Math.max(1, Math.ceil(content.trim().split(/\s+/).length / 500))} chunk{Math.ceil(content.trim().split(/\s+/).length / 500) !== 1 ? "s" : ""} will be created ({content.trim().split(/\s+/).length} words)
+                    ~{Math.max(1, Math.ceil(content.trim().split(/\s+/).length / 500))} chunk
+                    {Math.ceil(content.trim().split(/\s+/).length / 500) !== 1 ? "s" : ""} will be
+                    created ({content.trim().split(/\s+/).length} words)
                   </p>
                 )}
               </div>
@@ -283,8 +312,8 @@ function DocumentDrawer({
                       embedStatus.type === "success"
                         ? "bg-[#10b981]/5 border-[#10b981]/20 text-[#10b981]"
                         : embedStatus.type === "error"
-                        ? "bg-danger/5 border-danger/20 text-danger"
-                        : "bg-accent/5 border-accent/20 text-accent"
+                          ? "bg-danger/5 border-danger/20 text-danger"
+                          : "bg-accent/5 border-accent/20 text-accent"
                     )}
                   >
                     {embedding ? (
@@ -324,7 +353,11 @@ function DocumentDrawer({
                   disabled={embedding}
                   className="h-10 px-4 border border-accent/40 text-accent rounded-lg text-[12px] font-bold uppercase tracking-wider hover:bg-accent/5 transition-colors disabled:opacity-50 flex items-center gap-2"
                 >
-                  {embedding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
+                  {embedding ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Zap className="w-3.5 h-3.5" />
+                  )}
                   Re-Embed
                 </button>
               )}
@@ -339,7 +372,13 @@ function DocumentDrawer({
                 ) : (
                   <Check className="w-3.5 h-3.5" />
                 )}
-                {saving ? "Saving..." : embedding ? "Embedding..." : doc ? "Update" : "Save & Embed"}
+                {saving
+                  ? "Saving..."
+                  : embedding
+                    ? "Embedding..."
+                    : doc
+                      ? "Update"
+                      : "Save & Embed"}
               </button>
             </div>
           </motion.div>
@@ -389,10 +428,12 @@ function DeleteModal({
             </div>
           </div>
           <p className="text-sm text-text-secondary mb-1">
-            Are you sure you want to delete <strong className="text-text-primary">"{doc.title}"</strong>?
+            Are you sure you want to delete{" "}
+            <strong className="text-text-primary">"{doc.title}"</strong>?
           </p>
           <p className="text-xs text-text-muted mb-6">
-            All {doc.chunkCount} embedded vector chunk{doc.chunkCount !== 1 ? "s" : ""} will be permanently deleted.
+            All {doc.chunkCount} embedded vector chunk{doc.chunkCount !== 1 ? "s" : ""} will be
+            permanently deleted.
           </p>
           <div className="flex gap-3">
             <button
@@ -406,7 +447,11 @@ function DeleteModal({
               disabled={deleting}
               className="flex-1 h-10 bg-danger hover:bg-danger/90 text-white rounded-xl text-sm font-bold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+              {deleting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Trash2 className="w-4 h-4" />
+              )}
               {deleting ? "Deleting..." : "Delete"}
             </button>
           </div>
@@ -444,7 +489,9 @@ function DocCard({
             <FileText className="w-4 h-4 text-accent" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-text-primary text-sm leading-snug truncate">{doc.title}</h3>
+            <h3 className="font-semibold text-text-primary text-sm leading-snug truncate">
+              {doc.title}
+            </h3>
             {doc.description && (
               <p className="text-xs text-text-muted mt-0.5 line-clamp-2">{doc.description}</p>
             )}
@@ -478,7 +525,12 @@ function DocCard({
 
       {/* Footer meta */}
       <div className="flex items-center gap-2 flex-wrap">
-        <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border", catColor)}>
+        <span
+          className={cn(
+            "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border",
+            catColor
+          )}
+        >
           {doc.category}
         </span>
 
@@ -523,7 +575,9 @@ export function KnowledgeBaseClient() {
   // Seeding states
   const [seeding, setSeeding] = useState(false);
   const [seedingStep, setSeedingStep] = useState("");
-  const [seedingStatus, setSeedingStatus] = useState<"idle" | "seeding" | "success" | "error">("idle");
+  const [seedingStatus, setSeedingStatus] = useState<"idle" | "seeding" | "success" | "error">(
+    "idle"
+  );
   const [seedingError, setSeedingError] = useState("");
 
   // Re-embed from card action
@@ -547,7 +601,9 @@ export function KnowledgeBaseClient() {
     setLoading(false);
   };
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -574,7 +630,9 @@ export function KnowledgeBaseClient() {
       const res = await seedDefaultKnowledgeAction();
       if (res.success) {
         await delay(600);
-        setSeedingStep(`Successfully embedded ${res.chunksEmbedded} chunks for ${res.documentsSeeded} operational guides!`);
+        setSeedingStep(
+          `Successfully embedded ${res.chunksEmbedded} chunks for ${res.documentsSeeded} operational guides!`
+        );
         setSeedingStatus("success");
         await delay(1500);
         setSeedingStatus("idle");
@@ -636,8 +694,19 @@ export function KnowledgeBaseClient() {
         >
           {[
             { label: "Documents", value: kbStatus.docCount, icon: FileText, color: "text-accent" },
-            { label: "Vector Chunks", value: kbStatus.chunkCount, icon: Layers, color: "text-[#6366f1]" },
-            { label: "Embedding Model", value: "text-embedding-004", icon: Cpu, color: "text-[#10b981]", small: true },
+            {
+              label: "Vector Chunks",
+              value: kbStatus.chunkCount,
+              icon: Layers,
+              color: "text-[#6366f1]",
+            },
+            {
+              label: "Embedding Model",
+              value: "text-embedding-004",
+              icon: Cpu,
+              color: "text-[#10b981]",
+              small: true,
+            },
             {
               label: "AI Status",
               value: kbStatus.geminiConfigured ? "Active" : "Not Configured",
@@ -649,12 +718,27 @@ export function KnowledgeBaseClient() {
               key={stat.label}
               className="bg-white border border-border rounded-xl p-4 flex items-center gap-3"
             >
-              <div className={cn("w-9 h-9 rounded-lg bg-current/8 flex items-center justify-center border border-current/15", stat.color)}>
+              <div
+                className={cn(
+                  "w-9 h-9 rounded-lg bg-current/8 flex items-center justify-center border border-current/15",
+                  stat.color
+                )}
+              >
                 <stat.icon className={cn("w-4 h-4", stat.color)} />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] text-text-muted uppercase tracking-wider font-bold">{stat.label}</p>
-                <p className={cn("font-bold text-sm truncate", stat.small ? "text-xs" : "", stat.color === "text-[#10b981]" && kbStatus.geminiConfigured ? "text-text-primary" : stat.color)}>
+                <p className="text-[10px] text-text-muted uppercase tracking-wider font-bold">
+                  {stat.label}
+                </p>
+                <p
+                  className={cn(
+                    "font-bold text-sm truncate",
+                    stat.small ? "text-xs" : "",
+                    stat.color === "text-[#10b981]" && kbStatus.geminiConfigured
+                      ? "text-text-primary"
+                      : stat.color
+                  )}
+                >
                   {stat.value}
                 </p>
               </div>
@@ -707,7 +791,10 @@ export function KnowledgeBaseClient() {
 
         {/* Add button */}
         <button
-          onClick={() => { setEditingDoc(null); setDrawerOpen(true); }}
+          onClick={() => {
+            setEditingDoc(null);
+            setDrawerOpen(true);
+          }}
           className="flex items-center gap-2 px-4 h-9 bg-accent hover:bg-accent-hover text-white rounded-lg text-[12px] font-bold uppercase tracking-wider transition-colors shrink-0"
         >
           <Plus className="w-4 h-4" />
@@ -745,9 +832,16 @@ export function KnowledgeBaseClient() {
             <DocCard
               key={doc.id}
               doc={doc}
-              onEdit={() => { setEditingDoc(doc); setDrawerOpen(true); }}
+              onEdit={() => {
+                setEditingDoc(doc);
+                setDrawerOpen(true);
+              }}
               onDelete={() => setDeleteTarget(doc)}
-              onReEmbed={() => { setReEmbedTarget(doc); setEditingDoc(doc); setDrawerOpen(true); }}
+              onReEmbed={() => {
+                setReEmbedTarget(doc);
+                setEditingDoc(doc);
+                setDrawerOpen(true);
+              }}
             />
           ))}
         </motion.div>
@@ -758,7 +852,9 @@ export function KnowledgeBaseClient() {
           </div>
           <div className="text-center">
             <h3 className="font-semibold text-text-primary mb-1">
-              {searchQuery || activeCategory !== "All" ? "No documents found" : "Knowledge Base is Empty"}
+              {searchQuery || activeCategory !== "All"
+                ? "No documents found"
+                : "Knowledge Base is Empty"}
             </h3>
             <p className="text-text-muted text-sm">
               {searchQuery || activeCategory !== "All"
@@ -777,7 +873,10 @@ export function KnowledgeBaseClient() {
                 Seed Default Knowledge
               </button>
               <button
-                onClick={() => { setEditingDoc(null); setDrawerOpen(true); }}
+                onClick={() => {
+                  setEditingDoc(null);
+                  setDrawerOpen(true);
+                }}
                 className="flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent-hover text-white rounded-xl text-sm font-bold uppercase tracking-wider transition-colors"
               >
                 <Plus className="w-4 h-4" />
@@ -792,7 +891,11 @@ export function KnowledgeBaseClient() {
       <DocumentDrawer
         open={drawerOpen}
         doc={editingDoc}
-        onClose={() => { setDrawerOpen(false); setEditingDoc(null); setReEmbedTarget(null); }}
+        onClose={() => {
+          setDrawerOpen(false);
+          setEditingDoc(null);
+          setReEmbedTarget(null);
+        }}
         onSaved={loadData}
       />
 

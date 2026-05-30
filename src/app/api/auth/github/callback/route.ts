@@ -19,13 +19,17 @@ export async function GET(request: NextRequest) {
   }
 
   if (!code) {
-    return NextResponse.redirect(`${devRedirectUrl}?error=${encodeURIComponent("Missing authorization code.")}`);
+    return NextResponse.redirect(
+      `${devRedirectUrl}?error=${encodeURIComponent("Missing authorization code.")}`
+    );
   }
 
   try {
     const session = await getCurrentSessionAction();
     if (!session?.userId) {
-      return NextResponse.redirect(`${devRedirectUrl}?error=${encodeURIComponent("Session expired. Please log in first.")}`);
+      return NextResponse.redirect(
+        `${devRedirectUrl}?error=${encodeURIComponent("Session expired. Please log in first.")}`
+      );
     }
 
     // Get GitHub configuration for Client ID and Client Secret
@@ -119,6 +123,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${devRedirectUrl}?success=github-linked`);
   } catch (err: any) {
     console.error("Failed to complete GitHub OAuth callback:", err);
-    return NextResponse.redirect(`${devRedirectUrl}?error=${encodeURIComponent(err.message || "OAuth exchange failed.")}`);
+    return NextResponse.redirect(
+      `${devRedirectUrl}?error=${encodeURIComponent(err.message || "OAuth exchange failed.")}`
+    );
   }
 }

@@ -13,8 +13,7 @@ export default async function FinancePage() {
     .filter((inv) => inv.status === "Paid")
     .reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
 
-  const taxLiability = invoices
-    .reduce((sum, inv) => sum + Number(inv.tax || 0), 0);
+  const taxLiability = invoices.reduce((sum, inv) => sum + Number(inv.tax || 0), 0);
 
   const revenueThisMonth = invoices
     .filter((inv) => ["Paid", "Sent", "Partially Paid"].includes(inv.status))

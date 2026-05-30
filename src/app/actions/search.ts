@@ -30,13 +30,15 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
       .from(projects)
       .where(or(ilike(projects.id, searchTerm), ilike(projects.name, searchTerm)))
       .limit(5);
-    
-    projectResults.forEach(p => results.push({
-      id: p.id,
-      name: p.name,
-      type: "project",
-      href: `/dashboard/projects/${p.id}`
-    }));
+
+    projectResults.forEach((p) =>
+      results.push({
+        id: p.id,
+        name: p.name,
+        type: "project",
+        href: `/dashboard/projects/${p.id}`,
+      })
+    );
 
     // 2. Search Clients
     const clientResults = await db
@@ -44,13 +46,15 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
       .from(clients)
       .where(or(ilike(clients.id, searchTerm), ilike(clients.name, searchTerm)))
       .limit(5);
-    
-    clientResults.forEach(c => results.push({
-      id: c.id,
-      name: c.name,
-      type: "client",
-      href: `/dashboard/clients/${c.id}`
-    }));
+
+    clientResults.forEach((c) =>
+      results.push({
+        id: c.id,
+        name: c.name,
+        type: "client",
+        href: `/dashboard/clients/${c.id}`,
+      })
+    );
 
     // 3. Search Invoices
     const invoiceResults = await db
@@ -58,14 +62,16 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
       .from(invoices)
       .where(ilike(invoices.id, searchTerm))
       .limit(5);
-    
-    invoiceResults.forEach(inv => results.push({
-      id: inv.id,
-      name: `Invoice ${inv.id}`,
-      type: "invoice",
-      href: `/dashboard/finance/invoices/${inv.id}`,
-      metadata: inv.status
-    }));
+
+    invoiceResults.forEach((inv) =>
+      results.push({
+        id: inv.id,
+        name: `Invoice ${inv.id}`,
+        type: "invoice",
+        href: `/dashboard/finance/invoices/${inv.id}`,
+        metadata: inv.status,
+      })
+    );
 
     // 4. Search Leads
     const leadResults = await db
@@ -73,13 +79,15 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
       .from(leads)
       .where(or(ilike(leads.id, searchTerm), ilike(leads.company, searchTerm)))
       .limit(5);
-    
-    leadResults.forEach(l => results.push({
-      id: l.id,
-      name: l.name,
-      type: "lead",
-      href: `/dashboard/leads/${l.id}`
-    }));
+
+    leadResults.forEach((l) =>
+      results.push({
+        id: l.id,
+        name: l.name,
+        type: "lead",
+        href: `/dashboard/leads/${l.id}`,
+      })
+    );
 
     // 5. Search Employees
     const employeeResults = await db
@@ -87,13 +95,15 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
       .from(employees)
       .where(or(ilike(employees.id, searchTerm), ilike(employees.name, searchTerm)))
       .limit(5);
-    
-    employeeResults.forEach(e => results.push({
-      id: e.id,
-      name: e.name,
-      type: "employee",
-      href: `/dashboard/hr/employees/${e.id}`
-    }));
+
+    employeeResults.forEach((e) =>
+      results.push({
+        id: e.id,
+        name: e.name,
+        type: "employee",
+        href: `/dashboard/hr/employees/${e.id}`,
+      })
+    );
 
     // 6. Search Tasks
     const taskResults = await db
@@ -101,14 +111,15 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
       .from(tasks)
       .where(or(ilike(tasks.id, searchTerm), ilike(tasks.title, searchTerm)))
       .limit(5);
-    
-    taskResults.forEach(t => results.push({
-      id: t.id,
-      name: t.title,
-      type: "task",
-      href: `/dashboard/tasks/${t.id}`
-    }));
 
+    taskResults.forEach((t) =>
+      results.push({
+        id: t.id,
+        name: t.title,
+        type: "task",
+        href: `/dashboard/tasks/${t.id}`,
+      })
+    );
   } catch (error) {
     console.error("Search error:", error);
   }

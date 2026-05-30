@@ -11,17 +11,23 @@ export async function GET(request: NextRequest) {
 
   if (error) {
     console.error("OAuth consent error received from Google:", error);
-    return NextResponse.redirect(`${settingsRedirectUrl}&gdrive_error=${encodeURIComponent(error)}`);
+    return NextResponse.redirect(
+      `${settingsRedirectUrl}&gdrive_error=${encodeURIComponent(error)}`
+    );
   }
 
   if (!code) {
-    return NextResponse.redirect(`${settingsRedirectUrl}&gdrive_error=${encodeURIComponent("Missing authorization code.")}`);
+    return NextResponse.redirect(
+      `${settingsRedirectUrl}&gdrive_error=${encodeURIComponent("Missing authorization code.")}`
+    );
   }
 
   try {
     const clientConfig = await getGDriveClientConfig();
     if (!clientConfig) {
-      throw new Error("Google Drive client configuration (Client ID/Secret) is missing in the database.");
+      throw new Error(
+        "Google Drive client configuration (Client ID/Secret) is missing in the database."
+      );
     }
 
     const redirectUri = `${origin}/api/auth/callback/google-drive`;
@@ -42,7 +48,11 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       const errResponse = await response.json();
-      throw new Error(errResponse.error_description || errResponse.error || "Failed to exchange authorization code.");
+      throw new Error(
+        errResponse.error_description ||
+          errResponse.error ||
+          "Failed to exchange authorization code."
+      );
     }
 
     const data = await response.json();
@@ -52,15 +62,19 @@ export async function GET(request: NextRequest) {
     const expiryDate = Date.now() + expiresIn * 1000;
 
     if (!refreshToken) {
-      // NOTE: Google only returns refreshToken on the very first authorization. 
+      // NOTE: Google only returns refreshToken on the very first authorization.
       // If we re-authenticate, we might not get it unless prompt=consent is used.
-      console.warn("No refresh token returned by Google. If this is a reconnect, verify you used prompt=consent.");
+      console.warn(
+        "No refresh token returned by Google. If this is a reconnect, verify you used prompt=consent."
+      );
     }
 
     // Load existing credentials to preserve the refresh token if Google didn't return one in this request
-    const existingCredsRecord = await fetch(`${origin}/api/config?key=gdrive_credentials`).catch(() => null);
+    const existingCredsRecord = await fetch(`${origin}/api/config?key=gdrive_credentials`).catch(
+      () => null
+    );
     let finalRefreshToken = refreshToken;
-    
+
     if (!finalRefreshToken) {
       try {
         // Safe internal import fallback since we're in Next.js Server Route context
@@ -75,7 +89,9 @@ export async function GET(request: NextRequest) {
     }
 
     if (!finalRefreshToken) {
-      throw new Error("OAuth integration failed: No refresh token returned. Please disconnect and try again, ensuring permissions are granted.");
+      throw new Error(
+        "OAuth integration failed: No refresh token returned. Please disconnect and try again, ensuring permissions are granted."
+      );
     }
 
     const credentials = {
@@ -91,6 +107,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${settingsRedirectUrl}&gdrive_success=true`);
   } catch (err: any) {
     console.error("Failed to complete Google Drive OAuth2 callback:", err);
-    return NextResponse.redirect(`${settingsRedirectUrl}&gdrive_error=${encodeURIComponent(err.message || "OAuth exchange failed.")}`);
+    return NextResponse.redirect(
+      `${settingsRedirectUrl}&gdrive_error=${encodeURIComponent(err.message || "OAuth exchange failed.")}`
+    );
   }
 }

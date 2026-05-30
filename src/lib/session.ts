@@ -24,12 +24,12 @@ function encrypt(text: string): string {
   const iv = crypto.randomBytes(IV_LENGTH);
   const key = crypto.scryptSync(SESSION_SECRET, "session-salt", 32);
   const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
-  
+
   let encrypted = cipher.update(text, "utf8", "hex");
   encrypted += cipher.final("hex");
-  
+
   const tag = cipher.getAuthTag();
-  
+
   return `${iv.toString("hex")}:${tag.toString("hex")}:${encrypted}`;
 }
 
@@ -40,16 +40,16 @@ function decrypt(cipherText: string): string | null {
   try {
     const parts = cipherText.split(":");
     if (parts.length !== 3) return null;
-    
+
     const [ivHex, tagHex, encryptedHex] = parts;
     const iv = Buffer.from(ivHex, "hex");
     const tag = Buffer.from(tagHex, "hex");
     const encrypted = Buffer.from(encryptedHex, "hex");
-    
+
     const key = crypto.scryptSync(SESSION_SECRET, "session-salt", 32);
     const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
     decipher.setAuthTag(tag);
-    
+
     let decrypted = decipher.update(encrypted, undefined, "utf8");
     decrypted += decipher.final("utf8");
     return decrypted;
@@ -67,10 +67,10 @@ export async function createSession(data: Omit<SessionData, "createdAt">) {
     ...data,
     createdAt: new Date().toISOString(),
   };
-  
+
   const token = encrypt(JSON.stringify(sessionData));
   const cookieStore = await cookies();
-  
+
   cookieStore.set("qb-session", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -88,10 +88,10 @@ export async function getSession(): Promise<SessionData | null> {
     const cookieStore = await cookies();
     const cookie = cookieStore.get("qb-session");
     if (!cookie || !cookie.value) return null;
-    
+
     const decrypted = decrypt(cookie.value);
     if (!decrypted) return null;
-    
+
     return JSON.parse(decrypted) as SessionData;
   } catch {
     return null;

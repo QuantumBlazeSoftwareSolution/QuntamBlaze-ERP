@@ -76,7 +76,9 @@ export function IntegrationsTab() {
   const [loadingStatus, setLoadingStatus] = useState(true);
 
   // Drawer & Selection states
-  const [drawerType, setDrawerType] = useState<"gdrive" | "pusher" | "gemini" | "github" | null>(null);
+  const [drawerType, setDrawerType] = useState<"gdrive" | "pusher" | "gemini" | "github" | null>(
+    null
+  );
   const drawerOpen = !!drawerType;
   const setDrawerOpen = (open: boolean) => {
     if (!open) setDrawerType(null);
@@ -128,9 +130,11 @@ export function IntegrationsTab() {
   const [geminiBaseModelInput, setGeminiBaseModelInput] = useState("gemini-2.0-flash");
   const [showApiKey, setShowApiKey] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
-  
+
   // Dynamic Gemini models state
-  const [availableGeminiModels, setAvailableGeminiModels] = useState<{ id: string; displayName: string; description?: string }[]>([]);
+  const [availableGeminiModels, setAvailableGeminiModels] = useState<
+    { id: string; displayName: string; description?: string }[]
+  >([]);
   const [isLoadingGeminiModels, setIsLoadingGeminiModels] = useState(false);
 
   // Knowledge Base stats (shown inside Gemini drawer)
@@ -311,7 +315,11 @@ export function IntegrationsTab() {
   };
 
   const handleDisconnectGithub = async () => {
-    if (!confirm("Are you sure you want to disconnect GitHub Developer Suite? This will wipe the global App settings.")) {
+    if (
+      !confirm(
+        "Are you sure you want to disconnect GitHub Developer Suite? This will wipe the global App settings."
+      )
+    ) {
       return;
     }
     setIsDisconnectingGithub(true);
@@ -396,7 +404,6 @@ export function IntegrationsTab() {
     }
   }, [geminiApiKeyInput]);
 
-
   useEffect(() => {
     loadStatus();
     loadPusherStatus();
@@ -410,7 +417,8 @@ export function IntegrationsTab() {
     if (success) {
       setUrlNotification({
         type: "success",
-        message: "Google Drive authenticated successfully! You can now configure the base sync folder.",
+        message:
+          "Google Drive authenticated successfully! You can now configure the base sync folder.",
       });
       setDrawerOpen(true); // Open drawer automatically to pick the base folder
       // Clear URL params
@@ -465,7 +473,9 @@ export function IntegrationsTab() {
     try {
       const res = await saveGoogleDriveClientConfigAction(clientIdInput, clientSecretInput);
       if (res.success) {
-        setDrawerSuccess("OAuth credentials saved successfully! You can now connect your Google account.");
+        setDrawerSuccess(
+          "OAuth credentials saved successfully! You can now connect your Google account."
+        );
         await loadStatus();
       } else {
         setDrawerError(res.error || "Failed to save configuration.");
@@ -495,7 +505,11 @@ export function IntegrationsTab() {
 
   // Disconnect Google Drive
   const handleDisconnect = async () => {
-    if (!confirm("Are you sure you want to disconnect Google Drive? This will revoke access and clear all sync configurations.")) {
+    if (
+      !confirm(
+        "Are you sure you want to disconnect Google Drive? This will revoke access and clear all sync configurations."
+      )
+    ) {
       return;
     }
     setIsDisconnecting(true);
@@ -527,7 +541,8 @@ export function IntegrationsTab() {
     setDrawerSuccess("");
 
     try {
-      const folderName = folders.find((f) => f.id === selectedFolderId)?.name || "Google Drive Folder";
+      const folderName =
+        folders.find((f) => f.id === selectedFolderId)?.name || "Google Drive Folder";
       const res = await saveBaseFolderSettingsAction(selectedFolderId, folderName);
       if (res.success) {
         setDrawerSuccess("Base sync folder updated successfully!");
@@ -596,7 +611,11 @@ export function IntegrationsTab() {
   };
 
   const handleDisconnectPusher = async () => {
-    if (!confirm("Are you sure you want to disconnect Pusher Channels? Real-time chats will stop working.")) {
+    if (
+      !confirm(
+        "Are you sure you want to disconnect Pusher Channels? Real-time chats will stop working."
+      )
+    ) {
       return;
     }
     setIsDisconnectingPusher(true);
@@ -644,7 +663,11 @@ export function IntegrationsTab() {
   };
 
   const handleDisconnectGemini = async () => {
-    if (!confirm("Are you sure you want to disconnect Google Gemini AI? Custom AI features will stop working.")) {
+    if (
+      !confirm(
+        "Are you sure you want to disconnect Google Gemini AI? Custom AI features will stop working."
+      )
+    ) {
       return;
     }
     setIsDisconnectingGemini(true);
@@ -726,10 +749,10 @@ export function IntegrationsTab() {
       status: loadingStatus
         ? "Loading..."
         : gdriveStatus.isConnected && gdriveStatus.baseFolder
-        ? "Connected"
-        : gdriveStatus.isConnected
-        ? "Requires Sync Folder"
-        : "Not Connected",
+          ? "Connected"
+          : gdriveStatus.isConnected
+            ? "Requires Sync Folder"
+            : "Not Connected",
       color: "text-blue-500",
       actionLabel: "CONFIGURE HUB",
       onAction: () => setDrawerType("gdrive"),
@@ -737,13 +760,14 @@ export function IntegrationsTab() {
     {
       id: "pusher",
       name: "Pusher (WebSocket)",
-      description: "Enable real-time messaging, collaboration, and instant updates across the workspace.",
+      description:
+        "Enable real-time messaging, collaboration, and instant updates across the workspace.",
       icon: MessageSquare,
       status: loadingPusherStatus
         ? "Loading..."
         : pusherStatus.isConfigured
-        ? "Connected"
-        : "Not Connected",
+          ? "Connected"
+          : "Not Connected",
       color: "text-indigo-500",
       actionLabel: "CONFIGURE HUB",
       onAction: () => setDrawerType("pusher"),
@@ -761,13 +785,14 @@ export function IntegrationsTab() {
     {
       id: "gemini",
       name: "Google Gemini AI",
-      description: "Configure Google Gemini to activate intelligent context-aware ERP assistance and dynamic suggestions.",
+      description:
+        "Configure Google Gemini to activate intelligent context-aware ERP assistance and dynamic suggestions.",
       icon: Sparkles,
       status: loadingGeminiStatus
         ? "Loading..."
         : geminiStatus.isConfigured
-        ? "Connected"
-        : "Not Connected",
+          ? "Connected"
+          : "Not Connected",
       color: "text-teal-600",
       actionLabel: "CONFIGURE HUB",
       onAction: () => setDrawerType("gemini"),
@@ -775,13 +800,14 @@ export function IntegrationsTab() {
     {
       id: "github",
       name: "GitHub Developer Suite",
-      description: "Manage repository creation, branch setups, collaborator sync, and Pull Requests.",
+      description:
+        "Manage repository creation, branch setups, collaborator sync, and Pull Requests.",
       icon: GitBranch,
       status: loadingGithubStatus
         ? "Loading..."
         : githubStatus.isConfigured
-        ? "Connected"
-        : "Not Connected",
+          ? "Connected"
+          : "Not Connected",
       color: "text-neutral-800",
       actionLabel: "CONFIGURE HUB",
       onAction: () => setDrawerType("github"),
@@ -827,7 +853,10 @@ export function IntegrationsTab() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div
-                  className={cn("p-3 rounded-xl bg-page-bg border border-border", integration.color)}
+                  className={cn(
+                    "p-3 rounded-xl bg-page-bg border border-border",
+                    integration.color
+                  )}
                 >
                   <integration.icon className="w-6 h-6" />
                 </div>
@@ -838,10 +867,10 @@ export function IntegrationsTab() {
                       integration.status === "Connected"
                         ? "bg-success"
                         : integration.status === "Requires Sync Folder"
-                        ? "bg-amber-500 animate-pulse"
-                        : integration.status === "Loading..."
-                        ? "bg-text-muted animate-spin"
-                        : "bg-text-muted"
+                          ? "bg-amber-500 animate-pulse"
+                          : integration.status === "Loading..."
+                            ? "bg-text-muted animate-spin"
+                            : "bg-text-muted"
                     )}
                   />
                   <span
@@ -850,8 +879,8 @@ export function IntegrationsTab() {
                       integration.status === "Connected"
                         ? "text-success"
                         : integration.status === "Requires Sync Folder"
-                        ? "text-amber-500"
-                        : "text-text-muted"
+                          ? "text-amber-500"
+                          : "text-text-muted"
                     )}
                   >
                     {integration.status}
@@ -869,10 +898,19 @@ export function IntegrationsTab() {
 
             <button
               onClick={integration.onAction}
-              disabled={integration.id !== "gdrive" && integration.id !== "pusher" && integration.id !== "gemini" && integration.id !== "github"}
+              disabled={
+                integration.id !== "gdrive" &&
+                integration.id !== "pusher" &&
+                integration.id !== "gemini" &&
+                integration.id !== "github"
+              }
               className={cn(
                 "mt-8 flex items-center justify-between w-full p-4 rounded-xl bg-page-bg border border-divider group-hover:border-accent/50 transition-all cursor-pointer",
-                (integration.id !== "gdrive" && integration.id !== "pusher" && integration.id !== "gemini" && integration.id !== "github") && "opacity-50 cursor-not-allowed"
+                integration.id !== "gdrive" &&
+                  integration.id !== "pusher" &&
+                  integration.id !== "gemini" &&
+                  integration.id !== "github" &&
+                  "opacity-50 cursor-not-allowed"
               )}
             >
               <span className="text-[12px] font-bold text-text-secondary group-hover:text-text-primary">
@@ -925,7 +963,9 @@ export function IntegrationsTab() {
                             <HelpCircle className="w-4 h-4" />
                           </button>
                         </h3>
-                        <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">Cloud Sync Settings</p>
+                        <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">
+                          Cloud Sync Settings
+                        </p>
                       </div>
                     </div>
                   ) : drawerType === "pusher" ? (
@@ -945,7 +985,9 @@ export function IntegrationsTab() {
                             <HelpCircle className="w-4 h-4" />
                           </button>
                         </h3>
-                        <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">Real-time Web Sync Settings</p>
+                        <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">
+                          Real-time Web Sync Settings
+                        </p>
                       </div>
                     </div>
                   ) : drawerType === "github" ? (
@@ -965,7 +1007,9 @@ export function IntegrationsTab() {
                             <HelpCircle className="w-4 h-4" />
                           </button>
                         </h3>
-                        <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">Repository Sync Settings</p>
+                        <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">
+                          Repository Sync Settings
+                        </p>
                       </div>
                     </div>
                   ) : (
@@ -977,7 +1021,9 @@ export function IntegrationsTab() {
                         <h3 className="text-xl font-bold text-text-primary flex items-center gap-1.5">
                           Google Gemini AI
                         </h3>
-                        <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">Artificial Intelligence Settings</p>
+                        <p className="text-[11px] text-text-muted uppercase tracking-widest font-bold">
+                          Artificial Intelligence Settings
+                        </p>
                       </div>
                     </div>
                   )}
@@ -1020,7 +1066,9 @@ export function IntegrationsTab() {
                             </span>
                           </div>
                           <p className="text-[12px] text-text-secondary leading-relaxed">
-                            To connect Google Drive, you'll need to create an OAuth Client ID and Secret in the Google Cloud Console. We've built an interactive step-by-step guide to help you do this in 2 minutes.
+                            To connect Google Drive, you'll need to create an OAuth Client ID and
+                            Secret in the Google Cloud Console. We've built an interactive
+                            step-by-step guide to help you do this in 2 minutes.
                           </p>
                           <button
                             type="button"
@@ -1084,13 +1132,16 @@ export function IntegrationsTab() {
                             <HardDrive className="w-6 h-6 animate-pulse" />
                           </div>
                           <div className="space-y-1">
-                            <h4 className="text-sm font-bold text-text-primary">Credentials Configured</h4>
+                            <h4 className="text-sm font-bold text-text-primary">
+                              Credentials Configured
+                            </h4>
                             <p className="text-[11px] text-text-muted break-all">
                               Client ID: {gdriveStatus.clientId.slice(0, 15)}...
                             </p>
                           </div>
                           <p className="text-[12px] text-text-secondary leading-relaxed">
-                            OAuth endpoints are loaded. Click the connection link below to authenticate with Google Consent.
+                            OAuth endpoints are loaded. Click the connection link below to
+                            authenticate with Google Consent.
                           </p>
                         </div>
 
@@ -1133,11 +1184,17 @@ export function IntegrationsTab() {
                               <Check className="w-4 h-4" />
                             </div>
                             <div>
-                              <p className="text-[12px] font-bold text-text-primary">Account Authorized</p>
-                              <p className="text-[10px] text-emerald-600 font-mono">Status: Connected</p>
+                              <p className="text-[12px] font-bold text-text-primary">
+                                Account Authorized
+                              </p>
+                              <p className="text-[10px] text-emerald-600 font-mono">
+                                Status: Connected
+                              </p>
                             </div>
                           </div>
-                          <span className="px-2 py-0.5 bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest rounded-full">ACTIVE</span>
+                          <span className="px-2 py-0.5 bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest rounded-full">
+                            ACTIVE
+                          </span>
                         </div>
 
                         {/* Folder Selection Option */}
@@ -1181,7 +1238,8 @@ export function IntegrationsTab() {
                               </div>
                             )}
                             <p className="text-[11px] text-text-muted leading-relaxed">
-                              All project proposals, receipts, and agreements will sync directly inside this base folder.
+                              All project proposals, receipts, and agreements will sync directly
+                              inside this base folder.
                             </p>
                           </div>
 
@@ -1190,7 +1248,9 @@ export function IntegrationsTab() {
                             <div className="p-4 bg-slate-50 border border-border rounded-xl flex items-center gap-3">
                               <CheckCircle className="w-5 h-5 text-accent" />
                               <div>
-                                <p className="text-[11px] text-text-muted uppercase tracking-widest font-black">Active Base Folder</p>
+                                <p className="text-[11px] text-text-muted uppercase tracking-widest font-black">
+                                  Active Base Folder
+                                </p>
                                 <p className="text-[13px] font-bold text-text-primary">
                                   {gdriveStatus.baseFolder.baseFolderName}
                                 </p>
@@ -1201,7 +1261,9 @@ export function IntegrationsTab() {
                           {/* Divider */}
                           <div className="relative flex py-4 items-center">
                             <div className="flex-grow border-t border-divider"></div>
-                            <span className="flex-shrink mx-4 text-text-muted text-[10px] font-black uppercase tracking-wider">or</span>
+                            <span className="flex-shrink mx-4 text-text-muted text-[10px] font-black uppercase tracking-wider">
+                              or
+                            </span>
                             <div className="flex-grow border-t border-divider"></div>
                           </div>
 
@@ -1249,7 +1311,9 @@ export function IntegrationsTab() {
                         </span>
                       </div>
                       <p className="text-[12px] text-text-secondary leading-relaxed">
-                        To enable real-time collaboration, you can create a free account in Pusher and configure your Channels application. This keeps messages synced across active client browsers instantly.
+                        To enable real-time collaboration, you can create a free account in Pusher
+                        and configure your Channels application. This keeps messages synced across
+                        active client browsers instantly.
                       </p>
                       <button
                         type="button"
@@ -1349,7 +1413,10 @@ export function IntegrationsTab() {
                         </span>
                       </div>
                       <p className="text-[12px] text-text-secondary leading-relaxed">
-                        To enable the GitHub Developer Suite, create a dedicated GitHub App in your target organization and copy your App ID, Client ID, Client Secret, Org name, and Private Key. We've built a step-by-step setup guide to make this easy.
+                        To enable the GitHub Developer Suite, create a dedicated GitHub App in your
+                        target organization and copy your App ID, Client ID, Client Secret, Org
+                        name, and Private Key. We've built a step-by-step setup guide to make this
+                        easy.
                       </p>
                       <button
                         type="button"
@@ -1411,7 +1478,11 @@ export function IntegrationsTab() {
                             onClick={() => setShowGithubClientSecret(!showGithubClientSecret)}
                             className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-text-primary transition-colors border-0 bg-transparent p-0 cursor-pointer"
                           >
-                            {showGithubClientSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            {showGithubClientSecret ? (
+                              <EyeOff className="w-4 h-4" />
+                            ) : (
+                              <Eye className="w-4 h-4" />
+                            )}
                           </button>
                         </div>
                       </div>
@@ -1451,7 +1522,9 @@ export function IntegrationsTab() {
 
                     {githubInstalledOrgs.length > 0 && (
                       <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-[12px] space-y-1">
-                        <p className="font-bold text-emerald-800">✓ App Installed & Verified on Orgs:</p>
+                        <p className="font-bold text-emerald-800">
+                          ✓ App Installed & Verified on Orgs:
+                        </p>
                         <ul className="list-disc pl-5 text-emerald-700 font-semibold">
                           {githubInstalledOrgs.map((org) => (
                             <li key={org}>{org}</li>
@@ -1486,7 +1559,9 @@ export function IntegrationsTab() {
                         </span>
                       </div>
                       <p className="text-[12px] text-text-secondary leading-relaxed">
-                        Configure your Google Gemini API key to enable secure, lightning-fast intelligence directly within your ERP platform. No third-party servers required.
+                        Configure your Google Gemini API key to enable secure, lightning-fast
+                        intelligence directly within your ERP platform. No third-party servers
+                        required.
                       </p>
                     </div>
 
@@ -1500,7 +1575,12 @@ export function IntegrationsTab() {
                               Gemini API Key
                             </span>
                             <span className="text-[9px] text-teal-600 font-bold normal-case">
-                              <a href="https://aistudio.google.com/" target="_blank" rel="noreferrer" className="hover:underline">
+                              <a
+                                href="https://aistudio.google.com/"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="hover:underline"
+                              >
                                 Get API Key from Google AI Studio ↗
                               </a>
                             </span>
@@ -1511,7 +1591,9 @@ export function IntegrationsTab() {
                               required
                               value={geminiApiKeyInput}
                               onChange={(e) => setGeminiApiKeyInput(e.target.value)}
-                              placeholder={geminiStatus.isConfigured ? "••••••••••••••••" : "AIzaSy..."}
+                              placeholder={
+                                geminiStatus.isConfigured ? "••••••••••••••••" : "AIzaSy..."
+                              }
                               className="w-full h-11 pl-4 pr-10 border border-border rounded-xl text-[13px] text-text-primary focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
                             />
                             <button
@@ -1537,7 +1619,8 @@ export function IntegrationsTab() {
                             </span>
                             {isLoadingGeminiModels && (
                               <span className="text-[9px] text-teal-600 flex items-center gap-1 normal-case font-semibold animate-pulse">
-                                <RefreshCw className="w-3 h-3 animate-spin" /> Fetching available models...
+                                <RefreshCw className="w-3 h-3 animate-spin" /> Fetching available
+                                models...
                               </span>
                             )}
                           </label>
@@ -1556,10 +1639,18 @@ export function IntegrationsTab() {
                                 ))
                               ) : (
                                 <>
-                                  <option value="gemini-2.0-flash">gemini-2.0-flash (Recommended, Fast & Smart)</option>
-                                  <option value="gemini-2.5-flash">gemini-2.5-flash (Enhanced Capabilities)</option>
-                                  <option value="gemini-1.5-flash">gemini-1.5-flash (Legacy Lightweight)</option>
-                                  <option value="gemini-1.5-pro">gemini-1.5-pro (Deep Reasoning & Analysis)</option>
+                                  <option value="gemini-2.0-flash">
+                                    gemini-2.0-flash (Recommended, Fast & Smart)
+                                  </option>
+                                  <option value="gemini-2.5-flash">
+                                    gemini-2.5-flash (Enhanced Capabilities)
+                                  </option>
+                                  <option value="gemini-1.5-flash">
+                                    gemini-1.5-flash (Legacy Lightweight)
+                                  </option>
+                                  <option value="gemini-1.5-pro">
+                                    gemini-1.5-pro (Deep Reasoning & Analysis)
+                                  </option>
                                 </>
                               )}
                             </select>
@@ -1591,8 +1682,14 @@ export function IntegrationsTab() {
                             <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                           )}
                           <div>
-                            <p className="font-extrabold">{testResult.success ? "Connection Check Passed!" : "Connection Check Failed"}</p>
-                            <p className="text-[11px] font-normal mt-0.5 text-text-secondary">{testResult.message}</p>
+                            <p className="font-extrabold">
+                              {testResult.success
+                                ? "Connection Check Passed!"
+                                : "Connection Check Failed"}
+                            </p>
+                            <p className="text-[11px] font-normal mt-0.5 text-text-secondary">
+                              {testResult.message}
+                            </p>
                           </div>
                         </div>
                       )}
@@ -1685,12 +1782,20 @@ export function IntegrationsTab() {
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="bg-white border border-divider rounded-lg p-3 text-center">
-                        <p className="text-xl font-bold text-text-primary">{kbStats?.docCount ?? "—"}</p>
-                        <p className="text-[10px] text-text-muted uppercase tracking-wider">Documents</p>
+                        <p className="text-xl font-bold text-text-primary">
+                          {kbStats?.docCount ?? "—"}
+                        </p>
+                        <p className="text-[10px] text-text-muted uppercase tracking-wider">
+                          Documents
+                        </p>
                       </div>
                       <div className="bg-white border border-divider rounded-lg p-3 text-center">
-                        <p className="text-xl font-bold text-text-primary">{kbStats?.chunkCount ?? "—"}</p>
-                        <p className="text-[10px] text-text-muted uppercase tracking-wider">Vector Chunks</p>
+                        <p className="text-xl font-bold text-text-primary">
+                          {kbStats?.chunkCount ?? "—"}
+                        </p>
+                        <p className="text-[10px] text-text-muted uppercase tracking-wider">
+                          Vector Chunks
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1762,8 +1867,12 @@ export function IntegrationsTab() {
                     <Settings className="w-5 h-5 animate-spin-slow" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-text-primary">Google Cloud Configuration</h3>
-                    <p className="text-[11px] text-text-muted uppercase tracking-widest font-black">2-Minute Setup Steps</p>
+                    <h3 className="text-xl font-bold text-text-primary">
+                      Google Cloud Configuration
+                    </h3>
+                    <p className="text-[11px] text-text-muted uppercase tracking-widest font-black">
+                      2-Minute Setup Steps
+                    </p>
                   </div>
                 </div>
                 <button
@@ -1782,9 +1891,22 @@ export function IntegrationsTab() {
                     1
                   </div>
                   <div className="space-y-1.5 pt-0.5">
-                    <h4 className="font-bold text-text-primary text-[14px]">Create a Google Cloud Project</h4>
+                    <h4 className="font-bold text-text-primary text-[14px]">
+                      Create a Google Cloud Project
+                    </h4>
                     <p>
-                      Go to the <a href="https://console.cloud.google.com/" target="_blank" rel="noreferrer" className="text-blue-500 font-bold hover:underline">Google Cloud Console</a>. Click the project selector dropdown at the top, select <strong>"New Project"</strong>, name it <code>QuantumBlaze ERP Sync</code>, and click <strong>Create</strong>.
+                      Go to the{" "}
+                      <a
+                        href="https://console.cloud.google.com/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-blue-500 font-bold hover:underline"
+                      >
+                        Google Cloud Console
+                      </a>
+                      . Click the project selector dropdown at the top, select{" "}
+                      <strong>"New Project"</strong>, name it <code>QuantumBlaze ERP Sync</code>,
+                      and click <strong>Create</strong>.
                     </p>
                   </div>
                 </div>
@@ -1795,9 +1917,13 @@ export function IntegrationsTab() {
                     2
                   </div>
                   <div className="space-y-1.5 pt-0.5">
-                    <h4 className="font-bold text-text-primary text-[14px]">Enable the Google Drive API</h4>
+                    <h4 className="font-bold text-text-primary text-[14px]">
+                      Enable the Google Drive API
+                    </h4>
                     <p>
-                      Search for <strong>"Google Drive API"</strong> in the top search bar, click on it, and click the blue <strong>"Enable"</strong> button to enable cloud file synchronizations.
+                      Search for <strong>"Google Drive API"</strong> in the top search bar, click on
+                      it, and click the blue <strong>"Enable"</strong> button to enable cloud file
+                      synchronizations.
                     </p>
                   </div>
                 </div>
@@ -1808,13 +1934,27 @@ export function IntegrationsTab() {
                     3
                   </div>
                   <div className="space-y-1.5 pt-0.5">
-                    <h4 className="font-bold text-text-primary text-[14px]">Configure OAuth Consent Screen & Scopes</h4>
+                    <h4 className="font-bold text-text-primary text-[14px]">
+                      Configure OAuth Consent Screen & Scopes
+                    </h4>
                     <p>
-                      Go to <strong>"OAuth consent screen"</strong> inside the left navigation pane. Set User Type to <strong>"External"</strong> and fill out the required App details.
+                      Go to <strong>"OAuth consent screen"</strong> inside the left navigation pane.
+                      Set User Type to <strong>"External"</strong> and fill out the required App
+                      details.
                     </p>
                     <ul className="list-disc pl-5 space-y-1.5 mt-2 text-text-muted">
-                      <li><strong>Scopes</strong>: Add the <code className="bg-slate-100 px-1.5 py-0.5 rounded text-accent font-bold font-mono">.../auth/drive.file</code> scope (this lets the app read and write files).</li>
-                      <li><strong>Test Users (CRITICAL)</strong>: Add your personal Google/Gmail account under the test users section so you can authenticate during testing without needing Google's review.</li>
+                      <li>
+                        <strong>Scopes</strong>: Add the{" "}
+                        <code className="bg-slate-100 px-1.5 py-0.5 rounded text-accent font-bold font-mono">
+                          .../auth/drive.file
+                        </code>{" "}
+                        scope (this lets the app read and write files).
+                      </li>
+                      <li>
+                        <strong>Test Users (CRITICAL)</strong>: Add your personal Google/Gmail
+                        account under the test users section so you can authenticate during testing
+                        without needing Google's review.
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -1826,12 +1966,17 @@ export function IntegrationsTab() {
                   </div>
                   <div className="space-y-3 pt-0.5 w-full">
                     <div className="space-y-1">
-                      <h4 className="font-bold text-text-primary text-[14px]">Create OAuth Credentials</h4>
+                      <h4 className="font-bold text-text-primary text-[14px]">
+                        Create OAuth Credentials
+                      </h4>
                       <p>
-                        Go to the <strong>"Credentials"</strong> tab, click <strong>"+ Create Credentials"</strong> and select <strong>"OAuth client ID"</strong>. Select <strong>"Web application"</strong> as the Application Type.
+                        Go to the <strong>"Credentials"</strong> tab, click{" "}
+                        <strong>"+ Create Credentials"</strong> and select{" "}
+                        <strong>"OAuth client ID"</strong>. Select{" "}
+                        <strong>"Web application"</strong> as the Application Type.
                       </p>
                     </div>
-                    
+
                     {/* Copy Box */}
                     <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-2xl space-y-2">
                       <div className="flex items-center justify-between text-[11px] font-black text-blue-600 uppercase tracking-widest">
@@ -1858,7 +2003,9 @@ export function IntegrationsTab() {
                         {clientOrigin || "http://localhost:3000"}/api/auth/callback/google-drive
                       </div>
                       <p className="text-[10px] text-text-muted">
-                        Paste the exact link above into the <strong>"Authorized redirect URIs"</strong> section in your Google Cloud Console.
+                        Paste the exact link above into the{" "}
+                        <strong>"Authorized redirect URIs"</strong> section in your Google Cloud
+                        Console.
                       </p>
                     </div>
                   </div>
@@ -1872,7 +2019,9 @@ export function IntegrationsTab() {
                   <div className="space-y-1.5 pt-0.5">
                     <h4 className="font-bold text-text-primary text-[14px]">Connect and Sync!</h4>
                     <p>
-                      Copy your generated <strong>Client ID</strong> and <strong>Client Secret</strong>, paste them into this drawer, click save, and click the connect button. You're fully ready!
+                      Copy your generated <strong>Client ID</strong> and{" "}
+                      <strong>Client Secret</strong>, paste them into this drawer, click save, and
+                      click the connect button. You're fully ready!
                     </p>
                   </div>
                 </div>
@@ -1921,8 +2070,12 @@ export function IntegrationsTab() {
                     <Settings className="w-5 h-5 animate-spin-slow" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-text-primary">Pusher Channels Configuration</h3>
-                    <p className="text-[11px] text-text-muted uppercase tracking-widest font-black">2-Minute Setup Steps</p>
+                    <h3 className="text-xl font-bold text-text-primary">
+                      Pusher Channels Configuration
+                    </h3>
+                    <p className="text-[11px] text-text-muted uppercase tracking-widest font-black">
+                      2-Minute Setup Steps
+                    </p>
                   </div>
                 </div>
                 <button
@@ -1941,9 +2094,21 @@ export function IntegrationsTab() {
                     1
                   </div>
                   <div className="space-y-1.5 pt-0.5">
-                    <h4 className="font-bold text-text-primary text-[14px]">Create a Pusher Account</h4>
+                    <h4 className="font-bold text-text-primary text-[14px]">
+                      Create a Pusher Account
+                    </h4>
                     <p>
-                      Go to the <a href="https://dashboard.pusher.com/" target="_blank" rel="noreferrer" className="text-purple-500 font-bold hover:underline">Pusher Dashboard</a>. Sign up for a free account (no credit card required) or sign in to your existing account.
+                      Go to the{" "}
+                      <a
+                        href="https://dashboard.pusher.com/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-purple-500 font-bold hover:underline"
+                      >
+                        Pusher Dashboard
+                      </a>
+                      . Sign up for a free account (no credit card required) or sign in to your
+                      existing account.
                     </p>
                   </div>
                 </div>
@@ -1954,9 +2119,14 @@ export function IntegrationsTab() {
                     2
                   </div>
                   <div className="space-y-1.5 pt-0.5">
-                    <h4 className="font-bold text-text-primary text-[14px]">Create a Channels App</h4>
+                    <h4 className="font-bold text-text-primary text-[14px]">
+                      Create a Channels App
+                    </h4>
                     <p>
-                      Inside the Pusher Console, go to <strong>"Channels"</strong> in the sidebar. Click on the <strong>"Create app"</strong> button. Name your application (e.g. <code>QuantumBlaze ERP Chat</code>) and choose a cluster close to you (e.g. <code>ap2</code> for Mumbai/Colombo/Asia).
+                      Inside the Pusher Console, go to <strong>"Channels"</strong> in the sidebar.
+                      Click on the <strong>"Create app"</strong> button. Name your application (e.g.{" "}
+                      <code>QuantumBlaze ERP Chat</code>) and choose a cluster close to you (e.g.{" "}
+                      <code>ap2</code> for Mumbai/Colombo/Asia).
                     </p>
                   </div>
                 </div>
@@ -1967,9 +2137,12 @@ export function IntegrationsTab() {
                     3
                   </div>
                   <div className="space-y-1.5 pt-0.5">
-                    <h4 className="font-bold text-text-primary text-[14px]">Go to "App Keys" Section</h4>
+                    <h4 className="font-bold text-text-primary text-[14px]">
+                      Go to "App Keys" Section
+                    </h4>
                     <p>
-                      Once the app is created, navigate to the <strong>"App Keys"</strong> tab in the left-hand navigation menu of your Pusher app.
+                      Once the app is created, navigate to the <strong>"App Keys"</strong> tab in
+                      the left-hand navigation menu of your Pusher app.
                     </p>
                   </div>
                 </div>
@@ -1982,15 +2155,21 @@ export function IntegrationsTab() {
                   <div className="space-y-3 pt-0.5 w-full">
                     <div className="space-y-1">
                       <h4 className="font-bold text-text-primary text-[14px]">Copy Credentials</h4>
-                      <p>
-                        You will see code blocks containing:
-                      </p>
+                      <p>You will see code blocks containing:</p>
                     </div>
                     <ul className="list-disc pl-5 space-y-1.5 text-text-muted">
-                      <li><code>app_id</code>: Your unique Pusher application identification</li>
-                      <li><code>key</code>: The public client API key</li>
-                      <li><code>secret</code>: Your private server API signature</li>
-                      <li><code>cluster</code>: The regional server network cluster</li>
+                      <li>
+                        <code>app_id</code>: Your unique Pusher application identification
+                      </li>
+                      <li>
+                        <code>key</code>: The public client API key
+                      </li>
+                      <li>
+                        <code>secret</code>: Your private server API signature
+                      </li>
+                      <li>
+                        <code>cluster</code>: The regional server network cluster
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -2001,9 +2180,12 @@ export function IntegrationsTab() {
                     5
                   </div>
                   <div className="space-y-1.5 pt-0.5">
-                    <h4 className="font-bold text-text-primary text-[14px]">Save and Start Collaborating!</h4>
+                    <h4 className="font-bold text-text-primary text-[14px]">
+                      Save and Start Collaborating!
+                    </h4>
                     <p>
-                      Paste all four parameters into the drawer configuration panel and click save. The ERP will immediately activate real-time syncing!
+                      Paste all four parameters into the drawer configuration panel and click save.
+                      The ERP will immediately activate real-time syncing!
                     </p>
                   </div>
                 </div>
@@ -2052,8 +2234,12 @@ export function IntegrationsTab() {
                     <GitBranch className="w-5 h-5 animate-pulse" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-text-primary">GitHub App Developer Suite</h3>
-                    <p className="text-[11px] text-text-muted uppercase tracking-widest font-black">Step-by-Step Setup Guide</p>
+                    <h3 className="text-xl font-bold text-text-primary">
+                      GitHub App Developer Suite
+                    </h3>
+                    <p className="text-[11px] text-text-muted uppercase tracking-widest font-black">
+                      Step-by-Step Setup Guide
+                    </p>
                   </div>
                 </div>
                 <button
@@ -2072,9 +2258,14 @@ export function IntegrationsTab() {
                     1
                   </div>
                   <div className="space-y-1.5 pt-0.5">
-                    <h4 className="font-bold text-text-primary text-[14px]">Create a New GitHub App</h4>
+                    <h4 className="font-bold text-text-primary text-[14px]">
+                      Create a New GitHub App
+                    </h4>
                     <p>
-                      Navigate to your GitHub organization's developer settings page (e.g. <code>https://github.com/organizations/YOUR_ORG/settings/apps</code>) or your personal developer settings if running individually. Click **"New GitHub App"**.
+                      Navigate to your GitHub organization's developer settings page (e.g.{" "}
+                      <code>https://github.com/organizations/YOUR_ORG/settings/apps</code>) or your
+                      personal developer settings if running individually. Click **"New GitHub
+                      App"**.
                     </p>
                   </div>
                 </div>
@@ -2085,9 +2276,14 @@ export function IntegrationsTab() {
                     2
                   </div>
                   <div className="space-y-1.5 pt-0.5">
-                    <h4 className="font-bold text-text-primary text-[14px]">Set App Name & Homepage URL</h4>
+                    <h4 className="font-bold text-text-primary text-[14px]">
+                      Set App Name & Homepage URL
+                    </h4>
                     <p>
-                      Choose a descriptive name for your application (e.g. <code>QuantumBlaze ERP Suite</code>). Set the **Homepage URL** to your ERP instance domain or <code>http://localhost:3000</code> for local developer environments.
+                      Choose a descriptive name for your application (e.g.{" "}
+                      <code>QuantumBlaze ERP Suite</code>). Set the **Homepage URL** to your ERP
+                      instance domain or <code>http://localhost:3000</code> for local developer
+                      environments.
                     </p>
                   </div>
                 </div>
@@ -2099,9 +2295,12 @@ export function IntegrationsTab() {
                   </div>
                   <div className="space-y-3 pt-0.5 w-full">
                     <div className="space-y-1">
-                      <h4 className="font-bold text-text-primary text-[14px]">Configure OAuth & Callback URL</h4>
+                      <h4 className="font-bold text-text-primary text-[14px]">
+                        Configure OAuth & Callback URL
+                      </h4>
                       <p>
-                        Enable **"User authorization response (OAuth)"**. Set the **Callback URL** to the exact authorization callback below:
+                        Enable **"User authorization response (OAuth)"**. Set the **Callback URL**
+                        to the exact authorization callback below:
                       </p>
                     </div>
 
@@ -2112,7 +2311,9 @@ export function IntegrationsTab() {
                         <button
                           type="button"
                           onClick={() => {
-                            navigator.clipboard.writeText(`${clientOrigin || window.location.origin}/api/auth/github/callback`);
+                            navigator.clipboard.writeText(
+                              `${clientOrigin || window.location.origin}/api/auth/github/callback`
+                            );
                             setCopied(true);
                             setTimeout(() => setCopied(false), 2000);
                           }}
@@ -2135,7 +2336,9 @@ export function IntegrationsTab() {
                         {clientOrigin || "http://localhost:3000"}/api/auth/github/callback
                       </div>
                       <p className="text-[10px] text-text-muted">
-                        Check the box for <strong>"Request user authorization (OAuth) during installation"</strong> right below the callback URL.
+                        Check the box for{" "}
+                        <strong>"Request user authorization (OAuth) during installation"</strong>{" "}
+                        right below the callback URL.
                       </p>
                     </div>
                   </div>
@@ -2147,9 +2350,13 @@ export function IntegrationsTab() {
                   </div>
                   <div className="space-y-3 pt-0.5 w-full">
                     <div className="space-y-1">
-                      <h4 className="font-bold text-text-primary text-[14px]">Configure Webhook Settings</h4>
+                      <h4 className="font-bold text-text-primary text-[14px]">
+                        Configure Webhook Settings
+                      </h4>
                       <p>
-                        Scroll down to the <strong>Webhook</strong> section. Check the <strong>"Active"</strong> checkbox. Set the <strong>Webhook URL</strong> to the exact endpoint below:
+                        Scroll down to the <strong>Webhook</strong> section. Check the{" "}
+                        <strong>"Active"</strong> checkbox. Set the <strong>Webhook URL</strong> to
+                        the exact endpoint below:
                       </p>
                     </div>
 
@@ -2160,7 +2367,9 @@ export function IntegrationsTab() {
                         <button
                           type="button"
                           onClick={() => {
-                            navigator.clipboard.writeText(`${clientOrigin || window.location.origin}/api/webhooks/github`);
+                            navigator.clipboard.writeText(
+                              `${clientOrigin || window.location.origin}/api/webhooks/github`
+                            );
                             setWebhookCopied(true);
                             setTimeout(() => setWebhookCopied(false), 2000);
                           }}
@@ -2183,15 +2392,42 @@ export function IntegrationsTab() {
                         {clientOrigin || "http://localhost:3000"}/api/webhooks/github
                       </div>
                       <p className="text-[10px] text-text-muted">
-                        Set a secure, private string as your <strong>Webhook Secret</strong> (and keep note of it—you will enter this same secret in the configuration form).
+                        Set a secure, private string as your <strong>Webhook Secret</strong> (and
+                        keep note of it—you will enter this same secret in the configuration form).
                       </p>
                       {/* Local Dev Tip */}
                       <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-xl text-[11px] leading-relaxed text-amber-800 space-y-1.5 mt-2">
-                        <span className="font-bold block text-xs">⚠️ Local Development / localhost Notice</span>
-                        <span>GitHub cannot send webhooks directly to a <code>localhost</code> domain. To make it work locally:</span>
+                        <span className="font-bold block text-xs">
+                          ⚠️ Local Development / localhost Notice
+                        </span>
+                        <span>
+                          GitHub cannot send webhooks directly to a <code>localhost</code> domain.
+                          To make it work locally:
+                        </span>
                         <ul className="list-disc pl-4 space-y-1 mt-1 font-medium">
-                          <li><strong>Option A (Recommended):</strong> Go to <a href="https://smee.io" target="_blank" rel="noreferrer" className="underline font-bold text-amber-900 hover:text-amber-950">smee.io</a>, click <strong>"Start a new channel"</strong>, set the resulting Smee URL as the Webhook URL, and forward payloads locally using: <code className="bg-amber-100 text-amber-950 px-1 py-0.5 rounded text-[10px]">npx -y smee-client -u [SmeeURL] -p 3000 -P /api/webhooks/github</code>.</li>
-                          <li><strong>Option B (Fast Testing):</strong> Simply <strong>UNCHECK</strong> the <strong>"Active"</strong> checkbox in the Webhook section. All features (repo provisioning, branch/PR creation) will still work 100% via API!</li>
+                          <li>
+                            <strong>Option A (Recommended):</strong> Go to{" "}
+                            <a
+                              href="https://smee.io"
+                              target="_blank"
+                              rel="noreferrer"
+                              className="underline font-bold text-amber-900 hover:text-amber-950"
+                            >
+                              smee.io
+                            </a>
+                            , click <strong>"Start a new channel"</strong>, set the resulting Smee
+                            URL as the Webhook URL, and forward payloads locally using:{" "}
+                            <code className="bg-amber-100 text-amber-950 px-1 py-0.5 rounded text-[10px]">
+                              npx -y smee-client -u [SmeeURL] -p 3000 -P /api/webhooks/github
+                            </code>
+                            .
+                          </li>
+                          <li>
+                            <strong>Option B (Fast Testing):</strong> Simply{" "}
+                            <strong>UNCHECK</strong> the <strong>"Active"</strong> checkbox in the
+                            Webhook section. All features (repo provisioning, branch/PR creation)
+                            will still work 100% via API!
+                          </li>
                         </ul>
                       </div>
                     </div>
@@ -2204,42 +2440,65 @@ export function IntegrationsTab() {
                     5
                   </div>
                   <div className="space-y-3 pt-0.5 w-full">
-                    <h4 className="font-bold text-text-primary text-[14px]">Configure Repository & Organization Permissions</h4>
+                    <h4 className="font-bold text-text-primary text-[14px]">
+                      Configure Repository & Organization Permissions
+                    </h4>
                     <p>
-                      In the left side panel of your GitHub App settings, navigate to <strong>"Permissions & events"</strong>. Click on each section and strictly configure these access scopes down the list:
+                      In the left side panel of your GitHub App settings, navigate to{" "}
+                      <strong>"Permissions & events"</strong>. Click on each section and strictly
+                      configure these access scopes down the list:
                     </p>
 
                     <div className="space-y-3 mt-3">
                       {/* Repos Permissions */}
                       <div className="border border-neutral-200 rounded-xl overflow-hidden">
                         <div className="bg-neutral-50 px-4 py-2 border-b border-neutral-200 flex items-center justify-between">
-                          <span className="text-[11px] font-black text-neutral-700 uppercase tracking-wider">Repository Permissions</span>
-                          <span className="text-[10px] font-bold text-[#10B981] bg-[#ECFDF5] px-2 py-0.5 rounded border border-[#A7F3D0]">Read & Write Scopes</span>
+                          <span className="text-[11px] font-black text-neutral-700 uppercase tracking-wider">
+                            Repository Permissions
+                          </span>
+                          <span className="text-[10px] font-bold text-[#10B981] bg-[#ECFDF5] px-2 py-0.5 rounded border border-[#A7F3D0]">
+                            Read & Write Scopes
+                          </span>
                         </div>
                         <div className="divide-y divide-neutral-100 bg-white text-xs">
                           <div className="px-4 py-2.5 flex justify-between items-center">
                             <span className="font-bold text-text-primary">Administration</span>
-                            <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Read & write</span>
+                            <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                              Read & write
+                            </span>
                           </div>
                           <div className="px-4 py-2.5 flex justify-between items-center bg-slate-50/20">
                             <span className="font-bold text-text-primary">Contents</span>
-                            <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Read & write</span>
+                            <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                              Read & write
+                            </span>
                           </div>
                           <div className="px-4 py-2.5 flex justify-between items-center">
                             <span className="font-bold text-text-primary">Issues</span>
-                            <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Read & write</span>
+                            <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                              Read & write
+                            </span>
                           </div>
                           <div className="px-4 py-2.5 flex justify-between items-center bg-slate-50/20">
                             <span className="font-bold text-text-primary">Metadata</span>
-                            <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Read-only (Auto-selected)</span>
+                            <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                              Read-only (Auto-selected)
+                            </span>
                           </div>
                           <div className="px-4 py-2.5 flex justify-between items-center">
                             <span className="font-bold text-text-primary">Pull Requests</span>
-                            <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Read & write</span>
+                            <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                              Read & write
+                            </span>
                           </div>
                           <div className="px-4 py-2 flex items-center justify-between bg-neutral-50/50 text-[10px] text-text-muted italic">
-                            <span>* Set all other Repository permissions (Actions, Secrets, Variables, Deployments, Pages, Projects etc.) to:</span>
-                            <span className="font-bold text-neutral-500 bg-neutral-100 px-1.5 py-0.5 rounded">No access</span>
+                            <span>
+                              * Set all other Repository permissions (Actions, Secrets, Variables,
+                              Deployments, Pages, Projects etc.) to:
+                            </span>
+                            <span className="font-bold text-neutral-500 bg-neutral-100 px-1.5 py-0.5 rounded">
+                              No access
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -2247,17 +2506,25 @@ export function IntegrationsTab() {
                       {/* Org Permissions */}
                       <div className="border border-neutral-200 rounded-xl overflow-hidden">
                         <div className="bg-neutral-50 px-4 py-2 border-b border-neutral-200 flex items-center justify-between">
-                          <span className="text-[11px] font-black text-neutral-700 uppercase tracking-wider">Organization Permissions</span>
-                          <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Read Scopes</span>
+                          <span className="text-[11px] font-black text-neutral-700 uppercase tracking-wider">
+                            Organization Permissions
+                          </span>
+                          <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                            Read Scopes
+                          </span>
                         </div>
                         <div className="divide-y divide-neutral-100 bg-white text-xs">
                           <div className="px-4 py-2.5 flex justify-between items-center">
                             <span className="font-bold text-text-primary">Members</span>
-                            <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Read-only</span>
+                            <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                              Read-only
+                            </span>
                           </div>
                           <div className="px-4 py-2 flex items-center justify-between bg-neutral-50/50 text-[10px] text-text-muted italic">
                             <span>* Set all other Organization permissions to:</span>
-                            <span className="font-bold text-neutral-500 bg-neutral-100 px-1.5 py-0.5 rounded">No access</span>
+                            <span className="font-bold text-neutral-500 bg-neutral-100 px-1.5 py-0.5 rounded">
+                              No access
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -2265,11 +2532,21 @@ export function IntegrationsTab() {
                       {/* Account Permissions */}
                       <div className="border border-neutral-200 rounded-xl overflow-hidden">
                         <div className="bg-neutral-50 px-4 py-2 border-b border-neutral-200 flex items-center justify-between">
-                          <span className="text-[11px] font-black text-neutral-700 uppercase tracking-wider">Account Permissions</span>
-                          <span className="text-[10px] font-bold text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded border border-neutral-200">No Access Required</span>
+                          <span className="text-[11px] font-black text-neutral-700 uppercase tracking-wider">
+                            Account Permissions
+                          </span>
+                          <span className="text-[10px] font-bold text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded border border-neutral-200">
+                            No Access Required
+                          </span>
                         </div>
                         <div className="p-3 bg-white text-xs text-text-muted text-center font-medium">
-                          Set <strong>all</strong> Account permissions (Email addresses, profile, keys etc.) to <code className="bg-neutral-100 text-neutral-600 px-1.5 py-0.5 rounded text-[10px]">No access</code>. Personal user authorization is securely handled directly via OAuth callback.
+                          Set <strong>all</strong> Account permissions (Email addresses, profile,
+                          keys etc.) to{" "}
+                          <code className="bg-neutral-100 text-neutral-600 px-1.5 py-0.5 rounded text-[10px]">
+                            No access
+                          </code>
+                          . Personal user authorization is securely handled directly via OAuth
+                          callback.
                         </div>
                       </div>
                     </div>
@@ -2282,33 +2559,49 @@ export function IntegrationsTab() {
                     6
                   </div>
                   <div className="space-y-2 pt-0.5 w-full">
-                    <h4 className="font-bold text-text-primary text-[14px]">Subscribe to Webhook Events</h4>
+                    <h4 className="font-bold text-text-primary text-[14px]">
+                      Subscribe to Webhook Events
+                    </h4>
                     <p>
-                      At the very bottom of the <strong>"Permissions & events"</strong> page, look for the <strong>"Subscribe to events"</strong> section. Check the checkboxes for precisely these events:
+                      At the very bottom of the <strong>"Permissions & events"</strong> page, look
+                      for the <strong>"Subscribe to events"</strong> section. Check the checkboxes
+                      for precisely these events:
                     </p>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2 bg-neutral-50 p-4 rounded-xl border border-neutral-200 font-mono text-[11px] text-text-primary font-bold">
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">✓</div>
+                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">
+                          ✓
+                        </div>
                         <span>Issues</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">✓</div>
+                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">
+                          ✓
+                        </div>
                         <span>Label</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">✓</div>
+                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">
+                          ✓
+                        </div>
                         <span>Member</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">✓</div>
+                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">
+                          ✓
+                        </div>
                         <span>Pull request</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">✓</div>
+                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">
+                          ✓
+                        </div>
                         <span>Push</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">✓</div>
+                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">
+                          ✓
+                        </div>
                         <span>Repository</span>
                       </div>
                     </div>
@@ -2321,15 +2614,23 @@ export function IntegrationsTab() {
                     7
                   </div>
                   <div className="space-y-1.5 pt-0.5 w-full">
-                    <h4 className="font-bold text-text-primary text-[14px]">Select App Installation Scope</h4>
+                    <h4 className="font-bold text-text-primary text-[14px]">
+                      Select App Installation Scope
+                    </h4>
                     <p>
-                      Under the section <strong>"Where can this GitHub App be installed?"</strong> (at the bottom of the App creation form), select:
+                      Under the section <strong>"Where can this GitHub App be installed?"</strong>{" "}
+                      (at the bottom of the App creation form), select:
                     </p>
                     <div className="mt-2 bg-neutral-50 border border-neutral-200 rounded-xl p-4 flex items-center gap-3">
                       <div className="w-5 h-5 rounded-full border-4 border-[#10B981] bg-white shrink-0"></div>
                       <div>
-                        <span className="font-bold text-xs text-text-primary block">Any account</span>
-                        <span className="text-[10px] text-text-muted">Allows this App to be installed on other GitHub user/organization accounts (Required for multi-tenant ERP operations).</span>
+                        <span className="font-bold text-xs text-text-primary block">
+                          Any account
+                        </span>
+                        <span className="text-[10px] text-text-muted">
+                          Allows this App to be installed on other GitHub user/organization accounts
+                          (Required for multi-tenant ERP operations).
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -2341,14 +2642,28 @@ export function IntegrationsTab() {
                     8
                   </div>
                   <div className="space-y-1.5 pt-0.5 w-full">
-                    <h4 className="font-bold text-text-primary text-[14px]">Create GitHub App & Gather Credentials</h4>
+                    <h4 className="font-bold text-text-primary text-[14px]">
+                      Create GitHub App & Gather Credentials
+                    </h4>
                     <p>
-                      Click the green <strong>"Create GitHub App"</strong> button. Once the app is successfully created, copy the following values:
+                      Click the green <strong>"Create GitHub App"</strong> button. Once the app is
+                      successfully created, copy the following values:
                     </p>
                     <ul className="list-disc pl-5 mt-2 space-y-1.5 text-text-secondary">
-                      <li>Copy the <strong>App ID</strong> and <strong>Client ID</strong> from the main app summary.</li>
-                      <li>In the <strong>Client secrets</strong> section, click <strong>"Generate a new client secret"</strong> and copy it immediately.</li>
-                      <li>In the <strong>Private keys</strong> section at the very bottom, click <strong>"Generate a private key"</strong>. Open the downloaded <code>.pem</code> file in any text editor, and copy the entire text starting with <code>-----BEGIN RSA PRIVATE KEY-----</code>.</li>
+                      <li>
+                        Copy the <strong>App ID</strong> and <strong>Client ID</strong> from the
+                        main app summary.
+                      </li>
+                      <li>
+                        In the <strong>Client secrets</strong> section, click{" "}
+                        <strong>"Generate a new client secret"</strong> and copy it immediately.
+                      </li>
+                      <li>
+                        In the <strong>Private keys</strong> section at the very bottom, click{" "}
+                        <strong>"Generate a private key"</strong>. Open the downloaded{" "}
+                        <code>.pem</code> file in any text editor, and copy the entire text starting
+                        with <code>-----BEGIN RSA PRIVATE KEY-----</code>.
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -2359,9 +2674,16 @@ export function IntegrationsTab() {
                     9
                   </div>
                   <div className="space-y-1.5 pt-0.5 w-full">
-                    <h4 className="font-bold text-text-primary text-[14px]">Install App & Connect with ERP Settings</h4>
+                    <h4 className="font-bold text-text-primary text-[14px]">
+                      Install App & Connect with ERP Settings
+                    </h4>
                     <p>
-                      In the left sidebar of your GitHub App settings, click <strong>"Install App"</strong>, and install it onto your target Organization. Enter that exact GitHub Organization name under <strong>Organization / Owner Name</strong> in the ERP configuration form along with your credentials, and click <strong>"Save Settings"</strong>. You are completely ready to go!
+                      In the left sidebar of your GitHub App settings, click{" "}
+                      <strong>"Install App"</strong>, and install it onto your target Organization.
+                      Enter that exact GitHub Organization name under{" "}
+                      <strong>Organization / Owner Name</strong> in the ERP configuration form along
+                      with your credentials, and click <strong>"Save Settings"</strong>. You are
+                      completely ready to go!
                     </p>
                   </div>
                 </div>

@@ -209,12 +209,12 @@ export function TaskDetailPanel() {
                     <SubtaskItem id="STSK-02" label="IAM Role Audit" completed />
                     <SubtaskItem id="STSK-03" label="Latency Profiling" />
                     <SubtaskItem id="STSK-04" label="Report Generation" />
-                    
+
                     <div className="mt-4 flex items-center gap-3 pl-1">
                       <div className="w-5 h-5 rounded-md border-2 border-dashed border-white/10 flex items-center justify-center">
                         <Plus className="w-3 h-3 text-slate-600" />
                       </div>
-                      <input 
+                      <input
                         type="text"
                         value={newSubtask}
                         onChange={(e) => setNewSubtask(e.target.value)}
@@ -231,16 +231,8 @@ export function TaskDetailPanel() {
                     File Repository
                   </h4>
                   <div className="grid grid-cols-1 gap-3">
-                    <AttachmentItem 
-                      name="Audit_Preliminary_v2.pdf" 
-                      size="2.4 MB" 
-                      type="pdf" 
-                    />
-                    <AttachmentItem 
-                      name="Infrastructure_Map.fig" 
-                      size="18.1 MB" 
-                      type="design" 
-                    />
+                    <AttachmentItem name="Audit_Preliminary_v2.pdf" size="2.4 MB" type="pdf" />
+                    <AttachmentItem name="Infrastructure_Map.fig" size="18.1 MB" type="design" />
                     <button className="flex items-center justify-center gap-2 p-4 rounded-2xl border border-dashed border-white/5 hover:border-emerald-500/30 hover:bg-emerald-500/[0.02] transition-all group">
                       <Plus className="w-4 h-4 text-slate-600 group-hover:text-emerald-400" />
                       <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest group-hover:text-emerald-400">
@@ -259,23 +251,23 @@ export function TaskDetailPanel() {
                 className="flex flex-col h-full bg-[#0F172A]"
               >
                 <div className="flex-1 p-8 space-y-8">
-                  <ActivityLogEntry 
-                    user="John Doe" 
+                  <ActivityLogEntry
+                    user="John Doe"
                     initials="JD"
                     color="bg-emerald-500"
                     action="pushed state to"
                     target="CRITICAL"
                     time="14:20 PM"
                   />
-                  <CommentEntry 
+                  <CommentEntry
                     user="Alice Lee"
                     initials="AL"
                     color="bg-blue-500"
                     message="The ingress rules in US-EAST-1 seem to be dropping packets at peak load. We might need a security group audit."
                     time="10:45 AM"
                   />
-                  <ActivityLogEntry 
-                    user="System" 
+                  <ActivityLogEntry
+                    user="System"
                     initials="QB"
                     color="bg-slate-700"
                     action="automatically generated"
@@ -283,11 +275,11 @@ export function TaskDetailPanel() {
                     time="Yesterday"
                   />
                 </div>
-                
+
                 {/* Comment Input Sticky */}
                 <div className="p-6 bg-[#0F172A] border-t border-white/5 sticky bottom-0">
                   <div className="relative">
-                    <textarea 
+                    <textarea
                       placeholder="Discuss this task or @mention team..."
                       className="w-full bg-white/5 border border-white/5 rounded-2xl p-4 pr-16 text-sm font-medium text-slate-200 placeholder:text-slate-600 outline-none focus:border-emerald-500/30 transition-all resize-none h-24"
                     />
@@ -304,12 +296,12 @@ export function TaskDetailPanel() {
         {/* Action Footer */}
         <div className="px-8 py-6 border-t border-white/5 bg-[#0F172A]/80 backdrop-blur-xl flex items-center justify-between">
           <div className="flex items-center gap-4">
-             <button className="p-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-white transition-all">
-               <Share2 className="w-4 h-4" />
-             </button>
-             <button className="p-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-white transition-all">
-               <Paperclip className="w-4 h-4" />
-             </button>
+            <button className="p-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-white transition-all">
+              <Share2 className="w-4 h-4" />
+            </button>
+            <button className="p-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-white transition-all">
+              <Paperclip className="w-4 h-4" />
+            </button>
           </div>
           <button
             onClick={closeTask}
@@ -323,7 +315,15 @@ export function TaskDetailPanel() {
   );
 }
 
-function ParamItem({ label, icon, children }: { label: string; icon: React.ReactElement; children: React.ReactNode }) {
+function ParamItem({
+  label,
+  icon,
+  children,
+}: {
+  label: string;
+  icon: React.ReactElement;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">
@@ -338,17 +338,23 @@ function ParamItem({ label, icon, children }: { label: string; icon: React.React
 function SubtaskItem({ id, label, completed }: { id: string; label: string; completed?: boolean }) {
   return (
     <div className="flex items-center gap-4 group cursor-pointer p-1 rounded-xl transition-all">
-      <div className={cn(
-        "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all",
-        completed ? "bg-emerald-500 border-emerald-500" : "bg-transparent border-white/10 group-hover:border-emerald-500/50"
-      )}>
+      <div
+        className={cn(
+          "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all",
+          completed
+            ? "bg-emerald-500 border-emerald-500"
+            : "bg-transparent border-white/10 group-hover:border-emerald-500/50"
+        )}
+      >
         {completed && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
       </div>
       <div className="flex flex-col">
-        <span className={cn(
-          "text-xs font-bold transition-all",
-          completed ? "text-slate-500 line-through" : "text-slate-300 group-hover:text-white"
-        )}>
+        <span
+          className={cn(
+            "text-xs font-bold transition-all",
+            completed ? "text-slate-500 line-through" : "text-slate-300 group-hover:text-white"
+          )}
+        >
           {label}
         </span>
         <span className="text-[8px] font-mono text-slate-600 uppercase tracking-tighter">{id}</span>
@@ -366,7 +372,9 @@ function AttachmentItem({ name, size, type }: { name: string; size: string; type
         </div>
         <div className="flex flex-col">
           <span className="text-xs font-bold text-slate-200">{name}</span>
-          <span className="text-[9px] font-black text-slate-600 uppercase">{size} • {type}</span>
+          <span className="text-[9px] font-black text-slate-600 uppercase">
+            {size} • {type}
+          </span>
         </div>
       </div>
       <MoreVertical className="w-4 h-4 text-slate-700 hover:text-white" />
@@ -377,7 +385,12 @@ function AttachmentItem({ name, size, type }: { name: string; size: string; type
 function ActivityLogEntry({ user, initials, color, action, target, time }: any) {
   return (
     <div className="flex items-start gap-4">
-      <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-black text-white shrink-0 shadow-lg", color)}>
+      <div
+        className={cn(
+          "w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-black text-white shrink-0 shadow-lg",
+          color
+        )}
+      >
         {initials}
       </div>
       <div className="flex flex-col gap-1">
@@ -388,7 +401,9 @@ function ActivityLogEntry({ user, initials, color, action, target, time }: any) 
             {target}
           </span>
         </p>
-        <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">{time}</span>
+        <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">
+          {time}
+        </span>
       </div>
     </div>
   );
@@ -397,13 +412,22 @@ function ActivityLogEntry({ user, initials, color, action, target, time }: any) 
 function CommentEntry({ user, initials, color, message, time }: any) {
   return (
     <div className="flex gap-4">
-      <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-black text-white shrink-0 shadow-lg", color)}>
+      <div
+        className={cn(
+          "w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-black text-white shrink-0 shadow-lg",
+          color
+        )}
+      >
         {initials}
       </div>
       <div className="flex-1 space-y-2">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-black text-slate-200 uppercase tracking-widest">{user}</span>
-          <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-auto">{time}</span>
+          <span className="text-[10px] font-black text-slate-200 uppercase tracking-widest">
+            {user}
+          </span>
+          <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-auto">
+            {time}
+          </span>
         </div>
         <div className="p-4 rounded-2xl rounded-tl-none bg-white/[0.03] border border-white/5 text-sm text-slate-400 leading-relaxed font-medium">
           {message}

@@ -13,7 +13,7 @@ export const tasks = pgTable("tasks", {
   priority: varchar("priority", { length: 20 }).default("medium").notNull(), // low, medium, high
   dueDate: timestamp("due_date"),
   assigneeId: varchar("assignee_id", { length: 255 }).references(() => employees.id),
-  
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

@@ -42,7 +42,7 @@ async function getEmbeddingModel(apiKey: string): Promise<string> {
     "gemini-embedding-2",
     "gemini-embedding-2-preview",
     "embedding-001",
-    "text-embedding-preview-0409"
+    "text-embedding-preview-0409",
   ];
 
   try {
@@ -52,7 +52,7 @@ async function getEmbeddingModel(apiKey: string): Promise<string> {
     );
     if (!res.ok) throw new Error("Could not list models");
 
-    const data = await res.json() as any;
+    const data = (await res.json()) as any;
     const models: any[] = data?.models || [];
     const embedModels = models
       .filter((m: any) => m.supportedGenerationMethods?.includes("embedContent"))
@@ -103,11 +103,12 @@ async function embedText(text: string, apiKey: string): Promise<number[]> {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const msg = (errorData as any)?.error?.message || `HTTP ${response.status} ${response.statusText}`;
+    const msg =
+      (errorData as any)?.error?.message || `HTTP ${response.status} ${response.statusText}`;
     throw new Error(`Gemini Embedding API error (model: ${model}): ${msg}`);
   }
 
-  const data = await response.json() as any;
+  const data = (await response.json()) as any;
   const values: number[] = data?.embedding?.values;
   if (!values || values.length === 0) {
     throw new Error("Gemini returned an empty embedding vector.");
@@ -131,11 +132,12 @@ async function generateContent(prompt: string, apiKey: string, model: string): P
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const msg = (errorData as any)?.error?.message || `HTTP ${response.status} ${response.statusText}`;
+    const msg =
+      (errorData as any)?.error?.message || `HTTP ${response.status} ${response.statusText}`;
     throw new Error(`Gemini Chat API error: ${msg}`);
   }
 
-  const data = await response.json() as any;
+  const data = (await response.json()) as any;
   return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
 }
 
@@ -280,7 +282,8 @@ export async function embedKnowledgeDocumentAction(
     if (!geminiCfg) {
       return {
         success: false,
-        error: "Gemini API is not configured. Please set up your API key in Settings → Integrations.",
+        error:
+          "Gemini API is not configured. Please set up your API key in Settings → Integrations.",
       };
     }
 
@@ -290,7 +293,10 @@ export async function embedKnowledgeDocumentAction(
 
     const chunks = splitIntoChunks(fullText, 500);
     if (chunks.length === 0) {
-      return { success: false, error: "Could not extract any content chunks from the provided text." };
+      return {
+        success: false,
+        error: "Could not extract any content chunks from the provided text.",
+      };
     }
 
     // Embed each chunk via native fetch (no SDK dependency)
@@ -355,7 +361,12 @@ export async function embedKnowledgeDocumentAction(
 export async function askKnowledgeBaseAction(question: string): Promise<{
   success: boolean;
   answer?: string;
-  sources?: Array<{ documentId: string; title: string; contentPreview: string; similarity: number }>;
+  sources?: Array<{
+    documentId: string;
+    title: string;
+    contentPreview: string;
+    similarity: number;
+  }>;
   error?: string;
   noResults?: boolean;
 }> {
@@ -416,13 +427,18 @@ export async function askKnowledgeBaseAction(question: string): Promise<{
     const docRecords = await db
       .select({ id: knowledgeDocuments.id, title: knowledgeDocuments.title })
       .from(knowledgeDocuments)
-      .where(sql`${knowledgeDocuments.id} = ANY(${sql.raw(`ARRAY[${docIds.map((d) => `'${d}'`).join(",")}]`)})`);
+      .where(
+        sql`${knowledgeDocuments.id} = ANY(${sql.raw(`ARRAY[${docIds.map((d) => `'${d}'`).join(",")}]`)})`
+      );
 
     const docTitleMap = Object.fromEntries(docRecords.map((d) => [d.id, d.title]));
 
     // Build RAG context
     const contextText = rows
-      .map((r: any, i: number) => `[Source ${i + 1}: ${docTitleMap[r.document_id] || "Unknown"}]\n${r.content}`)
+      .map(
+        (r: any, i: number) =>
+          `[Source ${i + 1}: ${docTitleMap[r.document_id] || "Unknown"}]\n${r.content}`
+      )
       .join("\n\n---\n\n");
 
     const ragPrompt = `You are QuantumBlaze ERP's intelligent Knowledge Base Assistant.
@@ -477,9 +493,7 @@ export async function checkKnowledgeBaseReadyAction() {
       .from(knowledgeDocuments)
       .where(isNull(knowledgeDocuments.deletedAt));
 
-    const [chunkCountResult] = await db
-      .select({ value: count() })
-      .from(knowledgeChunks);
+    const [chunkCountResult] = await db.select({ value: count() }).from(knowledgeChunks);
 
     return {
       success: true,
@@ -510,7 +524,8 @@ export async function seedDefaultKnowledgeAction() {
     if (!geminiCfg) {
       return {
         success: false,
-        error: "Gemini API is not configured. Please set up your API key in Settings → Integrations first.",
+        error:
+          "Gemini API is not configured. Please set up your API key in Settings → Integrations first.",
       };
     }
 
@@ -577,4 +592,3 @@ export async function seedDefaultKnowledgeAction() {
     };
   }
 }
-

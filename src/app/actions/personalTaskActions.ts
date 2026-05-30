@@ -129,13 +129,11 @@ export async function updatePersonalTaskAction(id: string, data: Partial<Persona
     if (data.description !== undefined) updateFields.description = data.description;
     if (data.priority !== undefined) updateFields.priority = data.priority;
     if (data.status !== undefined) updateFields.status = data.status;
-    if (data.dueDate !== undefined) updateFields.dueDate = data.dueDate ? new Date(data.dueDate) : null;
+    if (data.dueDate !== undefined)
+      updateFields.dueDate = data.dueDate ? new Date(data.dueDate) : null;
     if (data.checklist !== undefined) updateFields.checklist = data.checklist;
 
-    await db
-      .update(personalTasks)
-      .set(updateFields)
-      .where(eq(personalTasks.id, id));
+    await db.update(personalTasks).set(updateFields).where(eq(personalTasks.id, id));
 
     revalidatePath("/dashboard/profile");
     return { success: true };
@@ -165,9 +163,7 @@ export async function deletePersonalTaskAction(id: string) {
       return { success: false, error: "Task not found or access denied." };
     }
 
-    await db
-      .delete(personalTasks)
-      .where(eq(personalTasks.id, id));
+    await db.delete(personalTasks).where(eq(personalTasks.id, id));
 
     revalidatePath("/dashboard/profile");
     return { success: true };

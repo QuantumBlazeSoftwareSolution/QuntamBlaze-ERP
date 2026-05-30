@@ -2,7 +2,18 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, UserPlus, HelpCircle, MapPin, DollarSign, Users, Info, Sparkles, Check, AlertCircle } from "lucide-react";
+import {
+  X,
+  UserPlus,
+  HelpCircle,
+  MapPin,
+  DollarSign,
+  Users,
+  Info,
+  Sparkles,
+  Check,
+  AlertCircle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createCandidateAction } from "@/app/actions/hrActions";
 import { Employee, Job } from "@/types/hr";
@@ -18,7 +29,13 @@ interface NewCandidateModalProps {
 const SOURCES = ["LinkedIn", "Referral", "Website", "Agency", "Direct", "Job Board"];
 const PIPELINE_STAGES = ["Applied", "Screening", "Technical", "Final", "Offer"];
 
-export function NewCandidateModal({ isOpen, onClose, onSuccess, jobs, employees }: NewCandidateModalProps) {
+export function NewCandidateModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  jobs,
+  employees,
+}: NewCandidateModalProps) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");

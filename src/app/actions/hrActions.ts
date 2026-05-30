@@ -5,7 +5,11 @@ import { revalidatePath } from "next/cache";
 import { incrementAndGet } from "@/lib/db/idTracker";
 
 import { db } from "@/lib/db";
-import { candidates as candidatesTable, jobs as jobsTable, employees as employeesTable } from "@/lib/db/schema";
+import {
+  candidates as candidatesTable,
+  jobs as jobsTable,
+  employees as employeesTable,
+} from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { MOCK_JOBS, MOCK_CANDIDATES } from "@/lib/mockData/hr";
 
@@ -27,11 +31,15 @@ export async function createEmployeeAction(data: {
     }
 
     const name = `${firstName} ${lastName}`;
-    
+
     // Generate formatted ID: EMP-DEPT-YY-SEQ
-    const deptCode = department.toUpperCase().replace(/[^A-Z]/g, "").substring(0, 3) || "GEN";
+    const deptCode =
+      department
+        .toUpperCase()
+        .replace(/[^A-Z]/g, "")
+        .substring(0, 3) || "GEN";
     const year = new Date().getFullYear().toString().substring(2);
-    
+
     const seq = await incrementAndGet(`EMP_${deptCode}_${year}`, `EMP-${deptCode}-${year}`);
     const id = `EMP-${deptCode}-${year}-${seq.toString().padStart(3, "0")}`;
 
@@ -206,8 +214,10 @@ export async function getRecruitmentDashboardDataAction() {
 
     // 3. Auto-seed if database is empty (no jobs)
     if (dbJobs.length === 0) {
-      console.log("🌱 Database recruitment tables are empty. Auto-seeding mock jobs & candidates...");
-      
+      console.log(
+        "🌱 Database recruitment tables are empty. Auto-seeding mock jobs & candidates..."
+      );
+
       // Get all employee IDs currently in the DB to prevent foreign key errors
       const currentEmployees = await db.select({ id: employeesTable.id }).from(employeesTable);
       const activeEmployeeIds = new Set(currentEmployees.map((e) => e.id));
@@ -397,7 +407,10 @@ export async function createCandidateAction(data: {
     } = data;
 
     if (!jobId || !firstName || !lastName || !email || !source) {
-      return { success: false, error: "Missing required fields (First/Last Name, Email, Job, and Source are required)." };
+      return {
+        success: false,
+        error: "Missing required fields (First/Last Name, Email, Job, and Source are required).",
+      };
     }
 
     // Generate formatted ID: CND-YY-Seq (e.g. CND-26-001)
@@ -519,4 +532,3 @@ export async function createJobAction(data: {
     return { success: false, error: error.message || "Failed to create job opening." };
   }
 }
-

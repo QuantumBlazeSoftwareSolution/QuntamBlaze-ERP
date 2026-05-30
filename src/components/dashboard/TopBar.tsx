@@ -145,7 +145,7 @@ export const TopBar = ({ title }: { title: string }) => {
                     <p className="text-xs text-text-muted truncate mt-0.5 font-mono">
                       {session?.email || "jane@company.com"}
                     </p>
-                    
+
                     {/* Role Pill Badge */}
                     <div className="flex items-center gap-1.5 mt-3">
                       <span
@@ -177,7 +177,7 @@ export const TopBar = ({ title }: { title: string }) => {
                       <User className="w-4 h-4 text-text-secondary" />
                       <span>View Profile</span>
                     </button>
-                    
+
                     <button
                       onClick={() => {
                         setShowDropdown(false);

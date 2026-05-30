@@ -13,7 +13,10 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { askKnowledgeBaseAction, checkKnowledgeBaseReadyAction } from "@/app/actions/knowledgeBaseActions";
+import {
+  askKnowledgeBaseAction,
+  checkKnowledgeBaseReadyAction,
+} from "@/app/actions/knowledgeBaseActions";
 import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer";
 
 interface Source {
@@ -42,7 +45,9 @@ export function AIAssistantChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [kbReady, setKbReady] = useState<{ geminiConfigured: boolean; chunkCount: number } | null>(null);
+  const [kbReady, setKbReady] = useState<{ geminiConfigured: boolean; chunkCount: number } | null>(
+    null
+  );
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -110,13 +115,20 @@ export function AIAssistantChat() {
               {kbReady.chunkCount} chunks
             </span>
           )}
-          <div className={cn(
-            "flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border",
-            kbReady?.geminiConfigured
-              ? "text-accent bg-accent/10 border-accent/20"
-              : "text-text-muted bg-page-bg border-divider"
-          )}>
-            <div className={cn("w-1.5 h-1.5 rounded-full", kbReady?.geminiConfigured ? "bg-accent animate-pulse" : "bg-text-muted")} />
+          <div
+            className={cn(
+              "flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border",
+              kbReady?.geminiConfigured
+                ? "text-accent bg-accent/10 border-accent/20"
+                : "text-text-muted bg-page-bg border-divider"
+            )}
+          >
+            <div
+              className={cn(
+                "w-1.5 h-1.5 rounded-full",
+                kbReady?.geminiConfigured ? "bg-accent animate-pulse" : "bg-text-muted"
+              )}
+            />
             {kbReady?.geminiConfigured ? "Online" : "Not Configured"}
           </div>
         </div>
@@ -128,7 +140,13 @@ export function AIAssistantChat() {
           <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
           <div>
             <p className="font-semibold mb-0.5">Gemini AI not configured</p>
-            <p className="text-warning/80">Add your Gemini API key in <a href="/dashboard/settings" className="underline font-medium">Settings → Integrations</a> to enable Ask AI.</p>
+            <p className="text-warning/80">
+              Add your Gemini API key in{" "}
+              <a href="/dashboard/settings" className="underline font-medium">
+                Settings → Integrations
+              </a>{" "}
+              to enable Ask AI.
+            </p>
           </div>
         </div>
       )}
@@ -139,7 +157,13 @@ export function AIAssistantChat() {
           <BookOpen className="w-4 h-4 shrink-0 mt-0.5" />
           <div>
             <p className="font-semibold mb-0.5">Knowledge Base is empty</p>
-            <p className="text-accent/80">Add documents in <a href="/dashboard/knowledge-base" className="underline font-medium">Knowledge Base</a> to start getting AI answers.</p>
+            <p className="text-accent/80">
+              Add documents in{" "}
+              <a href="/dashboard/knowledge-base" className="underline font-medium">
+                Knowledge Base
+              </a>{" "}
+              to start getting AI answers.
+            </p>
           </div>
         </div>
       )}
@@ -152,26 +176,33 @@ export function AIAssistantChat() {
               key={msg.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className={cn("flex gap-3 max-w-[90%]", msg.sender === "user" ? "ml-auto flex-row-reverse" : "")}
+              className={cn(
+                "flex gap-3 max-w-[90%]",
+                msg.sender === "user" ? "ml-auto flex-row-reverse" : ""
+              )}
             >
-              <div className={cn(
-                "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border",
-                msg.sender === "ai"
-                  ? "bg-accent/10 text-accent border-accent/20"
-                  : "bg-sidebar-bg text-white border-border"
-              )}>
+              <div
+                className={cn(
+                  "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border",
+                  msg.sender === "ai"
+                    ? "bg-accent/10 text-accent border-accent/20"
+                    : "bg-sidebar-bg text-white border-border"
+                )}
+              >
                 {msg.sender === "ai" ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
               </div>
 
               <div className="space-y-1.5 flex-1 min-w-0">
-                <div className={cn(
-                  "p-3 rounded-xl text-sm leading-relaxed shadow-sm",
-                  msg.sender === "ai"
-                    ? msg.isError
-                      ? "bg-danger/5 border border-danger/20 text-danger rounded-tl-sm"
-                      : "bg-page-bg border border-divider text-text-primary rounded-tl-sm"
-                    : "bg-accent text-white rounded-tr-sm"
-                )}>
+                <div
+                  className={cn(
+                    "p-3 rounded-xl text-sm leading-relaxed shadow-sm",
+                    msg.sender === "ai"
+                      ? msg.isError
+                        ? "bg-danger/5 border border-danger/20 text-danger rounded-tl-sm"
+                        : "bg-page-bg border border-divider text-text-primary rounded-tl-sm"
+                      : "bg-accent text-white rounded-tr-sm"
+                  )}
+                >
                   {msg.sender === "ai" && !msg.isError ? (
                     <MarkdownRenderer
                       text={msg.text}

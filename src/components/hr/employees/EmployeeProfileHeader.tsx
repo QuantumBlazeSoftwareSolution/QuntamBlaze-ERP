@@ -86,7 +86,16 @@ export function EmployeeProfileHeader({ employee, onEditClick }: EmployeeProfile
               </div>
               <div className="flex items-center gap-2 text-[#94A3B8]">
                 <Calendar className="w-4 h-4" />
-                <span>Joined {employee.joinDate ? new Date(employee.joinDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "N/A"}</span>
+                <span>
+                  Joined{" "}
+                  {employee.joinDate
+                    ? new Date(employee.joinDate).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })
+                    : "N/A"}
+                </span>
               </div>
             </div>
 

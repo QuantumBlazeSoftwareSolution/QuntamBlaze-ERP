@@ -11,11 +11,7 @@ export interface LogDetails {
   newValue?: any;
 }
 
-export async function logAction(
-  entityId: string,
-  entityType: string,
-  details: LogDetails
-) {
+export async function logAction(entityId: string, entityType: string, details: LogDetails) {
   try {
     await db.insert(systemLog).values({
       id: uuidv4(),

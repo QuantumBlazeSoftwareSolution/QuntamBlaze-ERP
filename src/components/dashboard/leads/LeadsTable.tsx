@@ -50,8 +50,7 @@ export function LeadsTable({ statusFilter, data }: LeadsTableProps) {
   const [selectedLead, setSelectedLead] = useState<any | null>(null);
 
   const filtered = useMemo(
-    () =>
-      statusFilter === "all" ? data : data.filter((l) => l.status === statusFilter),
+    () => (statusFilter === "all" ? data : data.filter((l) => l.status === statusFilter)),
     [statusFilter, data]
   );
 
@@ -206,7 +205,8 @@ export function LeadsTable({ statusFilter, data }: LeadsTableProps) {
             {filtered.length} lead{filtered.length !== 1 ? "s" : ""}
           </span>
           <span className="text-[12px] font-mono font-bold text-text-secondary">
-            Pipeline: {formatCurrency(filtered.reduce((s, l) => s + Number(l.estimatedValue || 0), 0))}
+            Pipeline:{" "}
+            {formatCurrency(filtered.reduce((s, l) => s + Number(l.estimatedValue || 0), 0))}
           </span>
         </div>
       </div>

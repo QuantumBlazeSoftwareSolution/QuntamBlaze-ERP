@@ -14,7 +14,7 @@ export async function GET() {
   const headcountByDept = Object.entries(deptCounts).map(([name, count], i) => ({
     name,
     count,
-    color: ["#3B82F6", "#F59E0B", "#8B5CF6", "#EC4899", "#10B981", "#06B6D4", "#EF4444"][i % 7]
+    color: ["#3B82F6", "#F59E0B", "#8B5CF6", "#EC4899", "#10B981", "#06B6D4", "#EF4444"][i % 7],
   }));
 
   // Stubbed others for now

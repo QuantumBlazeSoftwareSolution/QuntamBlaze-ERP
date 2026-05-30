@@ -33,9 +33,6 @@ export const clientsCrud = {
   },
 
   delete: async (id: string) => {
-    return db
-      .update(clients)
-      .set({ deletedAt: new Date() })
-      .where(eq(clients.id, id));
+    return db.update(clients).set({ deletedAt: new Date() }).where(eq(clients.id, id));
   },
 };

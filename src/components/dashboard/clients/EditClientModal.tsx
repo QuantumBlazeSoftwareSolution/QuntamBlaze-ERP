@@ -12,14 +12,7 @@ interface EditClientModalProps {
   client: any;
 }
 
-const INDUSTRIES = [
-  "Technology",
-  "Healthcare",
-  "Finance",
-  "Manufacturing",
-  "Retail",
-  "Other",
-];
+const INDUSTRIES = ["Technology", "Healthcare", "Finance", "Manufacturing", "Retail", "Other"];
 
 export function EditClientModal({ isOpen, onClose, client }: EditClientModalProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -27,23 +20,23 @@ export function EditClientModal({ isOpen, onClose, client }: EditClientModalProp
   const [showCustomIndustry, setShowCustomIndustry] = useState(
     !INDUSTRIES.includes(client?.industry) && client?.industry !== "Unknown"
   );
-  
+
   if (!isOpen || !client) return null;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-    
+
     const formData = new FormData(e.currentTarget);
     const result = await updateClientAction(client.id, formData);
-    
+
     if (result.success) {
       onClose();
     } else {
       setError(result.error || "Failed to update client.");
     }
-    
+
     setIsLoading(false);
   }
 
@@ -72,7 +65,9 @@ export function EditClientModal({ isOpen, onClose, client }: EditClientModalProp
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-text-primary">Edit Client Profile</h2>
-                  <p className="text-sm text-text-secondary mt-0.5">Update details for {client.name}</p>
+                  <p className="text-sm text-text-secondary mt-0.5">
+                    Update details for {client.name}
+                  </p>
                 </div>
               </div>
               <button
@@ -90,7 +85,7 @@ export function EditClientModal({ isOpen, onClose, client }: EditClientModalProp
                     {error}
                   </div>
                 )}
-                
+
                 <div className="grid grid-cols-2 gap-6">
                   <div className="col-span-2">
                     <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">
@@ -111,12 +106,16 @@ export function EditClientModal({ isOpen, onClose, client }: EditClientModalProp
                     </label>
                     <select
                       name="industry"
-                      defaultValue={INDUSTRIES.includes(client.industry) ? client.industry : "Other"}
+                      defaultValue={
+                        INDUSTRIES.includes(client.industry) ? client.industry : "Other"
+                      }
                       onChange={(e) => setShowCustomIndustry(e.target.value === "Other")}
                       className="w-full px-4 py-3 rounded-xl bg-page-bg border border-border text-text-primary text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all appearance-none"
                     >
                       {INDUSTRIES.map((ind) => (
-                        <option key={ind} value={ind}>{ind}</option>
+                        <option key={ind} value={ind}>
+                          {ind}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -134,7 +133,9 @@ export function EditClientModal({ isOpen, onClose, client }: EditClientModalProp
                         </label>
                         <input
                           name="customIndustry"
-                          defaultValue={!INDUSTRIES.includes(client.industry) ? client.industry : ""}
+                          defaultValue={
+                            !INDUSTRIES.includes(client.industry) ? client.industry : ""
+                          }
                           required={showCustomIndustry}
                           className="w-full px-4 py-3 rounded-xl bg-page-bg border border-border text-text-primary text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
                           placeholder="e.g. Aerospace"

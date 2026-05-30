@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   try {
     const rawBody = await request.text();
     const signature = request.headers.get("x-hub-signature-256") || "";
-    
+
     // Parse the payload to identify the repository
     const payload = JSON.parse(rawBody);
     const repoName = payload.repository?.name;
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     if (secret) {
       const hmac = crypto.createHmac("sha256", secret);
       const computedSignature = `sha256=${hmac.update(rawBody).digest("hex")}`;
-      
+
       try {
         if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(computedSignature))) {
           console.warn("GitHub Webhook signature verification failed.");
@@ -45,7 +45,10 @@ export async function POST(request: NextRequest) {
         }
       } catch (sigErr) {
         console.warn("Error comparing webhook signatures:", sigErr);
-        return NextResponse.json({ error: "Signature mismatch verification error." }, { status: 401 });
+        return NextResponse.json(
+          { error: "Signature mismatch verification error." },
+          { status: 401 }
+        );
       }
     }
 
@@ -120,6 +123,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (err: any) {
     console.error("Failed to process GitHub webhook:", err);
-    return NextResponse.json({ error: err.message || "Failed to process webhook" }, { status: 500 });
+    return NextResponse.json(
+      { error: err.message || "Failed to process webhook" },
+      { status: 500 }
+    );
   }
 }

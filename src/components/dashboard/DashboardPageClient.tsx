@@ -29,11 +29,11 @@ interface DashboardPageClientProps {
   activityFeedData: any[];
 }
 
-export default function DashboardPageClient({ 
-  statsData, 
-  projectHealthData, 
-  statusDistribution, 
-  activityFeedData 
+export default function DashboardPageClient({
+  statsData,
+  projectHealthData,
+  statusDistribution,
+  activityFeedData,
 }: DashboardPageClientProps) {
   return (
     <motion.div

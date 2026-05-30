@@ -44,10 +44,7 @@ export const projectsCrud = {
   },
 
   delete: async (id: string) => {
-    return db
-      .update(projects)
-      .set({ deletedAt: new Date() })
-      .where(eq(projects.id, id));
+    return db.update(projects).set({ deletedAt: new Date() }).where(eq(projects.id, id));
   },
 
   getMilestones: async (projectId: string) => {

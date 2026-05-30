@@ -30,7 +30,12 @@ export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientPr
     .sort((a, b) => b[1] - a[1])
     .slice(0, 4);
 
-  const deptColors = ["border-blue-500", "border-violet-500", "border-pink-500", "border-emerald-500"];
+  const deptColors = [
+    "border-blue-500",
+    "border-violet-500",
+    "border-pink-500",
+    "border-emerald-500",
+  ];
 
   return (
     <div className="flex-1 bg-[#F8FAFC] min-h-screen flex flex-col">
@@ -90,7 +95,12 @@ export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientPr
         {view !== "chart" && (
           <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6">
             {topDepts.map(([dept, count], i) => (
-              <QuickStat key={dept} label={dept} value={String(count)} color={deptColors[i] || "border-slate-500"} />
+              <QuickStat
+                key={dept}
+                label={dept}
+                value={String(count)}
+                color={deptColors[i] || "border-slate-500"}
+              />
             ))}
           </div>
         )}

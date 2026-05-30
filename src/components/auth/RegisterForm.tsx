@@ -157,7 +157,13 @@ export const RegisterForm = () => {
       </motion.div>
 
       {/* Luxury Role Selector */}
-      <motion.div custom={3} initial="hidden" animate="visible" variants={staggerVariants} className="space-y-2">
+      <motion.div
+        custom={3}
+        initial="hidden"
+        animate="visible"
+        variants={staggerVariants}
+        className="space-y-2"
+      >
         <label className="block text-text-primary text-sm font-medium flex items-center gap-1.5">
           <Shield className="w-4 h-4 text-accent" />
           <span>System Role Assignment</span>

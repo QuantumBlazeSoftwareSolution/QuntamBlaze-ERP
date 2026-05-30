@@ -97,44 +97,47 @@ export function AskAIWidget() {
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  const handleSend = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isTyping) return;
+  const handleSend = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!input.trim() || isTyping) return;
 
-    const userMsg: ChatMessage = { id: Date.now().toString(), sender: "user", text: input };
-    setMessages((prev) => [...prev, userMsg]);
-    const question = input;
-    setInput("");
-    setIsTyping(true);
+      const userMsg: ChatMessage = { id: Date.now().toString(), sender: "user", text: input };
+      setMessages((prev) => [...prev, userMsg]);
+      const question = input;
+      setInput("");
+      setIsTyping(true);
 
-    try {
-      const res = await askKnowledgeBaseAction(question);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          sender: "ai",
-          text: res.success
-            ? res.answer || "I couldn't generate a response."
-            : res.error || "Something went wrong.",
-          sources: res.success ? res.sources : undefined,
-          isError: !res.success,
-        },
-      ]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          sender: "ai",
-          text: "An unexpected error occurred. Please try again.",
-          isError: true,
-        },
-      ]);
-    } finally {
-      setIsTyping(false);
-    }
-  }, [input, isTyping]);
+      try {
+        const res = await askKnowledgeBaseAction(question);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            sender: "ai",
+            text: res.success
+              ? res.answer || "I couldn't generate a response."
+              : res.error || "Something went wrong.",
+            sources: res.success ? res.sources : undefined,
+            isError: !res.success,
+          },
+        ]);
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            sender: "ai",
+            text: "An unexpected error occurred. Please try again.",
+            isError: true,
+          },
+        ]);
+      } finally {
+        setIsTyping(false);
+      }
+    },
+    [input, isTyping]
+  );
 
   return (
     <div className="fixed bottom-6 right-6 z-[500] flex flex-col items-end gap-3" ref={panelRef}>
@@ -147,7 +150,9 @@ export function AskAIWidget() {
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", stiffness: 350, damping: 30 }}
             className="w-[380px] max-h-[560px] bg-white/95 backdrop-blur-xl border border-divider rounded-2xl shadow-2xl flex flex-col overflow-hidden"
-            style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(var(--color-accent)/0.1)" }}
+            style={{
+              boxShadow: "0 8px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(var(--color-accent)/0.1)",
+            }}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3.5 border-b border-divider bg-gradient-to-r from-accent/8 to-transparent shrink-0">
@@ -168,10 +173,12 @@ export function AskAIWidget() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <div className={cn(
-                  "w-1.5 h-1.5 rounded-full mr-1",
-                  kbStatus?.geminiConfigured ? "bg-[#10b981] animate-pulse" : "bg-text-muted"
-                )} />
+                <div
+                  className={cn(
+                    "w-1.5 h-1.5 rounded-full mr-1",
+                    kbStatus?.geminiConfigured ? "bg-[#10b981] animate-pulse" : "bg-text-muted"
+                  )}
+                />
                 <button
                   onClick={() => setOpen(false)}
                   className="p-1.5 rounded-lg hover:bg-divider text-text-muted hover:text-text-primary transition-colors"
@@ -216,24 +223,32 @@ export function AskAIWidget() {
                     animate={{ opacity: 1, y: 0 }}
                     className={cn("flex gap-2.5", msg.sender === "user" ? "flex-row-reverse" : "")}
                   >
-                    <div className={cn(
-                      "w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border",
-                      msg.sender === "ai"
-                        ? "bg-accent/10 text-accent border-accent/20"
-                        : "bg-sidebar-bg text-white border-border"
-                    )}>
-                      {msg.sender === "ai" ? <Bot className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+                    <div
+                      className={cn(
+                        "w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border",
+                        msg.sender === "ai"
+                          ? "bg-accent/10 text-accent border-accent/20"
+                          : "bg-sidebar-bg text-white border-border"
+                      )}
+                    >
+                      {msg.sender === "ai" ? (
+                        <Bot className="w-3.5 h-3.5" />
+                      ) : (
+                        <User className="w-3.5 h-3.5" />
+                      )}
                     </div>
 
                     <div className="space-y-1 flex-1 min-w-0">
-                      <div className={cn(
-                        "px-3 py-2 rounded-xl text-[12px] leading-relaxed",
-                        msg.sender === "ai"
-                          ? msg.isError
-                            ? "bg-danger/5 border border-danger/20 text-danger rounded-tl-sm"
-                            : "bg-page-bg border border-divider text-text-primary rounded-tl-sm"
-                          : "bg-accent text-white rounded-tr-sm"
-                      )}>
+                      <div
+                        className={cn(
+                          "px-3 py-2 rounded-xl text-[12px] leading-relaxed",
+                          msg.sender === "ai"
+                            ? msg.isError
+                              ? "bg-danger/5 border border-danger/20 text-danger rounded-tl-sm"
+                              : "bg-page-bg border border-divider text-text-primary rounded-tl-sm"
+                            : "bg-accent text-white rounded-tr-sm"
+                        )}
+                      >
                         {msg.sender === "ai" && !msg.isError ? (
                           <MarkdownRenderer
                             text={msg.text}
@@ -300,9 +315,7 @@ export function AskAIWidget() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder={
-                    kbStatus?.geminiConfigured
-                      ? "Ask anything..."
-                      : "Configure Gemini first..."
+                    kbStatus?.geminiConfigured ? "Ask anything..." : "Configure Gemini first..."
                   }
                   disabled={!kbStatus?.geminiConfigured || isTyping}
                   className="w-full bg-page-bg border border-divider rounded-xl h-10 pl-3.5 pr-10 text-[12px] text-text-primary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all placeholder:text-text-muted disabled:opacity-50"
@@ -330,9 +343,7 @@ export function AskAIWidget() {
         onClick={() => setOpen((v) => !v)}
         className={cn(
           "w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-all relative",
-          open
-            ? "bg-text-primary text-white"
-            : "bg-accent hover:bg-accent-hover text-white"
+          open ? "bg-text-primary text-white" : "bg-accent hover:bg-accent-hover text-white"
         )}
         style={{
           boxShadow: open

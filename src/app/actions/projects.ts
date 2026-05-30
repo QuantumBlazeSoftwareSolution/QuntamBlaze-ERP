@@ -15,7 +15,10 @@ export async function previewProjectIdAction(clientName: string) {
   }
 
   // Same logic as in generateProjectId / generateNextId
-  let abbr = clientName.replace(/[^a-zA-Z0-9]/g, "").slice(0, 4).toUpperCase();
+  let abbr = clientName
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .slice(0, 4)
+    .toUpperCase();
   if (abbr.length === 0) {
     abbr = "NEWX";
   } else if (abbr.length < 4) {
@@ -24,7 +27,7 @@ export async function previewProjectIdAction(clientName: string) {
 
   // Get project counter sequence preview
   const nextSeq = await previewNextSequence("PROJECT");
-  
+
   // Format the ID using our idEngine
   return generateNextId("PRJ", nextSeq, { compAbbr: abbr });
 }
@@ -38,15 +41,18 @@ export async function createProjectAction(data: ProjectFormData) {
     const client = await db.query.clients.findFirst({
       where: eq(clients.id, parsed.clientId),
     });
-    
+
     const clientName = client?.name || "CORP";
-    let abbr = clientName.replace(/[^a-zA-Z0-9]/g, "").slice(0, 4).toUpperCase();
+    let abbr = clientName
+      .replace(/[^a-zA-Z0-9]/g, "")
+      .slice(0, 4)
+      .toUpperCase();
     if (abbr.length === 0) abbr = "NEWX";
     else if (abbr.length < 4) abbr = abbr.padEnd(4, "X");
 
     // 3. Get the transaction-safe sequence ID
     const nextSeq = await incrementAndGet("PROJECT", "PRJ");
-    
+
     // 4. Generate the final project ID
     const projectId = generateNextId("PRJ", nextSeq, { compAbbr: abbr });
 

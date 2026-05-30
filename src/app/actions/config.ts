@@ -44,11 +44,14 @@ export async function getSystemConfigsAction() {
     // Seed missing defaults dynamically in database
     for (const key of Object.keys(DEFAULT_CONFIGS)) {
       if (!(key in configs)) {
-        await db.insert(systemConfig).values({
-          key,
-          value: DEFAULT_CONFIGS[key],
-          updatedAt: new Date(),
-        }).onConflictDoNothing();
+        await db
+          .insert(systemConfig)
+          .values({
+            key,
+            value: DEFAULT_CONFIGS[key],
+            updatedAt: new Date(),
+          })
+          .onConflictDoNothing();
         configs[key] = DEFAULT_CONFIGS[key];
       }
     }
@@ -56,18 +59,18 @@ export async function getSystemConfigsAction() {
     return { success: true, configs };
   } catch (error: any) {
     console.error("Failed to retrieve system configs:", error);
-    return { success: false, error: "Database error while fetching configurations.", configs: DEFAULT_CONFIGS };
+    return {
+      success: false,
+      error: "Database error while fetching configurations.",
+      configs: DEFAULT_CONFIGS,
+    };
   }
 }
 
 export async function saveSystemConfigAction(key: string, value: any) {
   try {
     // 1. Fetch previous value for audit logging
-    const existing = await db
-      .select()
-      .from(systemConfig)
-      .where(eq(systemConfig.key, key))
-      .limit(1);
+    const existing = await db.select().from(systemConfig).where(eq(systemConfig.key, key)).limit(1);
 
     const previousValue = existing.length > 0 ? existing[0].value : null;
 

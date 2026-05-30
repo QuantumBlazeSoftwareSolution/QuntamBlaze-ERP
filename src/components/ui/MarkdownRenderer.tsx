@@ -93,10 +93,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
               `h${Math.min(level + 1, 6)}`,
               {
                 key: blockIdx,
-                className: cn(
-                  "text-text-primary mt-3 mb-1 font-semibold leading-snug",
-                  sizeClass
-                ),
+                className: cn("text-text-primary mt-3 mb-1 font-semibold leading-snug", sizeClass),
               },
               renderInline(content)
             );
@@ -150,11 +147,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         }
 
         // 4. Standalone paragraph with internal lists separated by single \n
-        if (
-          trimmed.includes("\n* ") ||
-          trimmed.includes("\n- ") ||
-          trimmed.includes("\n1. ")
-        ) {
+        if (trimmed.includes("\n* ") || trimmed.includes("\n- ") || trimmed.includes("\n1. ")) {
           const lines = trimmed.split("\n");
           return (
             <div key={blockIdx} className="space-y-1">
@@ -209,10 +202,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         return (
           <p
             key={blockIdx}
-            className={cn(
-              "text-[13px] leading-relaxed text-text-secondary",
-              paragraphClassName
-            )}
+            className={cn("text-[13px] leading-relaxed text-text-secondary", paragraphClassName)}
           >
             {renderInline(trimmed)}
           </p>

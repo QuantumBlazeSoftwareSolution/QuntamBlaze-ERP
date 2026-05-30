@@ -1,10 +1,4 @@
-import {
-  pgTable,
-  varchar,
-  text,
-  integer,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { pgTable, varchar, text, integer, timestamp } from "drizzle-orm/pg-core";
 import { customType } from "drizzle-orm/pg-core";
 
 /**
@@ -22,11 +16,7 @@ const vector = (name: string, config: { dimensions: number }) =>
     },
     fromDriver(value: string): number[] {
       // Postgres returns the vector as a string like "[0.1,0.2,...]"
-      return value
-        .replace(/^\[/, "")
-        .replace(/\]$/, "")
-        .split(",")
-        .map(Number);
+      return value.replace(/^\[/, "").replace(/\]$/, "").split(",").map(Number);
     },
   })(name);
 

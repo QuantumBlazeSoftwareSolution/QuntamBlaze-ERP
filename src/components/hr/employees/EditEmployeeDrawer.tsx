@@ -2,7 +2,23 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, User, Mail, Phone, Briefcase, Building, CreditCard, Loader2, CheckCircle2, AlertCircle, ShieldAlert, MapPin, Calendar, CheckSquare, ChevronDown } from "lucide-react";
+import {
+  X,
+  User,
+  Mail,
+  Phone,
+  Briefcase,
+  Building,
+  CreditCard,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  ShieldAlert,
+  MapPin,
+  Calendar,
+  CheckSquare,
+  ChevronDown,
+} from "lucide-react";
 import { updateEmployeeAction } from "@/app/actions/hrActions";
 import { getEmployeeRolesAction } from "@/app/actions/employeeRoleActions";
 import { cn } from "@/lib/utils";
@@ -39,8 +55,16 @@ export function EditEmployeeDrawer({ isOpen, onClose, employee }: EditEmployeeDr
   useEffect(() => {
     if (isOpen && employee) {
       const deptUpper = employee.department?.toUpperCase() || "";
-      const isStandardDept = ["ENGINEERING", "DESIGN", "PRODUCT", "MARKETING", "SALES", "HR", "FINANCE"].includes(deptUpper);
-      
+      const isStandardDept = [
+        "ENGINEERING",
+        "DESIGN",
+        "PRODUCT",
+        "MARKETING",
+        "SALES",
+        "HR",
+        "FINANCE",
+      ].includes(deptUpper);
+
       setFormData({
         firstName: employee.firstName || "",
         lastName: employee.lastName || "",
@@ -49,11 +73,13 @@ export function EditEmployeeDrawer({ isOpen, onClose, employee }: EditEmployeeDr
         nic: employee.nic || "",
         role: employee.role || "",
         employeeRole: employee.employeeRole || "SE",
-        department: isStandardDept ? deptUpper : (employee.department ? "OTHER" : ""),
-        customDepartment: isStandardDept ? "" : (employee.department || ""),
+        department: isStandardDept ? deptUpper : employee.department ? "OTHER" : "",
+        customDepartment: isStandardDept ? "" : employee.department || "",
         status: employee.status || "Active",
         address: employee.address || "",
-        birthDate: employee.birthDate ? new Date(employee.birthDate).toISOString().split("T")[0] : "",
+        birthDate: employee.birthDate
+          ? new Date(employee.birthDate).toISOString().split("T")[0]
+          : "",
         joinDate: employee.joinDate ? new Date(employee.joinDate).toISOString().split("T")[0] : "",
       });
       setError("");
@@ -77,7 +103,9 @@ export function EditEmployeeDrawer({ isOpen, onClose, employee }: EditEmployeeDr
     }
   }, [isOpen]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setError("");
@@ -92,7 +120,8 @@ export function EditEmployeeDrawer({ isOpen, onClose, employee }: EditEmployeeDr
     try {
       const payload = {
         ...formData,
-        department: formData.department === "OTHER" ? formData.customDepartment : formData.department,
+        department:
+          formData.department === "OTHER" ? formData.customDepartment : formData.department,
         birthDate: formData.birthDate || null,
         joinDate: formData.joinDate || null,
       };
@@ -176,8 +205,10 @@ export function EditEmployeeDrawer({ isOpen, onClose, employee }: EditEmployeeDr
 
                   {/* Section 1: Personal Details */}
                   <div>
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Personal Identity</h4>
-                    
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+                      Personal Identity
+                    </h4>
+
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
@@ -323,8 +354,10 @@ export function EditEmployeeDrawer({ isOpen, onClose, employee }: EditEmployeeDr
 
                   {/* Section 2: Organizational Details */}
                   <div className="border-t border-slate-100 pt-6 mt-6">
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Organizational Role</h4>
-                    
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+                      Organizational Role
+                    </h4>
+
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
@@ -450,7 +483,9 @@ export function EditEmployeeDrawer({ isOpen, onClose, employee }: EditEmployeeDr
                   disabled={loading}
                   className={cn(
                     "flex-1 py-3 bg-[#0F172A] text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all",
-                    loading ? "opacity-70 cursor-not-allowed" : "hover:bg-slate-800 hover:scale-[1.02] shadow-lg shadow-slate-800/25"
+                    loading
+                      ? "opacity-70 cursor-not-allowed"
+                      : "hover:bg-slate-800 hover:scale-[1.02] shadow-lg shadow-slate-800/25"
                   )}
                 >
                   {loading ? (

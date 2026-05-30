@@ -6,7 +6,7 @@ export default async function HRDashboard() {
 
   // Compute stats from real data
   const totalHeadcount = employees.length;
-  const newHires30d = employees.filter(e => {
+  const newHires30d = employees.filter((e) => {
     const joinDate = new Date(e.joinDate || "");
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -90,13 +90,8 @@ export default async function HRDashboard() {
   const deptHeadcountData = Object.entries(deptCounts).map(([name, count], i) => ({
     name,
     count,
-    color: ["#3B82F6", "#F59E0B", "#8B5CF6", "#EC4899", "#10B981", "#06B6D4", "#EF4444"][i % 7]
+    color: ["#3B82F6", "#F59E0B", "#8B5CF6", "#EC4899", "#10B981", "#06B6D4", "#EF4444"][i % 7],
   }));
 
-  return (
-    <HRDashboardClient 
-      hrStats={hrStats}
-      deptHeadcountData={deptHeadcountData}
-    />
-  );
+  return <HRDashboardClient hrStats={hrStats} deptHeadcountData={deptHeadcountData} />;
 }

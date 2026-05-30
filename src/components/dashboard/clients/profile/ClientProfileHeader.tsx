@@ -86,7 +86,7 @@ export function ClientProfileHeader({ client }: ClientProfileHeaderProps) {
             </div>
           </div>
 
-          <button 
+          <button
             onClick={() => setIsEditModalOpen(true)}
             className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-border text-text-primary font-bold text-[13px] rounded-lg hover:bg-white/10 transition-all group"
           >
@@ -96,10 +96,10 @@ export function ClientProfileHeader({ client }: ClientProfileHeaderProps) {
         </div>
       </div>
 
-      <EditClientModal 
-        isOpen={isEditModalOpen} 
-        onClose={() => setIsEditModalOpen(false)} 
-        client={client} 
+      <EditClientModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        client={client}
       />
     </div>
   );

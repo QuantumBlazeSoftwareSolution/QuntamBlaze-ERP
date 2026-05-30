@@ -15,7 +15,10 @@ export default async function DevelopmentDashboardPage() {
   const isConfigured = statusRes.success && statusRes.isConfigured;
   const orgName = statusRes.success && statusRes.isConfigured ? statusRes.orgName : "";
   const isPersonalConnected = personalStatusRes.success && personalStatusRes.isConnected;
-  const personalUsername = personalStatusRes.success && personalStatusRes.isConnected ? personalStatusRes.githubUsername : "";
+  const personalUsername =
+    personalStatusRes.success && personalStatusRes.isConnected
+      ? personalStatusRes.githubUsername
+      : "";
 
   const initialData = dataRes.success
     ? {
@@ -36,19 +39,22 @@ export default async function DevelopmentDashboardPage() {
         <div>
           <h1 className="text-2xl font-bold text-text-primary tracking-tight">Development Suite</h1>
           <p className="text-[13px] text-text-secondary mt-1">
-            Orchestrate GitHub repositories, task branches, collaborators, and issues in one unified command center.
+            Orchestrate GitHub repositories, task branches, collaborators, and issues in one unified
+            command center.
           </p>
         </div>
       </div>
 
-      <Suspense fallback={
-        <div className="flex items-center justify-center p-12 bg-white border border-border rounded-2xl">
-          <div className="flex items-center gap-3 text-text-muted text-[13px]">
-            <RefreshCw className="w-4 h-4 animate-spin text-accent" />
-            Loading Development Workspace...
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center p-12 bg-white border border-border rounded-2xl">
+            <div className="flex items-center gap-3 text-text-muted text-[13px]">
+              <RefreshCw className="w-4 h-4 animate-spin text-accent" />
+              Loading Development Workspace...
+            </div>
           </div>
-        </div>
-      }>
+        }
+      >
         <DevelopmentClient
           isConfigured={isConfigured || false}
           orgName={orgName || ""}

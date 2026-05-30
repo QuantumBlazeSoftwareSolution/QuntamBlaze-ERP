@@ -28,7 +28,7 @@ export async function getGeminiStatusAction() {
 
     if (record && record.length > 0 && record[0].value) {
       const config = record[0].value as any;
-      
+
       // Mask the API Key for client safety (e.g. show only first 4 and last 4 characters, mask rest)
       const rawKey = config.apiKey || "";
       let maskedKey = "";
@@ -72,7 +72,7 @@ export async function testGeminiConnectionAction(apiKey: string, baseModel: stri
 
     // Call the official Google Gemini API using native fetch
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${baseModel}:generateContent?key=${apiKey}`;
-    
+
     const response = await fetch(endpoint, {
       method: "POST",
       headers: {
@@ -93,7 +93,8 @@ export async function testGeminiConnectionAction(apiKey: string, baseModel: stri
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      const apiErrorMessage = errorData?.error?.message || `HTTP ${response.status} ${response.statusText}`;
+      const apiErrorMessage =
+        errorData?.error?.message || `HTTP ${response.status} ${response.statusText}`;
       throw new Error(`Gemini API connection check failed: ${apiErrorMessage}`);
     }
 
@@ -104,14 +105,14 @@ export async function testGeminiConnectionAction(apiKey: string, baseModel: stri
       throw new Error("Connected but received an empty response from Gemini API.");
     }
 
-    return { 
-      success: true, 
-      message: `Connection successful! Model response: "${candidateText}"` 
+    return {
+      success: true,
+      message: `Connection successful! Model response: "${candidateText}"`,
     };
   } catch (err: any) {
-    return { 
-      success: false, 
-      error: err.message || "Connection failed. Please check your API key and try again." 
+    return {
+      success: false,
+      error: err.message || "Connection failed. Please check your API key and try again.",
     };
   }
 }
@@ -119,7 +120,7 @@ export async function testGeminiConnectionAction(apiKey: string, baseModel: stri
 export async function getAvailableGeminiModelsAction(apiKey?: string) {
   try {
     let keyToUse = apiKey || "";
-    
+
     // If no key is provided, or if it is a masked key, we load the raw key from DB
     if (!keyToUse || keyToUse.includes("••••")) {
       const record = await db
@@ -149,7 +150,8 @@ export async function getAvailableGeminiModelsAction(apiKey?: string) {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      const apiErrorMessage = errorData?.error?.message || `HTTP ${response.status} ${response.statusText}`;
+      const apiErrorMessage =
+        errorData?.error?.message || `HTTP ${response.status} ${response.statusText}`;
       throw new Error(`Failed to fetch models: ${apiErrorMessage}`);
     }
 
@@ -182,4 +184,3 @@ export async function getAvailableGeminiModelsAction(apiKey?: string) {
     return { success: false, error: err.message || "Failed to retrieve available models." };
   }
 }
-

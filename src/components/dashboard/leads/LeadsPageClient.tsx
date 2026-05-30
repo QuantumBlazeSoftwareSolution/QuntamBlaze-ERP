@@ -70,7 +70,12 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
             transition={{ delay: i * 0.1 }}
             className="bg-white border border-border rounded-2xl p-6 shadow-sm flex items-center gap-5"
           >
-            <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shrink-0", stat.bg)}>
+            <div
+              className={cn(
+                "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
+                stat.bg
+              )}
+            >
               <stat.icon className={cn("w-6 h-6", stat.color)} />
             </div>
             <div>

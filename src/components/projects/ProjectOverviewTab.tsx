@@ -46,8 +46,8 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
                   <div>
                     <p className="text-[10px] font-black text-[#94A3B8] uppercase">Kickoff</p>
                     <p className="text-xs font-bold text-[#0F172A]">
-                      {project.startDate instanceof Date 
-                        ? project.startDate.toLocaleDateString() 
+                      {project.startDate instanceof Date
+                        ? project.startDate.toLocaleDateString()
                         : String(project.startDate || "")}
                     </p>
                   </div>
@@ -59,8 +59,8 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
                   <div>
                     <p className="text-[10px] font-black text-[#94A3B8] uppercase">Deadline</p>
                     <p className="text-xs font-bold text-[#0F172A]">
-                      {project.deadline instanceof Date 
-                        ? project.deadline.toLocaleDateString() 
+                      {project.deadline instanceof Date
+                        ? project.deadline.toLocaleDateString()
                         : String(project.deadline || "")}
                     </p>
                   </div>

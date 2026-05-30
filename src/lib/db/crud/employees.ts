@@ -35,9 +35,6 @@ export const employeesCrud = {
   },
 
   delete: async (id: string) => {
-    return db
-      .update(employees)
-      .set({ deletedAt: new Date() })
-      .where(eq(employees.id, id));
+    return db.update(employees).set({ deletedAt: new Date() }).where(eq(employees.id, id));
   },
 };

@@ -224,7 +224,7 @@ export const ClientDetailsSheet = ({ client, onClose }: ClientDetailsSheetProps)
 
             {/* Footer Actions */}
             <div className="p-6 border-t border-divider bg-page-bg">
-              <button 
+              <button
                 onClick={() => setIsEditModalOpen(true)}
                 className="w-full py-3 bg-white border border-border text-text-primary font-bold text-sm rounded-lg hover:bg-page-bg transition-colors shadow-sm"
               >
@@ -233,10 +233,10 @@ export const ClientDetailsSheet = ({ client, onClose }: ClientDetailsSheetProps)
             </div>
           </motion.div>
 
-          <EditClientModal 
-            isOpen={isEditModalOpen} 
-            onClose={() => setIsEditModalOpen(false)} 
-            client={client} 
+          <EditClientModal
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            client={client}
           />
         </>
       )}

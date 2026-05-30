@@ -2,26 +2,26 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  User, 
-  Plus, 
-  Search, 
-  X, 
-  Lock, 
-  Shield, 
-  Code, 
-  Laptop, 
-  Sparkles, 
-  UserCheck, 
-  Trash2, 
-  Loader2 
+import {
+  User,
+  Plus,
+  Search,
+  X,
+  Lock,
+  Shield,
+  Code,
+  Laptop,
+  Sparkles,
+  UserCheck,
+  Trash2,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { 
-  getEmployeesAction, 
-  assignProjectMemberAction, 
-  removeProjectMemberAction 
+import {
+  getEmployeesAction,
+  assignProjectMemberAction,
+  removeProjectMemberAction,
 } from "@/app/actions/projectTeamActions";
 
 interface TeamMember {
@@ -59,7 +59,9 @@ export function ProjectTeamTab({ project }: ProjectTeamTabProps) {
 
   // Dialog State
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeRoleForAssign, setActiveRoleForAssign] = useState<"PM" | "TL" | "Dev" | "QA" | "UI/UX" | null>(null);
+  const [activeRoleForAssign, setActiveRoleForAssign] = useState<
+    "PM" | "TL" | "Dev" | "QA" | "UI/UX" | null
+  >(null);
   const [allEmployees, setAllEmployees] = useState<Employee[]>([]);
   const [isLoadingEmployees, setIsLoadingEmployees] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -96,7 +98,9 @@ export function ProjectTeamTab({ project }: ProjectTeamTabProps) {
 
   // Handle Remove Action
   const handleRemove = async (employeeId: string, role: "PM" | "TL" | "Dev" | "QA" | "UI/UX") => {
-    const confirmRemove = confirm(`Are you sure you want to remove this member from the project as ${role}?`);
+    const confirmRemove = confirm(
+      `Are you sure you want to remove this member from the project as ${role}?`
+    );
     if (!confirmRemove) return;
 
     const res = await removeProjectMemberAction(project.id, employeeId, role);
@@ -131,13 +135,13 @@ export function ProjectTeamTab({ project }: ProjectTeamTabProps) {
         if (baseRole !== "UI/UX") return false;
       }
     }
- 
+
     // Filter by search query
-    const matchQuery = 
+    const matchQuery =
       employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (employee.role || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
       employee.email.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
     return matchQuery;
   });
 
@@ -167,34 +171,42 @@ export function ProjectTeamTab({ project }: ProjectTeamTabProps) {
               Project Manager (PM)
             </h4>
             {projectManager ? (
-              <motion.div 
+              <motion.div
                 layoutId={`member-${projectManager.id}-PM`}
                 className="bg-white border-2 border-purple-100 hover:border-purple-200 rounded-2xl p-6 shadow-sm flex items-center gap-4 group transition-all"
               >
-                <div className={cn(
-                  "w-12 h-12 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-md",
-                  projectManager.color
-                )}>
+                <div
+                  className={cn(
+                    "w-12 h-12 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-md",
+                    projectManager.color
+                  )}
+                >
                   {projectManager.avatar ? (
-                    <img src={projectManager.avatar} alt={projectManager.name} className="w-full h-full rounded-xl object-cover" />
+                    <img
+                      src={projectManager.avatar}
+                      alt={projectManager.name}
+                      className="w-full h-full rounded-xl object-cover"
+                    />
                   ) : (
                     projectManager.initials
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-[#0F172A] truncate">{projectManager.name}</p>
-                  <p className="text-[11px] font-medium text-[#10B981]">{projectManager.employeeRole}</p>
+                  <p className="text-[11px] font-medium text-[#10B981]">
+                    {projectManager.employeeRole}
+                  </p>
                   <p className="text-[10px] text-[#94A3B8] truncate">{projectManager.email}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button 
+                  <button
                     onClick={() => openAssignModal("PM")}
                     className="p-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-600 transition-colors"
                     title="Change Project Manager"
                   >
                     <Sparkles className="w-4 h-4" />
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleRemove(projectManager.id, "PM")}
                     className="p-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-500 opacity-0 group-hover:opacity-100 transition-all"
                     title="Remove PM"
@@ -222,16 +234,22 @@ export function ProjectTeamTab({ project }: ProjectTeamTabProps) {
               Tech Lead (TL)
             </h4>
             {techLead ? (
-              <motion.div 
+              <motion.div
                 layoutId={`member-${techLead.id}-TL`}
                 className="bg-white border-2 border-blue-100 hover:border-blue-200 rounded-2xl p-6 shadow-sm flex items-center gap-4 group transition-all"
               >
-                <div className={cn(
-                  "w-12 h-12 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-md",
-                  techLead.color
-                )}>
+                <div
+                  className={cn(
+                    "w-12 h-12 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-md",
+                    techLead.color
+                  )}
+                >
                   {techLead.avatar ? (
-                    <img src={techLead.avatar} alt={techLead.name} className="w-full h-full rounded-xl object-cover" />
+                    <img
+                      src={techLead.avatar}
+                      alt={techLead.name}
+                      className="w-full h-full rounded-xl object-cover"
+                    />
                   ) : (
                     techLead.initials
                   )}
@@ -242,14 +260,14 @@ export function ProjectTeamTab({ project }: ProjectTeamTabProps) {
                   <p className="text-[10px] text-[#94A3B8] truncate">{techLead.email}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button 
+                  <button
                     onClick={() => openAssignModal("TL")}
                     className="p-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors"
                     title="Change Tech Lead"
                   >
                     <Sparkles className="w-4 h-4" />
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleRemove(techLead.id, "TL")}
                     className="p-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-500 opacity-0 group-hover:opacity-100 transition-all"
                     title="Remove TL"
@@ -300,22 +318,30 @@ export function ProjectTeamTab({ project }: ProjectTeamTabProps) {
                     exit={{ opacity: 0, scale: 0.9 }}
                     className="bg-white border border-[#E2E8F0] hover:border-[#10B981]/30 rounded-2xl p-5 shadow-sm flex items-center gap-3.5 group relative transition-all"
                   >
-                    <div className={cn(
-                      "w-11 h-11 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-sm",
-                      member.color
-                    )}>
+                    <div
+                      className={cn(
+                        "w-11 h-11 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-sm",
+                        member.color
+                      )}
+                    >
                       {member.avatar ? (
-                        <img src={member.avatar} alt={member.name} className="w-full h-full rounded-xl object-cover" />
+                        <img
+                          src={member.avatar}
+                          alt={member.name}
+                          className="w-full h-full rounded-xl object-cover"
+                        />
                       ) : (
                         member.initials
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold text-[#0F172A] truncate">{member.name}</p>
-                      <p className="text-[10px] font-semibold text-[#10B981] truncate">{member.employeeRole}</p>
+                      <p className="text-[10px] font-semibold text-[#10B981] truncate">
+                        {member.employeeRole}
+                      </p>
                       <p className="text-[9px] text-[#94A3B8] truncate">{member.email}</p>
                     </div>
-                    <button 
+                    <button
                       onClick={() => handleRemove(member.id, "Dev")}
                       className="absolute top-2 right-2 p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 opacity-0 group-hover:opacity-100 transition-all"
                       title="Remove Dev"
@@ -355,22 +381,30 @@ export function ProjectTeamTab({ project }: ProjectTeamTabProps) {
                     exit={{ opacity: 0, scale: 0.9 }}
                     className="bg-white border border-[#E2E8F0] hover:border-amber-500/30 rounded-2xl p-5 shadow-sm flex items-center gap-3.5 group relative transition-all"
                   >
-                    <div className={cn(
-                      "w-11 h-11 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-sm",
-                      member.color
-                    )}>
+                    <div
+                      className={cn(
+                        "w-11 h-11 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-sm",
+                        member.color
+                      )}
+                    >
                       {member.avatar ? (
-                        <img src={member.avatar} alt={member.name} className="w-full h-full rounded-xl object-cover" />
+                        <img
+                          src={member.avatar}
+                          alt={member.name}
+                          className="w-full h-full rounded-xl object-cover"
+                        />
                       ) : (
                         member.initials
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold text-[#0F172A] truncate">{member.name}</p>
-                      <p className="text-[10px] font-semibold text-amber-600 truncate">{member.employeeRole}</p>
+                      <p className="text-[10px] font-semibold text-amber-600 truncate">
+                        {member.employeeRole}
+                      </p>
                       <p className="text-[9px] text-[#94A3B8] truncate">{member.email}</p>
                     </div>
-                    <button 
+                    <button
                       onClick={() => handleRemove(member.id, "QA")}
                       className="absolute top-2 right-2 p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 opacity-0 group-hover:opacity-100 transition-all"
                       title="Remove QA"
@@ -421,22 +455,30 @@ export function ProjectTeamTab({ project }: ProjectTeamTabProps) {
                   exit={{ opacity: 0, scale: 0.9 }}
                   className="bg-white border border-[#E2E8F0] hover:border-pink-500/30 rounded-2xl p-5 shadow-sm flex items-center gap-3.5 group relative transition-all"
                 >
-                  <div className={cn(
-                    "w-11 h-11 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-sm",
-                    member.color
-                  )}>
+                  <div
+                    className={cn(
+                      "w-11 h-11 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-sm",
+                      member.color
+                    )}
+                  >
                     {member.avatar ? (
-                      <img src={member.avatar} alt={member.name} className="w-full h-full rounded-xl object-cover" />
+                      <img
+                        src={member.avatar}
+                        alt={member.name}
+                        className="w-full h-full rounded-xl object-cover"
+                      />
                     ) : (
                       member.initials
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-bold text-[#0F172A] truncate">{member.name}</p>
-                    <p className="text-[10px] font-semibold text-pink-600 truncate">{member.employeeRole}</p>
+                    <p className="text-[10px] font-semibold text-pink-600 truncate">
+                      {member.employeeRole}
+                    </p>
                     <p className="text-[9px] text-[#94A3B8] truncate">{member.email}</p>
                   </div>
-                  <button 
+                  <button
                     onClick={() => handleRemove(member.id, "UI/UX")}
                     className="absolute top-2 right-2 p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 opacity-0 group-hover:opacity-100 transition-all"
                     title="Remove Designer"
@@ -476,7 +518,9 @@ export function ProjectTeamTab({ project }: ProjectTeamTabProps) {
             </p>
             <h4 className="text-base font-bold text-[#0F172A]">Tasks Trajectory Per Member</h4>
             <p className="text-xs text-[#475569] leading-relaxed">
-              In the upcoming phase, you will be able to toggle each team member's slot to view their active task lists, burn-down ratios, and milestone contributions directly inside this workspace.
+              In the upcoming phase, you will be able to toggle each team member's slot to view
+              their active task lists, burn-down ratios, and milestone contributions directly inside
+              this workspace.
             </p>
           </div>
 
@@ -616,7 +660,11 @@ export function ProjectTeamTab({ project }: ProjectTeamTabProps) {
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-[11px] font-black text-slate-600 shadow-xs">
                             {employee.avatar ? (
-                              <img src={employee.avatar} alt={employee.name} className="w-full h-full rounded-xl object-cover" />
+                              <img
+                                src={employee.avatar}
+                                alt={employee.name}
+                                className="w-full h-full rounded-xl object-cover"
+                              />
                             ) : (
                               initials
                             )}
@@ -644,8 +692,8 @@ export function ProjectTeamTab({ project }: ProjectTeamTabProps) {
                           onClick={() => handleAssign(employee.id)}
                           className={cn(
                             "px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all",
-                            isAssigning 
-                              ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
+                            isAssigning
+                              ? "bg-slate-100 text-slate-400 cursor-not-allowed"
                               : "bg-[#F8FAFC] hover:bg-[#10B981] hover:text-white text-[#475569] shadow-xs active:scale-95"
                           )}
                         >

@@ -5,7 +5,8 @@ import ProfileClient from "@/components/profile/ProfileClient";
 
 export const metadata = {
   title: "My Profile & Personal Dashboard | Quantum Blaze ERP",
-  description: "Access your authorized profile details, credentials, and manage personal action checklists securely.",
+  description:
+    "Access your authorized profile details, credentials, and manage personal action checklists securely.",
 };
 
 export default async function ProfileDashboardPage() {
@@ -24,7 +25,8 @@ export default async function ProfileDashboardPage() {
           Account Profile & Board
         </h1>
         <p className="text-sm text-text-secondary mt-1">
-          Review credentials, active system authorization role, and track your personal task management items.
+          Review credentials, active system authorization role, and track your personal task
+          management items.
         </p>
       </div>
 

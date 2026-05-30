@@ -70,14 +70,12 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
 
   // Map employees to roles
   const getEmployeesInRole = (roleCode: string) => {
-    return employees.filter(
-      (e) => (e.employeeRole || "").toUpperCase() === roleCode.toUpperCase()
-    );
+    return employees.filter((e) => (e.employeeRole || "").toUpperCase() === roleCode.toUpperCase());
   };
 
   // Stats calculation
   const totalRoles = roles.length;
-  
+
   const employeesWithInvalidRoles = employees.filter((e) => {
     const code = (e.employeeRole || "").toUpperCase();
     return !roles.some((r) => r.code.toUpperCase() === code);
@@ -216,7 +214,8 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
               </div>
             </div>
             <p className="text-[#475569] text-sm">
-              Define standard roles & permissions inside the HR structure to govern project assignments.
+              Define standard roles & permissions inside the HR structure to govern project
+              assignments.
             </p>
           </div>
 
@@ -236,7 +235,9 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
               <Briefcase className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Functional Roles</p>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Functional Roles
+              </p>
               <p className="text-2xl font-black text-slate-800 mt-0.5">{totalRoles}</p>
             </div>
           </div>
@@ -246,7 +247,9 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
               <Users className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Most Active Role</p>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Most Active Role
+              </p>
               <p className="text-lg font-black text-slate-800 mt-0.5">
                 {topRole ? `${topRole.name} (${topRole.code})` : "None"}
               </p>
@@ -254,13 +257,21 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
-            <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shrink-0", unassignedCount > 0 ? "bg-amber-50 text-amber-600" : "bg-slate-50 text-slate-400")}>
+            <div
+              className={cn(
+                "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
+                unassignedCount > 0 ? "bg-amber-50 text-amber-600" : "bg-slate-50 text-slate-400"
+              )}
+            >
               <ShieldAlert className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Unassigned Employees</p>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Unassigned Employees
+              </p>
               <p className="text-2xl font-black text-slate-800 mt-0.5">
-                {unassignedCount} <span className="text-xs font-medium text-slate-400">members</span>
+                {unassignedCount}{" "}
+                <span className="text-xs font-medium text-slate-400">members</span>
               </p>
             </div>
           </div>
@@ -307,10 +318,12 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
                   <div>
                     <div className="flex items-center justify-between gap-3 mb-4">
                       <div className="flex items-center gap-2">
-                        <span className={cn(
-                          "px-3 py-1 rounded-xl text-white text-xs font-extrabold tracking-wider bg-gradient-to-br shadow-md shrink-0 uppercase",
-                          getBadgeGradient(role.code)
-                        )}>
+                        <span
+                          className={cn(
+                            "px-3 py-1 rounded-xl text-white text-xs font-extrabold tracking-wider bg-gradient-to-br shadow-md shrink-0 uppercase",
+                            getBadgeGradient(role.code)
+                          )}
+                        >
                           {role.code}
                         </span>
                         {role.baseRole && role.baseRole !== "None" && (
@@ -354,7 +367,8 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
                         Assigned Team
                       </p>
                       <p className="text-sm font-bold text-slate-700 mt-0.5">
-                        {roleEmployees.length} {roleEmployees.length === 1 ? "Employee" : "Employees"}
+                        {roleEmployees.length}{" "}
+                        {roleEmployees.length === 1 ? "Employee" : "Employees"}
                       </p>
                     </div>
 
@@ -370,9 +384,18 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
                           title={emp.name}
                         >
                           {emp.avatar ? (
-                            <img src={emp.avatar} alt={emp.name} className="w-full h-full object-cover" />
+                            <img
+                              src={emp.avatar}
+                              alt={emp.name}
+                              className="w-full h-full object-cover"
+                            />
                           ) : (
-                            emp.name.split(" ").map((n) => n[0]).join("").substring(0, 2).toUpperCase()
+                            emp.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")
+                              .substring(0, 2)
+                              .toUpperCase()
                           )}
                         </div>
                       ))}
@@ -382,7 +405,9 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
                         </div>
                       )}
                       {roleEmployees.length === 0 && (
-                        <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Empty</span>
+                        <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                          Empty
+                        </span>
                       )}
                     </div>
                   </div>
@@ -396,7 +421,8 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
               <FileText className="w-12 h-12 text-slate-300 mb-3" />
               <h3 className="text-base font-bold text-slate-700">No roles found</h3>
               <p className="text-xs text-slate-400 max-w-xs mt-1">
-                Try refining your search keyword or create a new functional role if it doesn't exist yet.
+                Try refining your search keyword or create a new functional role if it doesn't exist
+                yet.
               </p>
             </div>
           )}
@@ -431,7 +457,9 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
                     {editingRole ? "Edit Employee Role" : "Define Employee Role"}
                   </h2>
                   <p className="text-xs text-slate-500 mt-1">
-                    {editingRole ? "Modify functional metadata values" : "Register a brand new corporate code"}
+                    {editingRole
+                      ? "Modify functional metadata values"
+                      : "Register a brand new corporate code"}
                   </p>
                 </div>
                 <button
@@ -472,8 +500,14 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
                     {/* Role Code Input */}
                     <div className="space-y-1.5">
                       <label className="text-xs font-extrabold text-slate-700 uppercase tracking-wider flex justify-between">
-                        <span>Role Code Code <span className="text-rose-500">*</span></span>
-                        {editingRole && <span className="text-[10px] text-amber-500 font-normal">Immutable Field</span>}
+                        <span>
+                          Role Code Code <span className="text-rose-500">*</span>
+                        </span>
+                        {editingRole && (
+                          <span className="text-[10px] text-amber-500 font-normal">
+                            Immutable Field
+                          </span>
+                        )}
                       </label>
                       <input
                         type="text"
@@ -491,7 +525,8 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
                       />
                       {!editingRole && (
                         <p className="text-[10px] text-slate-400 leading-normal">
-                          Unique abbreviation uppercase tag. e.g. **Designer** becomes **DESIGNER** internally.
+                          Unique abbreviation uppercase tag. e.g. **Designer** becomes **DESIGNER**
+                          internally.
                         </p>
                       )}
                     </div>
@@ -515,7 +550,9 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
                     <div className="space-y-1.5">
                       <label className="text-xs font-extrabold text-slate-700 uppercase tracking-wider flex justify-between">
                         <span>Project Roster Mapping</span>
-                        <span className="text-[10px] font-semibold text-emerald-500 lowercase">Optional</span>
+                        <span className="text-[10px] font-semibold text-emerald-500 lowercase">
+                          Optional
+                        </span>
                       </label>
                       <div className="relative">
                         <select
@@ -530,13 +567,18 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
                           <option value="UI/UX">UI/UX Designer</option>
                         </select>
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
-                          <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                          <svg
+                            className="fill-current h-4 w-4"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                           </svg>
                         </div>
                       </div>
                       <p className="text-[10px] text-slate-400 leading-normal">
-                        Select which core delivery slot in project team rosters this dynamic role can be assigned to.
+                        Select which core delivery slot in project team rosters this dynamic role
+                        can be assigned to.
                       </p>
                     </div>
 
@@ -573,7 +615,9 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
                     disabled={isPending}
                     className={cn(
                       "flex-1 py-3 bg-emerald-500 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer",
-                      isPending ? "opacity-75 cursor-not-allowed" : "hover:bg-emerald-600 hover:scale-[1.02] shadow-lg shadow-emerald-500/20"
+                      isPending
+                        ? "opacity-75 cursor-not-allowed"
+                        : "hover:bg-emerald-600 hover:scale-[1.02] shadow-lg shadow-emerald-500/20"
                     )}
                   >
                     {isPending ? (
@@ -620,7 +664,8 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
                 <div>
                   <h3 className="text-lg font-bold text-slate-800">Delete Employee Role?</h3>
                   <p className="text-xs text-slate-500 mt-1">
-                    This operation will soft-delete the role: **{deletingRole.name} ({deletingRole.code})** from active indexes.
+                    This operation will soft-delete the role: **{deletingRole.name} (
+                    {deletingRole.code})** from active indexes.
                   </p>
                 </div>
               </div>
@@ -631,8 +676,9 @@ export function HRRolesClient({ roles, employees }: HRRolesClientProps) {
                   <ShieldAlert className="w-5 h-5 shrink-0 text-amber-600 mt-0.5" />
                   <div>
                     <span className="font-bold">Caution: </span>
-                    There are **{getEmployeesInRole(deletingRole.code).length} employees** currently assigned to this role code.
-                    Deleting it will revert their database roles to Software Engineer (**SE**) automatically.
+                    There are **{getEmployeesInRole(deletingRole.code).length} employees** currently
+                    assigned to this role code. Deleting it will revert their database roles to
+                    Software Engineer (**SE**) automatically.
                   </div>
                 </div>
               ) : (

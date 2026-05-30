@@ -6,12 +6,50 @@ export type EmployeeRoleInsert = typeof employeeRoles.$inferInsert;
 export type EmployeeRoleSelect = typeof employeeRoles.$inferSelect;
 
 const DEFAULT_ROLES = [
-  { id: "se", code: "SE", name: "Software Engineer", description: "Design, develop, and maintain software applications and systems.", baseRole: "Dev" },
-  { id: "pm", code: "PM", name: "Project Manager", description: "Plan, execute, and close projects, ensuring alignment with organizational goals.", baseRole: "PM" },
-  { id: "qa", code: "QA", name: "Quality Assurance", description: "Establish and enforce quality standards, and run rigorous validation pipelines.", baseRole: "QA" },
-  { id: "designer", code: "Designer", name: "UI/UX Designer", description: "Create user-centered interface layouts, graphics, and interactive journeys.", baseRole: "UI/UX" },
-  { id: "devops", code: "DevOps", name: "DevOps Engineer", description: "Orchestrate continuous delivery automation, infrastructure provisioning, and monitoring.", baseRole: "None" },
-  { id: "hr", code: "HR", name: "HR Manager", description: "Oversee employee onboarding, training, career roadmaps, and benefits administration.", baseRole: "None" }
+  {
+    id: "se",
+    code: "SE",
+    name: "Software Engineer",
+    description: "Design, develop, and maintain software applications and systems.",
+    baseRole: "Dev",
+  },
+  {
+    id: "pm",
+    code: "PM",
+    name: "Project Manager",
+    description: "Plan, execute, and close projects, ensuring alignment with organizational goals.",
+    baseRole: "PM",
+  },
+  {
+    id: "qa",
+    code: "QA",
+    name: "Quality Assurance",
+    description: "Establish and enforce quality standards, and run rigorous validation pipelines.",
+    baseRole: "QA",
+  },
+  {
+    id: "designer",
+    code: "Designer",
+    name: "UI/UX Designer",
+    description: "Create user-centered interface layouts, graphics, and interactive journeys.",
+    baseRole: "UI/UX",
+  },
+  {
+    id: "devops",
+    code: "DevOps",
+    name: "DevOps Engineer",
+    description:
+      "Orchestrate continuous delivery automation, infrastructure provisioning, and monitoring.",
+    baseRole: "None",
+  },
+  {
+    id: "hr",
+    code: "HR",
+    name: "HR Manager",
+    description:
+      "Oversee employee onboarding, training, career roadmaps, and benefits administration.",
+    baseRole: "None",
+  },
 ] as const;
 
 export const employeeRolesCrud = {
@@ -32,11 +70,12 @@ export const employeeRolesCrud = {
     }
 
     // 3. For existing databases, let's make sure the default roles have their baseRole properly updated
-    const needsUpdate = data.some(r => 
-      (r.code === "SE" && r.baseRole !== "Dev") ||
-      (r.code === "PM" && r.baseRole !== "PM") ||
-      (r.code === "QA" && r.baseRole !== "QA") ||
-      (r.code === "Designer" && r.baseRole !== "UI/UX")
+    const needsUpdate = data.some(
+      (r) =>
+        (r.code === "SE" && r.baseRole !== "Dev") ||
+        (r.code === "PM" && r.baseRole !== "PM") ||
+        (r.code === "QA" && r.baseRole !== "QA") ||
+        (r.code === "Designer" && r.baseRole !== "UI/UX")
     );
     if (needsUpdate) {
       for (const defaultRole of DEFAULT_ROLES) {

@@ -53,12 +53,7 @@ export async function assignProjectMemberAction(
     if (role === "PM" || role === "TL") {
       await db
         .delete(projectTeam)
-        .where(
-          and(
-            eq(projectTeam.projectId, projectId),
-            eq(projectTeam.projectRole, role)
-          )
-        );
+        .where(and(eq(projectTeam.projectId, projectId), eq(projectTeam.projectRole, role)));
     } else {
       // 2. For multi-select roles, check if this member is already assigned to this role on the project
       const existing = await db.query.projectTeam.findFirst({

@@ -71,16 +71,18 @@ export function SystemConfigForm() {
     async function fetchCountriesAndCurrencies() {
       setLoadingLists(true);
       try {
-        const response = await fetch("https://restcountries.com/v3.1/all?fields=name,cca2,currencies,flags");
+        const response = await fetch(
+          "https://restcountries.com/v3.1/all?fields=name,cca2,currencies,flags"
+        );
         if (!response.ok) throw new Error("API response error");
-        
+
         const data = await response.json();
-        
+
         const countryList: CountryOption[] = [];
         const currencyMap = new Map<string, CurrencyOption>();
 
         // Always put defaults/popular currencies in map first to preserve nice sorting/symbols
-        STATIC_CURRENCIES.forEach(curr => currencyMap.set(curr.code, curr));
+        STATIC_CURRENCIES.forEach((curr) => currencyMap.set(curr.code, curr));
 
         data.forEach((item: any) => {
           // Parse Country
@@ -113,12 +115,17 @@ export function SystemConfigForm() {
 
         // Sort lists alphabetically
         countryList.sort((a, b) => a.name.localeCompare(b.name));
-        const currencyList = Array.from(currencyMap.values()).sort((a, b) => a.code.localeCompare(b.code));
+        const currencyList = Array.from(currencyMap.values()).sort((a, b) =>
+          a.code.localeCompare(b.code)
+        );
 
         if (countryList.length > 0) setCountries(countryList);
         if (currencyList.length > 0) setCurrencies(currencyList);
       } catch (err) {
-        console.warn("RestCountries API failed, proceeding with high-quality static fallbacks.", err);
+        console.warn(
+          "RestCountries API failed, proceeding with high-quality static fallbacks.",
+          err
+        );
         // Fallbacks already set as initial states
       } finally {
         setLoadingLists(false);
@@ -136,10 +143,12 @@ export function SystemConfigForm() {
 
     try {
       // Find matching object templates
-      const targetCountryObj = countries.find(c => c.code === selectedCountryCode) || 
-                               STATIC_COUNTRIES.find(c => c.code === selectedCountryCode);
-      const targetCurrencyObj = currencies.find(c => c.code === selectedCurrencyCode) || 
-                                STATIC_CURRENCIES.find(c => c.code === selectedCurrencyCode);
+      const targetCountryObj =
+        countries.find((c) => c.code === selectedCountryCode) ||
+        STATIC_COUNTRIES.find((c) => c.code === selectedCountryCode);
+      const targetCurrencyObj =
+        currencies.find((c) => c.code === selectedCurrencyCode) ||
+        STATIC_CURRENCIES.find((c) => c.code === selectedCurrencyCode);
 
       if (!targetCountryObj || !targetCurrencyObj) {
         throw new Error("Invalid country or currency selection.");
@@ -221,7 +230,10 @@ export function SystemConfigForm() {
                 ) : (
                   <>
                     <div className="w-2.5 h-2.5 rounded-full bg-success animate-pulse" />
-                    <span>Loaded {countries.length} countries and {currencies.length} active global currencies.</span>
+                    <span>
+                      Loaded {countries.length} countries and {currencies.length} active global
+                      currencies.
+                    </span>
                   </>
                 )}
               </div>
@@ -258,7 +270,8 @@ export function SystemConfigForm() {
                 </div>
               </div>
               <p className="text-[11px] text-text-muted">
-                Configures the currency prefix/symbol dynamically rendered across all global project budget matrices.
+                Configures the currency prefix/symbol dynamically rendered across all global project
+                budget matrices.
               </p>
             </div>
 
@@ -274,13 +287,22 @@ export function SystemConfigForm() {
                 <div className="text-right font-mono font-bold text-text-primary">
                   {/* Derive current format values dynamically */}
                   {(() => {
-                    const tempCurr = currencies.find(c => c.code === selectedCurrencyCode) || STATIC_CURRENCIES[0];
+                    const tempCurr =
+                      currencies.find((c) => c.code === selectedCurrencyCode) ||
+                      STATIC_CURRENCIES[0];
                     const symbol = tempCurr.symbol;
                     const space = symbol.endsWith(".") || symbol.length > 1 ? " " : "";
                     return (
                       <>
-                        <p className="text-accent">{symbol}{space}23k / {symbol}{space}2.1M</p>
-                        <p className="text-text-secondary">{symbol}{space}23,000.00</p>
+                        <p className="text-accent">
+                          {symbol}
+                          {space}23k / {symbol}
+                          {space}2.1M
+                        </p>
+                        <p className="text-text-secondary">
+                          {symbol}
+                          {space}23,000.00
+                        </p>
                       </>
                     );
                   })()}
@@ -300,7 +322,10 @@ export function SystemConfigForm() {
               className="flex items-center gap-3 bg-success/10 border border-success/30 text-success px-6 py-4 rounded-xl text-[13px] font-bold shadow-sm"
             >
               <Check className="w-4 h-4 flex-shrink-0" />
-              <span>System configurations successfully updated! Dynamic currency format applied instantly system-wide.</span>
+              <span>
+                System configurations successfully updated! Dynamic currency format applied
+                instantly system-wide.
+              </span>
             </motion.div>
           )}
 
@@ -334,11 +359,7 @@ export function SystemConfigForm() {
             disabled={isSaving}
             className="flex items-center gap-2 px-10 py-4 bg-accent/10 border border-accent/30 text-accent font-bold rounded-xl hover:bg-accent/20 transition-all cursor-pointer disabled:opacity-50"
           >
-            {isSaving ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Save className="w-4 h-4" />
-            )}
+            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Save Configuration
           </button>
         </div>

@@ -84,18 +84,20 @@ async function run() {
       console.log(`Splits into ${chunks.length} chunks.`);
 
       for (let i = 0; i < chunks.length; i++) {
-        console.log(`Embedding chunk ${i + 1}/${chunks.length} (length: ${chunks[i].length} chars)...`);
+        console.log(
+          `Embedding chunk ${i + 1}/${chunks.length} (length: ${chunks[i].length} chars)...`
+        );
         const vector = await embedText(chunks[i]);
         console.log(`-> Vector dimension: ${vector.length}`);
-        
+
         // Validate vector size
         if (vector.length !== 768) {
           console.error(`ERROR: Chunk ${i + 1} has invalid dimension size: ${vector.length}`);
         }
 
         // Validate values
-        const hasNaN = vector.some(v => isNaN(v));
-        const hasNull = vector.some(v => v === null || v === undefined);
+        const hasNaN = vector.some((v) => isNaN(v));
+        const hasNull = vector.some((v) => v === null || v === undefined);
         if (hasNaN || hasNull) {
           console.error(`ERROR: Chunk ${i + 1} contains NaN or Null values!`);
         }
@@ -103,7 +105,6 @@ async function run() {
     }
 
     console.log("\nALL CHUNKS VALIDATED SUCCESSFULLY!");
-
   } catch (err) {
     console.error("FAILED validation:", err);
   }

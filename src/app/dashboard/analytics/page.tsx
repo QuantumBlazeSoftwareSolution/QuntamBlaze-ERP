@@ -15,15 +15,31 @@ export default async function AnalyticsPage() {
   const totalRevenue = invoices
     .filter((inv) => inv.status === "Paid")
     .reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
-  
-  const avgProjectValue = projects.length > 0 
-    ? projects.reduce((sum, p) => sum + Number(p.budget || 0), 0) / projects.length 
-    : 0;
+
+  const avgProjectValue =
+    projects.length > 0
+      ? projects.reduce((sum, p) => sum + Number(p.budget || 0), 0) / projects.length
+      : 0;
 
   const kpiMetrics = [
-    { label: "Gross Revenue", value: formatCurrency(totalRevenue), change: "+12.4%", status: "up" as const },
-    { label: "Active Projects", value: projects.filter(p => p.status === "Active").length.toString(), change: "+2", status: "up" as const },
-    { label: "Avg. Project Value", value: formatCurrency(avgProjectValue), change: "-3.1%", status: "down" as const },
+    {
+      label: "Gross Revenue",
+      value: formatCurrency(totalRevenue),
+      change: "+12.4%",
+      status: "up" as const,
+    },
+    {
+      label: "Active Projects",
+      value: projects.filter((p) => p.status === "Active").length.toString(),
+      change: "+2",
+      status: "up" as const,
+    },
+    {
+      label: "Avg. Project Value",
+      value: formatCurrency(avgProjectValue),
+      change: "-3.1%",
+      status: "down" as const,
+    },
     { label: "Client Satisfaction", value: "98.2%", change: "+0.5%", status: "up" as const },
   ];
 
@@ -37,12 +53,15 @@ export default async function AnalyticsPage() {
   ];
 
   // Top Clients
-  const topClients = clients.slice(0, 5).map(c => ({
-    name: c.name,
-    revenue: Number(c.totalBilled || 0),
-    projects: c.projects?.length || 0,
-    growth: "+12%"
-  })).sort((a, b) => b.revenue - a.revenue);
+  const topClients = clients
+    .slice(0, 5)
+    .map((c) => ({
+      name: c.name,
+      revenue: Number(c.totalBilled || 0),
+      projects: c.projects?.length || 0,
+      growth: "+12%",
+    }))
+    .sort((a, b) => b.revenue - a.revenue);
 
   // Status Distribution
   const statusCounts = projects.reduce((acc: Record<string, number>, p) => {
@@ -57,7 +76,7 @@ export default async function AnalyticsPage() {
   ];
 
   return (
-    <AnalyticsPageClient 
+    <AnalyticsPageClient
       kpiMetrics={kpiMetrics}
       monthlyRevenue={monthlyRevenue}
       topClients={topClients}

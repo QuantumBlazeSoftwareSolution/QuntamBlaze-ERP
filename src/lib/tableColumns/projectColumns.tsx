@@ -26,9 +26,7 @@ import { useSystemConfig } from "@/hooks/useSystemConfig";
 function BudgetCell({ amount }: { amount: number }) {
   const { formatCurrency } = useSystemConfig();
   return (
-    <span className="text-[13px] font-mono text-text-primary">
-      {formatCurrency(amount, true)}
-    </span>
+    <span className="text-[13px] font-mono text-text-primary">{formatCurrency(amount, true)}</span>
   );
 }
 

@@ -31,7 +31,7 @@ export function NewProjectModal() {
 
   // Client search state
   const [clientSearchQuery, setClientSearchQuery] = useState("");
-  const [clientResults, setClientResults] = useState<{id: string, name: string}[]>([]);
+  const [clientResults, setClientResults] = useState<{ id: string; name: string }[]>([]);
   const [isClientDropdownOpen, setIsClientDropdownOpen] = useState(false);
   const [selectedClientName, setSelectedClientName] = useState("");
 
@@ -209,7 +209,7 @@ export function NewProjectModal() {
                   Client Attribution
                 </label>
                 <div className="relative">
-                  <div 
+                  <div
                     className={cn(
                       "w-full h-12 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-4 text-sm font-bold text-[#0F172A] focus-within:ring-4 focus-within:ring-[#10B981]/10 focus-within:border-[#10B981] transition-all flex items-center cursor-pointer",
                       errors.clientId && "border-red-300 ring-red-50"
@@ -217,14 +217,17 @@ export function NewProjectModal() {
                     onClick={() => setIsClientDropdownOpen(true)}
                   >
                     {selectedClientName && !isClientDropdownOpen ? (
-                      <div className="flex-1 flex items-center justify-between" onClick={() => setIsClientDropdownOpen(true)}>
+                      <div
+                        className="flex-1 flex items-center justify-between"
+                        onClick={() => setIsClientDropdownOpen(true)}
+                      >
                         <span>{selectedClientName}</span>
                         <Search className="w-4 h-4 text-[#94A3B8]" />
                       </div>
                     ) : (
                       <div className="flex-1 flex items-center gap-2">
                         <Search className="w-4 h-4 text-[#94A3B8]" />
-                        <input 
+                        <input
                           className="w-full bg-transparent outline-none placeholder-[#94A3B8]"
                           placeholder="Search clients..."
                           value={clientSearchQuery}
@@ -238,7 +241,7 @@ export function NewProjectModal() {
                       </div>
                     )}
                   </div>
-                  
+
                   <AnimatePresence>
                     {isClientDropdownOpen && (
                       <motion.div
@@ -260,7 +263,9 @@ export function NewProjectModal() {
                               }}
                             >
                               <p className="text-sm font-bold text-[#0F172A]">{client.name}</p>
-                              <p className="text-[10px] font-black text-[#94A3B8] uppercase tracking-widest">{client.id}</p>
+                              <p className="text-[10px] font-black text-[#94A3B8] uppercase tracking-widest">
+                                {client.id}
+                              </p>
                             </div>
                           ))
                         ) : (
@@ -412,16 +417,16 @@ export function NewProjectModal() {
                     <AlertCircle className="w-3 h-3" /> {errors.description.message}
                   </p>
                 )}
+              </div>
             </div>
-          </div>
 
-          {submitError && (
-            <div className="mt-6 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3 animate-pulse">
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-              <p className="text-xs font-bold text-red-800">{submitError}</p>
-            </div>
-          )}
-        </form>
+            {submitError && (
+              <div className="mt-6 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3 animate-pulse">
+                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                <p className="text-xs font-bold text-red-800">{submitError}</p>
+              </div>
+            )}
+          </form>
         </div>
 
         {/* Footer */}

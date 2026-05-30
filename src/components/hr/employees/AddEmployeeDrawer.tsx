@@ -2,7 +2,20 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, User, Mail, Phone, Briefcase, Building, CreditCard, Loader2, CheckCircle2, AlertCircle, ShieldAlert, ChevronDown } from "lucide-react";
+import {
+  X,
+  User,
+  Mail,
+  Phone,
+  Briefcase,
+  Building,
+  CreditCard,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  ShieldAlert,
+  ChevronDown,
+} from "lucide-react";
 import { createEmployeeAction } from "@/app/actions/hrActions";
 import { getEmployeeRolesAction } from "@/app/actions/employeeRoleActions";
 import { cn } from "@/lib/utils";
@@ -62,7 +75,8 @@ export function AddEmployeeDrawer({ isOpen, onClose }: AddEmployeeDrawerProps) {
       // Use custom department if "OTHER" is selected
       const payload = {
         ...formData,
-        department: formData.department === "OTHER" ? formData.customDepartment : formData.department,
+        department:
+          formData.department === "OTHER" ? formData.customDepartment : formData.department,
       };
 
       const res = await createEmployeeAction(payload);
@@ -350,7 +364,9 @@ export function AddEmployeeDrawer({ isOpen, onClose }: AddEmployeeDrawerProps) {
                   disabled={loading}
                   className={cn(
                     "flex-1 py-3 bg-emerald-500 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all",
-                    loading ? "opacity-70 cursor-not-allowed" : "hover:bg-emerald-600 hover:scale-[1.02] shadow-lg shadow-emerald-500/25"
+                    loading
+                      ? "opacity-70 cursor-not-allowed"
+                      : "hover:bg-emerald-600 hover:scale-[1.02] shadow-lg shadow-emerald-500/25"
                   )}
                 >
                   {loading ? (

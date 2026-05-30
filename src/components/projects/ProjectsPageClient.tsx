@@ -100,9 +100,7 @@ export function ProjectsPageClient({ initialProjects }: ProjectsPageClientProps)
                             ? "completed"
                             : "active",
                       progress: p.progress || 0,
-                      budgetSpent: Math.round(
-                        Number(p.budget || 0) * ((p.progress || 0) / 100)
-                      ),
+                      budgetSpent: Math.round(Number(p.budget || 0) * ((p.progress || 0) / 100)),
                       budgetTotal: Number(p.budget || 0),
                     }}
                   />

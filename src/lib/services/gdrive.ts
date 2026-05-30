@@ -145,7 +145,10 @@ export async function listGoogleDriveFolders(parentId?: string) {
 /**
  * Creates a folder inside a specified parent in Google Drive
  */
-export async function createGoogleDriveFolder(folderName: string, parentId?: string): Promise<{ id: string; name: string }> {
+export async function createGoogleDriveFolder(
+  folderName: string,
+  parentId?: string
+): Promise<{ id: string; name: string }> {
   const token = await getFreshAccessToken();
   if (!token) throw new Error("Google Drive is not authenticated.");
 
@@ -222,14 +225,8 @@ export async function uploadFileToGoogleDrive(
   };
 
   const formData = new FormData();
-  formData.append(
-    "metadata",
-    new Blob([JSON.stringify(metadata)], { type: "application/json" })
-  );
-  formData.append(
-    "file",
-    new Blob([buffer], { type: mimeType })
-  );
+  formData.append("metadata", new Blob([JSON.stringify(metadata)], { type: "application/json" }));
+  formData.append("file", new Blob([buffer], { type: mimeType }));
 
   const response = await fetch(
     "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name",
@@ -257,20 +254,17 @@ export async function grantAnyoneWithLinkPermission(fileId: string): Promise<voi
   const token = await getFreshAccessToken();
   if (!token) throw new Error("Google Drive is not authenticated.");
 
-  const response = await fetch(
-    `https://www.googleapis.com/drive/v3/files/${fileId}/permissions`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        role: "reader",
-        type: "anyone",
-      }),
-    }
-  );
+  const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      role: "reader",
+      type: "anyone",
+    }),
+  });
 
   if (!response.ok) {
     const err = await response.json();

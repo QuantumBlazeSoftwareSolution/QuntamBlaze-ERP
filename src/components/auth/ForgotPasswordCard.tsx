@@ -5,7 +5,17 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, ArrowLeft, CheckCircle2, Loader2, Key, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
+import {
+  Mail,
+  ArrowLeft,
+  CheckCircle2,
+  Loader2,
+  Key,
+  Lock,
+  Eye,
+  EyeOff,
+  AlertCircle,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Countdown } from "@/components/ui/Countdown";
@@ -15,15 +25,17 @@ const requestSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
 });
 
-const resetSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  otp: z.string().min(6, "OTP code must be 6 digits").max(6, "OTP code must be 6 digits"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
+const resetSchema = z
+  .object({
+    email: z.string().email("Please enter a valid email address"),
+    otp: z.string().min(6, "OTP code must be 6 digits").max(6, "OTP code must be 6 digits"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 type RequestValues = z.infer<typeof requestSchema>;
 type ResetValues = z.infer<typeof resetSchema>;
@@ -37,7 +49,7 @@ const ForgotPasswordContent = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successRedirectTimer, setSuccessRedirectTimer] = useState(5);
-  
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -65,7 +77,7 @@ const ForgotPasswordContent = () => {
   useEffect(() => {
     const email = searchParams.get("email");
     const otp = searchParams.get("otp");
-    
+
     if (email) {
       setSubmittedEmail(email);
       setResetValue("email", email);
@@ -175,7 +187,8 @@ const ForgotPasswordContent = () => {
               </div>
               <h1 className="text-text-primary text-2xl font-bold mb-2">Reset password</h1>
               <p className="text-text-secondary text-sm mb-8 font-sans">
-                Enter your email address and we'll send a secure OTP verification code to reset your password.
+                Enter your email address and we'll send a secure OTP verification code to reset your
+                password.
               </p>
 
               <form onSubmit={handleSubmitRequest(onSubmitRequest)} className="w-full space-y-5">
@@ -239,7 +252,10 @@ const ForgotPasswordContent = () => {
                 </span>
               </p>
 
-              <form onSubmit={handleSubmitReset(onSubmitReset)} className="w-full space-y-4 text-left">
+              <form
+                onSubmit={handleSubmitReset(onSubmitReset)}
+                className="w-full space-y-4 text-left"
+              >
                 {/* Email (Hidden, but in DOM for react-hook-form schema compatibility) */}
                 <input type="hidden" {...registerReset("email")} />
 
@@ -308,11 +324,17 @@ const ForgotPasswordContent = () => {
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-text-muted hover:text-text-primary transition-colors bg-transparent border-0 cursor-pointer"
                     >
-                      {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
                     </button>
                   </div>
                   {resetErrors.confirmPassword && (
-                    <p className="text-red-500 text-xs mt-1.5">{resetErrors.confirmPassword.message}</p>
+                    <p className="text-red-500 text-xs mt-1.5">
+                      {resetErrors.confirmPassword.message}
+                    </p>
                   )}
                 </div>
 
@@ -321,11 +343,7 @@ const ForgotPasswordContent = () => {
                   disabled={isSubmitting}
                   className="bg-accent hover:bg-accent-hover text-white font-semibold rounded-lg h-11 w-full flex items-center justify-center transition-colors cursor-pointer mt-4"
                 >
-                  {isSubmitting ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    "Reset Password"
-                  )}
+                  {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Reset Password"}
                 </button>
               </form>
 
@@ -383,11 +401,13 @@ const ForgotPasswordContent = () => {
 
 export const ForgotPasswordCard = () => {
   return (
-    <Suspense fallback={
-      <div className="bg-surface-white border border-border rounded-2xl shadow-sm p-10 w-full max-w-[440px] flex items-center justify-center min-h-[300px]">
-        <Loader2 className="w-8 h-8 text-accent animate-spin" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="bg-surface-white border border-border rounded-2xl shadow-sm p-10 w-full max-w-[440px] flex items-center justify-center min-h-[300px]">
+          <Loader2 className="w-8 h-8 text-accent animate-spin" />
+        </div>
+      }
+    >
       <ForgotPasswordContent />
     </Suspense>
   );

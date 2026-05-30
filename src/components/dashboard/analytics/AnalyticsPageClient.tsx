@@ -23,7 +23,9 @@ export default function AnalyticsPageClient({
     <div className="space-y-8 pb-12">
       {/* Header */}
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold text-text-primary tracking-tight">Enterprise Analytics</h1>
+        <h1 className="text-3xl font-bold text-text-primary tracking-tight">
+          Enterprise Analytics
+        </h1>
         <p className="text-text-secondary text-lg">
           Intelligence-driven insights and performance metrics.
         </p>

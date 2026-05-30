@@ -24,7 +24,10 @@ import {
 } from "lucide-react";
 import Pusher from "pusher-js";
 import { getChatMessagesAction, sendChatMessageAction } from "@/app/actions/chatActions";
-import { getGDriveUploadContextAction, grantGDriveFilePermissionAction } from "@/app/actions/gdriveActions";
+import {
+  getGDriveUploadContextAction,
+  grantGDriveFilePermissionAction,
+} from "@/app/actions/gdriveActions";
 import { getPusherStatusAction } from "@/app/actions/pusherActions";
 import { cn } from "@/lib/utils";
 
@@ -82,11 +85,11 @@ export function ChatWorkspaceClient({
   const [searchTerm, setSearchTerm] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
-  
+
   // Message Input State
   const [inputValue, setInputValue] = useState("");
   const [sendingMessage, setSendingMessage] = useState(false);
-  
+
   // Attachments State
   const [attachmentsQueue, setAttachmentsQueue] = useState<Attachment[]>([]);
   const [uploadingFile, setUploadingFile] = useState(false);
@@ -103,9 +106,10 @@ export function ChatWorkspaceClient({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Filter projects by search
-  const filteredProjects = projects.filter((p) =>
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.id.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProjects = projects.filter(
+    (p) =>
+      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const selectedProject = projects.find((p) => p.id === selectedProjectId);
@@ -138,9 +142,8 @@ export function ChatWorkspaceClient({
           // Cast parsed jsonb column securely
           const parsed = res.messages.map((m: any) => ({
             ...m,
-            attachments: typeof m.attachments === "string" 
-              ? JSON.parse(m.attachments) 
-              : (m.attachments || []),
+            attachments:
+              typeof m.attachments === "string" ? JSON.parse(m.attachments) : m.attachments || [],
           }));
           setMessages(parsed);
         }
@@ -256,7 +259,9 @@ export function ChatWorkspaceClient({
 
       if (!initRes.ok) {
         const initErr = await initRes.json();
-        throw new Error(initErr.error?.message || "Failed to initialize Google Drive upload session.");
+        throw new Error(
+          initErr.error?.message || "Failed to initialize Google Drive upload session."
+        );
       }
 
       const uploadUrl = initRes.headers.get("Location");
@@ -315,7 +320,10 @@ export function ChatWorkspaceClient({
       // We run this via a secure Server Action to completely bypass browser CORS limitations.
       const permRes = await grantGDriveFilePermissionAction(fileId);
       if (!permRes.success) {
-        console.warn("Failed to grant public viewing permissions on direct client upload:", permRes.error);
+        console.warn(
+          "Failed to grant public viewing permissions on direct client upload:",
+          permRes.error
+        );
       }
 
       // 5. Append attachment details to message queue
@@ -329,7 +337,6 @@ export function ChatWorkspaceClient({
           size: file.size,
         },
       ]);
-
     } catch (err: any) {
       console.error("Client Google Drive upload error:", err);
       setUploadError(err.message || "An unexpected error occurred during direct upload.");
@@ -382,30 +389,18 @@ export function ChatWorkspaceClient({
       const res = await sendChatMessageAction(selectedProjectId, messageText, attachments);
       if (res.success && res.message) {
         setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === tempId
-              ? { ...res.message, status: "delivered" }
-              : msg
-          )
+          prev.map((msg) => (msg.id === tempId ? { ...res.message, status: "delivered" } : msg))
         );
       } else {
         setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === tempId
-              ? { ...msg, status: "failed" }
-              : msg
-          )
+          prev.map((msg) => (msg.id === tempId ? { ...msg, status: "failed" } : msg))
         );
         setUploadError(res.error || "Failed to deliver message.");
       }
     } catch (err: any) {
       console.error(err);
       setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === tempId
-            ? { ...msg, status: "failed" }
-            : msg
-        )
+        prev.map((msg) => (msg.id === tempId ? { ...msg, status: "failed" } : msg))
       );
       setUploadError("Could not dispatch message.");
     } finally {
@@ -415,43 +410,25 @@ export function ChatWorkspaceClient({
   };
 
   const handleRetrySendMessage = async (msg: Message) => {
-    setMessages((prev) =>
-      prev.map((m) =>
-        m.id === msg.id
-          ? { ...m, status: "waiting" }
-          : m
-      )
-    );
+    setMessages((prev) => prev.map((m) => (m.id === msg.id ? { ...m, status: "waiting" } : m)));
 
     try {
-      const res = await sendChatMessageAction(selectedProjectId, msg.messageText || "", msg.attachments);
+      const res = await sendChatMessageAction(
+        selectedProjectId,
+        msg.messageText || "",
+        msg.attachments
+      );
       if (res.success && res.message) {
         setMessages((prev) =>
-          prev.map((m) =>
-            m.id === msg.id
-              ? { ...res.message, status: "delivered" }
-              : m
-          )
+          prev.map((m) => (m.id === msg.id ? { ...res.message, status: "delivered" } : m))
         );
       } else {
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === msg.id
-              ? { ...m, status: "failed" }
-              : m
-          )
-        );
+        setMessages((prev) => prev.map((m) => (m.id === msg.id ? { ...m, status: "failed" } : m)));
         setUploadError(res.error || "Failed to deliver message.");
       }
     } catch (err: any) {
       console.error(err);
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === msg.id
-            ? { ...m, status: "failed" }
-            : m
-        )
-      );
+      setMessages((prev) => prev.map((m) => (m.id === msg.id ? { ...m, status: "failed" } : m)));
       setUploadError("Could not dispatch message.");
     }
   };
@@ -474,10 +451,12 @@ export function ChatWorkspaceClient({
   };
 
   return (
-    <div className={cn(
-      "flex bg-[#F8FAFC] border border-border rounded-3xl overflow-hidden shadow-sm",
-      hideSidebar ? "h-[650px]" : "h-full"
-    )}>
+    <div
+      className={cn(
+        "flex bg-[#F8FAFC] border border-border rounded-3xl overflow-hidden shadow-sm",
+        hideSidebar ? "h-[650px]" : "h-full"
+      )}
+    >
       {/* LEFT PANEL: Projects Directory */}
       {!hideSidebar && (
         <div className="w-80 border-r border-border flex flex-col bg-white shrink-0">
@@ -485,7 +464,9 @@ export function ChatWorkspaceClient({
           <div className="p-6 border-b border-border space-y-4">
             <div>
               <h3 className="text-lg font-bold text-text-primary">Project Channels</h3>
-              <p className="text-[11px] text-text-muted uppercase tracking-wider font-bold">Collaborators Feed</p>
+              <p className="text-[11px] text-text-muted uppercase tracking-wider font-bold">
+                Collaborators Feed
+              </p>
             </div>
             {/* Search bar */}
             <div className="relative">
@@ -565,7 +546,6 @@ export function ChatWorkspaceClient({
                   </p>
                 </div>
               </div>
-
             </div>
 
             {/* Error notifications */}
@@ -575,7 +555,10 @@ export function ChatWorkspaceClient({
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{uploadError}</span>
                 </div>
-                <button onClick={() => setUploadError("")} className="text-danger hover:scale-105 border-0 bg-transparent">
+                <button
+                  onClick={() => setUploadError("")}
+                  className="text-danger hover:scale-105 border-0 bg-transparent"
+                >
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -596,7 +579,8 @@ export function ChatWorkspaceClient({
                   <div className="space-y-1">
                     <h5 className="font-bold text-text-primary text-[13px]">No Messages Yet</h5>
                     <p className="text-[12px] leading-relaxed">
-                      This is the beginning of the real-time project collaboration feed. Type a message below to start!
+                      This is the beginning of the real-time project collaboration feed. Type a
+                      message below to start!
                     </p>
                   </div>
                 </div>
@@ -613,7 +597,12 @@ export function ChatWorkspaceClient({
 
                     // Render avatar initial
                     const nameInitials = msg.senderName
-                      ? msg.senderName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
+                      ? msg.senderName
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .slice(0, 2)
+                          .toUpperCase()
                       : "U";
 
                     return (
@@ -622,7 +611,10 @@ export function ChatWorkspaceClient({
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ type: "spring", stiffness: 300, damping: 28 }}
-                        className={cn("flex gap-3 max-w-[80%]", isSelf ? "ml-auto flex-row-reverse" : "mr-auto")}
+                        className={cn(
+                          "flex gap-3 max-w-[80%]",
+                          isSelf ? "ml-auto flex-row-reverse" : "mr-auto"
+                        )}
                       >
                         {/* Avatar */}
                         <div
@@ -635,7 +627,12 @@ export function ChatWorkspaceClient({
                         {/* Content Container */}
                         <div className="space-y-1.5">
                           {/* Sender Info */}
-                          <div className={cn("flex items-center gap-2 text-[11px]", isSelf ? "justify-end" : "justify-start")}>
+                          <div
+                            className={cn(
+                              "flex items-center gap-2 text-[11px]",
+                              isSelf ? "justify-end" : "justify-start"
+                            )}
+                          >
                             <span className="font-bold text-text-primary">{msg.senderName}</span>
                             <span
                               className="px-1.5 py-0.5 rounded-md font-black text-[9px] uppercase tracking-wider border"
@@ -691,10 +688,15 @@ export function ChatWorkspaceClient({
 
                             {/* Attachments List */}
                             {msg.attachments && msg.attachments.length > 0 && (
-                              <div className={cn("space-y-2 mt-2", msg.messageText ? "pt-2 border-t border-white/10" : "")}>
+                              <div
+                                className={cn(
+                                  "space-y-2 mt-2",
+                                  msg.messageText ? "pt-2 border-t border-white/10" : ""
+                                )}
+                              >
                                 {msg.attachments.map((file) => {
                                   const isImage = file.mimeType.startsWith("image/");
-                                  
+
                                   if (isImage) {
                                     return (
                                       <a
@@ -704,7 +706,9 @@ export function ChatWorkspaceClient({
                                         rel="noreferrer"
                                         className={cn(
                                           "block relative rounded-xl overflow-hidden border transition-all hover:opacity-90",
-                                          isSelf ? "border-white/20 shadow-sm" : "border-black/5 shadow-sm"
+                                          isSelf
+                                            ? "border-white/20 shadow-sm"
+                                            : "border-black/5 shadow-sm"
                                         )}
                                       >
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -777,7 +781,8 @@ export function ChatWorkspaceClient({
                             {uploadingFileName}
                           </span>
                           <span className="text-[10px] text-emerald-600 font-bold block">
-                            {formatBytes(Math.round((uploadProgress / 100) * uploadingFileSize))} of {formatBytes(uploadingFileSize)}
+                            {formatBytes(Math.round((uploadProgress / 100) * uploadingFileSize))} of{" "}
+                            {formatBytes(uploadingFileSize)}
                           </span>
                         </div>
                       </div>
@@ -863,8 +868,8 @@ export function ChatWorkspaceClient({
                     }
                   }}
                   placeholder={
-                    uploadingFile 
-                      ? "Uploading cloud attachment..." 
+                    uploadingFile
+                      ? "Uploading cloud attachment..."
                       : "Type your message here... (Press Enter to send)"
                   }
                   className="flex-1 bg-slate-50 border border-border rounded-xl px-4 py-3.5 text-[13px] text-text-primary focus:bg-white focus:border-accent outline-none max-h-32 min-h-12 resize-none custom-scrollbar transition-colors leading-relaxed"
@@ -873,10 +878,7 @@ export function ChatWorkspaceClient({
                 {/* Submit Send Button */}
                 <button
                   type="submit"
-                  disabled={
-                    uploadingFile || 
-                    (!inputValue.trim() && attachmentsQueue.length === 0)
-                  }
+                  disabled={uploadingFile || (!inputValue.trim() && attachmentsQueue.length === 0)}
                   className="h-12 px-6 bg-accent text-white font-bold rounded-xl text-[12px] uppercase tracking-wider flex items-center justify-center gap-2 hover:scale-[1.01] shadow-lg shadow-accent/15 transition-all disabled:opacity-40 shrink-0 cursor-pointer"
                 >
                   <Send className="w-4 h-4" />
@@ -896,9 +898,12 @@ export function ChatWorkspaceClient({
               <MessageSquare className="w-7 h-7" />
             </div>
             <div className="space-y-1.5">
-              <h4 className="font-bold text-text-primary text-[14px]">Select a Project Chat Channel</h4>
+              <h4 className="font-bold text-text-primary text-[14px]">
+                Select a Project Chat Channel
+              </h4>
               <p className="text-[12px] leading-relaxed">
-                Choose one of the assigned project channels from the directory on the left to start collaborating in real-time.
+                Choose one of the assigned project channels from the directory on the left to start
+                collaborating in real-time.
               </p>
             </div>
           </div>
