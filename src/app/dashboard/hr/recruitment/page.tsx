@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   PlusCircle,
@@ -10,17 +10,50 @@ import {
   Search,
   Filter,
   ChevronDown,
+  RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { JobsTable } from "@/components/hr/recruitment/JobsTable";
 import { RecruitmentPipeline } from "@/components/hr/recruitment/RecruitmentPipeline";
 import { NewJobModal } from "@/components/hr/recruitment/NewJobModal";
+import { NewCandidateModal } from "@/components/hr/recruitment/NewCandidateModal";
 import { HRNavbar } from "@/components/hr/HRNavbar";
-import { MOCK_JOBS, MOCK_CANDIDATES } from "@/lib/mockData/hr";
+import { getRecruitmentDashboardDataAction } from "@/app/actions/hrActions";
+import { Candidate, Job, Employee } from "@/types/hr";
 
 export default function RecruitmentPage() {
   const [view, setView] = useState<"pipeline" | "table">("pipeline");
   const [isNewJobModalOpen, setIsNewJobModalOpen] = useState(false);
+  const [isNewCandidateModalOpen, setIsNewCandidateModalOpen] = useState(false);
+
+  // Live database states
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch recruitment board dataset
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const res = await getRecruitmentDashboardDataAction();
+      if (res.success && res.candidates && res.jobs && res.employees) {
+        setCandidates(res.candidates);
+        setJobs(res.jobs);
+        setEmployees(res.employees);
+      } else {
+        console.error("Failed to load recruitment DB dataset:", res.error);
+      }
+    } catch (err) {
+      console.error("Error retrieving recruitment records:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   return (
     <div className="flex-1 bg-[#F8FAFC] min-h-screen flex flex-col">
@@ -37,13 +70,16 @@ export default function RecruitmentPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-bold text-[#475569] hover:bg-[#F1F5F9] transition-all bg-white">
+            <button
+              onClick={() => setIsNewCandidateModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-bold text-[#475569] hover:bg-[#F1F5F9] transition-all bg-white cursor-pointer active:scale-[0.98]"
+            >
               <UserPlus className="w-4 h-4" />
               <span>Add Candidate</span>
             </button>
             <button
               onClick={() => setIsNewJobModalOpen(true)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#10B981] text-white text-sm font-bold shadow-lg shadow-[#10B981]/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#10B981] text-white text-sm font-bold shadow-lg shadow-[#10B981]/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
             >
               <PlusCircle className="w-4 h-4" />
               <span>New Job Opening</span>
@@ -57,7 +93,7 @@ export default function RecruitmentPage() {
             <button
               onClick={() => setView("pipeline")}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all",
+                "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer",
                 view === "pipeline"
                   ? "bg-[#10B981] text-white shadow-md shadow-[#10B981]/20"
                   : "text-[#64748B] hover:bg-[#F8FAFC]"
@@ -69,7 +105,7 @@ export default function RecruitmentPage() {
             <button
               onClick={() => setView("table")}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all",
+                "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer",
                 view === "table"
                   ? "bg-[#10B981] text-white shadow-md shadow-[#10B981]/20"
                   : "text-[#64748B] hover:bg-[#F8FAFC]"
@@ -89,7 +125,7 @@ export default function RecruitmentPage() {
                 className="pl-10 pr-4 py-2.5 rounded-xl border border-[#E2E8F0] bg-white text-sm w-64 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition-all"
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#E2E8F0] bg-white text-sm font-bold text-[#64748B] hover:bg-[#F8FAFC] transition-all">
+            <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#E2E8F0] bg-white text-sm font-bold text-[#64748B] hover:bg-[#F8FAFC] transition-all cursor-pointer">
               <Filter className="w-4 h-4" />
               <span>Filters</span>
               <ChevronDown className="w-4 h-4 ml-1" />
@@ -98,21 +134,43 @@ export default function RecruitmentPage() {
         </div>
 
         {/* Content Section */}
-        <motion.div
-          key={view}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          {view === "pipeline" ? (
-            <RecruitmentPipeline candidates={MOCK_CANDIDATES} />
-          ) : (
-            <JobsTable data={MOCK_JOBS} />
-          )}
-        </motion.div>
+        {loading ? (
+          <div className="flex-1 flex flex-col items-center justify-center min-h-[400px] bg-white/50 border border-[#E2E8F0] rounded-2xl shadow-sm">
+            <RefreshCw className="w-10 h-10 text-[#10B981] animate-spin mb-4" />
+            <p className="text-sm font-bold text-[#64748B] uppercase tracking-wider animate-pulse">
+              Loading Live Recruitment Dashboard...
+            </p>
+          </div>
+        ) : (
+          <motion.div
+            key={view}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {view === "pipeline" ? (
+              <RecruitmentPipeline candidates={candidates} />
+            ) : (
+              <JobsTable data={jobs} />
+            )}
+          </motion.div>
+        )}
       </div>
 
-      <NewJobModal isOpen={isNewJobModalOpen} onClose={() => setIsNewJobModalOpen(false)} />
+      {/* Dynamic Action Modals */}
+      <NewJobModal
+        isOpen={isNewJobModalOpen}
+        onClose={() => setIsNewJobModalOpen(false)}
+        onSuccess={loadData}
+        employees={employees}
+      />
+      <NewCandidateModal
+        isOpen={isNewCandidateModalOpen}
+        onClose={() => setIsNewCandidateModalOpen(false)}
+        onSuccess={loadData}
+        jobs={jobs}
+        employees={employees}
+      />
     </div>
   );
 }

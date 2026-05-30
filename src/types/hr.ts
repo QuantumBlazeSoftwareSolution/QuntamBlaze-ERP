@@ -43,7 +43,7 @@ export interface Job {
   pipelineCount: number;
   postedDate: string;
   status: JobStatus;
-  hiringManager: {
+  hiringManager?: {
     id: string;
     name: string;
     avatar?: string;

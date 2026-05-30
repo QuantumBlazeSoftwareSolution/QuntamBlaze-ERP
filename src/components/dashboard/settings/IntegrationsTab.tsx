@@ -24,6 +24,8 @@ import {
   Eye,
   EyeOff,
   GitBranch,
+  Globe,
+  Webhook,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -179,6 +181,7 @@ export function IntegrationsTab() {
   const [showPusherSetupModal, setShowPusherSetupModal] = useState(false);
   const [showGithubSetupModal, setShowGithubSetupModal] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [webhookCopied, setWebhookCopied] = useState(false);
   const [clientOrigin, setClientOrigin] = useState("");
 
   useEffect(() => {
@@ -2137,70 +2140,228 @@ export function IntegrationsTab() {
                     </div>
                   </div>
                 </div>
-
-                {/* Step 4 */}
+                {/* Step 4 - Webhook Setup */}
                 <div className="flex gap-4">
                   <div className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-800 font-bold text-sm shrink-0">
                     4
                   </div>
-                  <div className="space-y-1.5 pt-0.5">
-                    <h4 className="font-bold text-text-primary text-[14px]">Set Permissions & Webhook Events</h4>
-                    <p>
-                      Under **"Permissions & events"**, set the following access scopes:
-                    </p>
-                    <ul className="list-disc pl-5 mt-2 space-y-2 text-text-secondary font-medium">
-                      <li>
-                        <strong>Repository Permissions</strong>:
-                        <ul className="list-circle pl-5 mt-1 text-text-muted space-y-0.5">
-                          <li><strong>Administration</strong>: <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded text-[11px]">Read & Write</code> (for repository provisioning & collaborator management)</li>
-                          <li><strong>Contents</strong>: <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded text-[11px]">Read & Write</code> (for git branch operations & code commits)</li>
-                          <li><strong>Issues</strong>: <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded text-[11px]">Read & Write</code> (for task ticket syncing)</li>
-                          <li><strong>Pull Requests</strong>: <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded text-[11px]">Read & Write</code> (for PR merges)</li>
+                  <div className="space-y-3 pt-0.5 w-full">
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-text-primary text-[14px]">Configure Webhook Settings</h4>
+                      <p>
+                        Scroll down to the <strong>Webhook</strong> section. Check the <strong>"Active"</strong> checkbox. Set the <strong>Webhook URL</strong> to the exact endpoint below:
+                      </p>
+                    </div>
+
+                    {/* Copy Box */}
+                    <div className="bg-neutral-50 border border-neutral-200 p-4 rounded-2xl space-y-2">
+                      <div className="flex items-center justify-between text-[11px] font-black text-neutral-700 uppercase tracking-widest">
+                        GitHub Webhook URL
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(`${clientOrigin || window.location.origin}/api/webhooks/github`);
+                            setWebhookCopied(true);
+                            setTimeout(() => setWebhookCopied(false), 2000);
+                          }}
+                          className="text-[10px] font-bold bg-white border border-neutral-300 hover:border-neutral-400 text-neutral-800 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer"
+                        >
+                          {webhookCopied ? (
+                            <>
+                              <Check className="w-3.5 h-3.5" />
+                              Copied!
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5" />
+                              Copy Link
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <div className="p-3 bg-white border border-border rounded-xl text-[11px] font-mono text-text-primary break-all select-all">
+                        {clientOrigin || "http://localhost:3000"}/api/webhooks/github
+                      </div>
+                      <p className="text-[10px] text-text-muted">
+                        Set a secure, private string as your <strong>Webhook Secret</strong> (and keep note of it—you will enter this same secret in the configuration form).
+                      </p>
+                      {/* Local Dev Tip */}
+                      <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-xl text-[11px] leading-relaxed text-amber-800 space-y-1.5 mt-2">
+                        <span className="font-bold block text-xs">⚠️ Local Development / localhost Notice</span>
+                        <span>GitHub cannot send webhooks directly to a <code>localhost</code> domain. To make it work locally:</span>
+                        <ul className="list-disc pl-4 space-y-1 mt-1 font-medium">
+                          <li><strong>Option A (Recommended):</strong> Go to <a href="https://smee.io" target="_blank" rel="noreferrer" className="underline font-bold text-amber-900 hover:text-amber-950">smee.io</a>, click <strong>"Start a new channel"</strong>, set the resulting Smee URL as the Webhook URL, and forward payloads locally using: <code className="bg-amber-100 text-amber-950 px-1 py-0.5 rounded text-[10px]">npx -y smee-client -u [SmeeURL] -p 3000 -P /api/webhooks/github</code>.</li>
+                          <li><strong>Option B (Fast Testing):</strong> Simply <strong>UNCHECK</strong> the <strong>"Active"</strong> checkbox in the Webhook section. All features (repo provisioning, branch/PR creation) will still work 100% via API!</li>
                         </ul>
-                      </li>
-                      <li>
-                        <strong>Organization Permissions</strong>:
-                        <ul className="list-circle pl-5 mt-1 text-text-muted space-y-0.5">
-                          <li><strong>Members</strong>: <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded text-[11px]">Read-only</code> (to fetch collaborator profiles)</li>
-                        </ul>
-                      </li>
-                      <li>
-                        <strong>Webhook Events (at the bottom)</strong>:
-                        <ul className="list-circle pl-5 mt-1 text-text-muted space-y-0.5">
-                          <li>Check <strong>"Push"</strong>, <strong>"Pull request"</strong>, and <strong>"Issues"</strong> events to receive real-time webhook timeline logs.</li>
-                        </ul>
-                      </li>
-                    </ul>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Step 5 */}
+                {/* Step 5 - Detailed Permissions */}
                 <div className="flex gap-4">
                   <div className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-800 font-bold text-sm shrink-0">
                     5
                   </div>
-                  <div className="space-y-1.5 pt-0.5">
-                    <h4 className="font-bold text-text-primary text-[14px]">Generate and Download Private Credentials</h4>
+                  <div className="space-y-3 pt-0.5 w-full">
+                    <h4 className="font-bold text-text-primary text-[14px]">Configure Repository & Organization Permissions</h4>
                     <p>
-                      Click **"Create GitHub App"**. On your new App dashboard page, save these credentials:
+                      In the left side panel of your GitHub App settings, navigate to <strong>"Permissions & events"</strong>. Click on each section and strictly configure these access scopes down the list:
                     </p>
-                    <ul className="list-disc pl-5 mt-2 space-y-1 text-text-muted">
-                      <li>Copy the <strong>App ID</strong> and <strong>Client ID</strong>.</li>
-                      <li>Click <strong>"Generate a new client secret"</strong> and copy the generated secret key.</li>
-                      <li>Scroll down, click <strong>"Generate a private key"</strong>. Open the downloaded <code>.pem</code> file in a text editor, and copy the full text starting with <code>-----BEGIN RSA PRIVATE KEY-----</code>.</li>
-                    </ul>
+
+                    <div className="space-y-3 mt-3">
+                      {/* Repos Permissions */}
+                      <div className="border border-neutral-200 rounded-xl overflow-hidden">
+                        <div className="bg-neutral-50 px-4 py-2 border-b border-neutral-200 flex items-center justify-between">
+                          <span className="text-[11px] font-black text-neutral-700 uppercase tracking-wider">Repository Permissions</span>
+                          <span className="text-[10px] font-bold text-[#10B981] bg-[#ECFDF5] px-2 py-0.5 rounded border border-[#A7F3D0]">Read & Write Scopes</span>
+                        </div>
+                        <div className="divide-y divide-neutral-100 bg-white text-xs">
+                          <div className="px-4 py-2.5 flex justify-between items-center">
+                            <span className="font-bold text-text-primary">Administration</span>
+                            <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Read & write</span>
+                          </div>
+                          <div className="px-4 py-2.5 flex justify-between items-center bg-slate-50/20">
+                            <span className="font-bold text-text-primary">Contents</span>
+                            <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Read & write</span>
+                          </div>
+                          <div className="px-4 py-2.5 flex justify-between items-center">
+                            <span className="font-bold text-text-primary">Issues</span>
+                            <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Read & write</span>
+                          </div>
+                          <div className="px-4 py-2.5 flex justify-between items-center bg-slate-50/20">
+                            <span className="font-bold text-text-primary">Metadata</span>
+                            <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Read-only (Auto-selected)</span>
+                          </div>
+                          <div className="px-4 py-2.5 flex justify-between items-center">
+                            <span className="font-bold text-text-primary">Pull Requests</span>
+                            <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Read & write</span>
+                          </div>
+                          <div className="px-4 py-2 flex items-center justify-between bg-neutral-50/50 text-[10px] text-text-muted italic">
+                            <span>* Set all other Repository permissions (Actions, Secrets, Variables, Deployments, Pages, Projects etc.) to:</span>
+                            <span className="font-bold text-neutral-500 bg-neutral-100 px-1.5 py-0.5 rounded">No access</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Org Permissions */}
+                      <div className="border border-neutral-200 rounded-xl overflow-hidden">
+                        <div className="bg-neutral-50 px-4 py-2 border-b border-neutral-200 flex items-center justify-between">
+                          <span className="text-[11px] font-black text-neutral-700 uppercase tracking-wider">Organization Permissions</span>
+                          <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Read Scopes</span>
+                        </div>
+                        <div className="divide-y divide-neutral-100 bg-white text-xs">
+                          <div className="px-4 py-2.5 flex justify-between items-center">
+                            <span className="font-bold text-text-primary">Members</span>
+                            <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Read-only</span>
+                          </div>
+                          <div className="px-4 py-2 flex items-center justify-between bg-neutral-50/50 text-[10px] text-text-muted italic">
+                            <span>* Set all other Organization permissions to:</span>
+                            <span className="font-bold text-neutral-500 bg-neutral-100 px-1.5 py-0.5 rounded">No access</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Account Permissions */}
+                      <div className="border border-neutral-200 rounded-xl overflow-hidden">
+                        <div className="bg-neutral-50 px-4 py-2 border-b border-neutral-200 flex items-center justify-between">
+                          <span className="text-[11px] font-black text-neutral-700 uppercase tracking-wider">Account Permissions</span>
+                          <span className="text-[10px] font-bold text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded border border-neutral-200">No Access Required</span>
+                        </div>
+                        <div className="p-3 bg-white text-xs text-text-muted text-center font-medium">
+                          Set <strong>all</strong> Account permissions (Email addresses, profile, keys etc.) to <code className="bg-neutral-100 text-neutral-600 px-1.5 py-0.5 rounded text-[10px]">No access</code>. Personal user authorization is securely handled directly via OAuth callback.
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Step 6 */}
+                {/* Step 6 - Webhook Event Subscriptions */}
                 <div className="flex gap-4">
                   <div className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-800 font-bold text-sm shrink-0">
                     6
                   </div>
-                  <div className="space-y-1.5 pt-0.5">
-                    <h4 className="font-bold text-text-primary text-[14px]">Install the App onto your Organization</h4>
+                  <div className="space-y-2 pt-0.5 w-full">
+                    <h4 className="font-bold text-text-primary text-[14px]">Subscribe to Webhook Events</h4>
                     <p>
-                      In the left side panel of your GitHub App settings, click **"Install App"**, and install it onto your target Organization. Finally, enter your Organization name as the <strong>Organization / Owner Name</strong> in this configuration form alongside your credentials. You are all set!
+                      At the very bottom of the <strong>"Permissions & events"</strong> page, look for the <strong>"Subscribe to events"</strong> section. Check the checkboxes for precisely these events:
+                    </p>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2 bg-neutral-50 p-4 rounded-xl border border-neutral-200 font-mono text-[11px] text-text-primary font-bold">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">✓</div>
+                        <span>Issues</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">✓</div>
+                        <span>Label</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">✓</div>
+                        <span>Member</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">✓</div>
+                        <span>Pull request</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">✓</div>
+                        <span>Push</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded border border-[#10B981] bg-[#ECFDF5] flex items-center justify-center text-[#10B981] shrink-0 font-sans text-[10px]">✓</div>
+                        <span>Repository</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 7 - Installation Target Scope */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-800 font-bold text-sm shrink-0">
+                    7
+                  </div>
+                  <div className="space-y-1.5 pt-0.5 w-full">
+                    <h4 className="font-bold text-text-primary text-[14px]">Select App Installation Scope</h4>
+                    <p>
+                      Under the section <strong>"Where can this GitHub App be installed?"</strong> (at the bottom of the App creation form), select:
+                    </p>
+                    <div className="mt-2 bg-neutral-50 border border-neutral-200 rounded-xl p-4 flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full border-4 border-[#10B981] bg-white shrink-0"></div>
+                      <div>
+                        <span className="font-bold text-xs text-text-primary block">Any account</span>
+                        <span className="text-[10px] text-text-muted">Allows this App to be installed on other GitHub user/organization accounts (Required for multi-tenant ERP operations).</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 8 - Credentials Generation */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-800 font-bold text-sm shrink-0">
+                    8
+                  </div>
+                  <div className="space-y-1.5 pt-0.5 w-full">
+                    <h4 className="font-bold text-text-primary text-[14px]">Create GitHub App & Gather Credentials</h4>
+                    <p>
+                      Click the green <strong>"Create GitHub App"</strong> button. Once the app is successfully created, copy the following values:
+                    </p>
+                    <ul className="list-disc pl-5 mt-2 space-y-1.5 text-text-secondary">
+                      <li>Copy the <strong>App ID</strong> and <strong>Client ID</strong> from the main app summary.</li>
+                      <li>In the <strong>Client secrets</strong> section, click <strong>"Generate a new client secret"</strong> and copy it immediately.</li>
+                      <li>In the <strong>Private keys</strong> section at the very bottom, click <strong>"Generate a private key"</strong>. Open the downloaded <code>.pem</code> file in any text editor, and copy the entire text starting with <code>-----BEGIN RSA PRIVATE KEY-----</code>.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Step 9 - Save configuration */}
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-800 font-bold text-sm shrink-0">
+                    9
+                  </div>
+                  <div className="space-y-1.5 pt-0.5 w-full">
+                    <h4 className="font-bold text-text-primary text-[14px]">Install App & Connect with ERP Settings</h4>
+                    <p>
+                      In the left sidebar of your GitHub App settings, click <strong>"Install App"</strong>, and install it onto your target Organization. Enter that exact GitHub Organization name under <strong>Organization / Owner Name</strong> in the ERP configuration form along with your credentials, and click <strong>"Save Settings"</strong>. You are completely ready to go!
                     </p>
                   </div>
                 </div>

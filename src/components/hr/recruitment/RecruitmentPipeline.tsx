@@ -23,6 +23,7 @@ import {
 import { Candidate, PipelineStage } from "@/types/hr";
 import { CandidateCard } from "./CandidateCard";
 import { cn } from "@/lib/utils";
+import { updateCandidateStageAction } from "@/app/actions/hrActions";
 
 interface RecruitmentPipelineProps {
   candidates: Candidate[];
@@ -51,6 +52,11 @@ const STAGE_COLORS: Record<string, string> = {
 export function RecruitmentPipeline({ candidates: initialCandidates }: RecruitmentPipelineProps) {
   const [candidates, setCandidates] = useState(initialCandidates);
   const [activeId, setActiveId] = useState<string | null>(null);
+
+  // Sync state with parent props on live DB refresh
+  React.useEffect(() => {
+    setCandidates(initialCandidates);
+  }, [initialCandidates]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -101,8 +107,17 @@ export function RecruitmentPipeline({ candidates: initialCandidates }: Recruitme
 
     if (!over) return;
 
+    const activeCandidate = candidates.find((c) => c.id === active.id);
+    if (activeCandidate) {
+      // Persist the stage update dynamically in the PostgreSQL database!
+      updateCandidateStageAction(activeCandidate.id, activeCandidate.currentStage).then((res) => {
+        if (!res.success) {
+          console.error("Failed to persist pipeline stage in DB:", res.error);
+        }
+      });
+    }
+
     if (active.id !== over.id) {
-      const activeCandidate = candidates.find((c) => c.id === active.id);
       const overCandidate = candidates.find((c) => c.id === over.id);
 
       if (
