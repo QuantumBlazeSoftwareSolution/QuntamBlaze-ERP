@@ -131,6 +131,9 @@ export function ChatWorkspaceClient({
     const clientId = process.env.NEXT_PUBLIC_CLIENT_ID || "default";
     const multitenantRoomId = `${clientId}_${selectedProjectId}`;
 
+    console.log("[PartySocket] Initializing WebSocket connection...");
+    console.log(`[PartySocket] Host: ${host} | Room ID: ${multitenantRoomId}`);
+
     const socket = new PartySocket({
       host: host,
       room: multitenantRoomId,
@@ -140,6 +143,18 @@ export function ChatWorkspaceClient({
     });
 
     socketRef.current = socket;
+
+    socket.onopen = () => {
+      console.log("[PartySocket] Connection successfully established!");
+    };
+
+    socket.onerror = (err) => {
+      console.error("[PartySocket] Connection error occurred:", err);
+    };
+
+    socket.onclose = (event) => {
+      console.warn("[PartySocket] Connection closed by server:", event);
+    };
 
     socket.onmessage = (event) => {
       try {
