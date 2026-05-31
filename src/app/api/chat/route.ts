@@ -6,10 +6,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    const projectId = request.nextUrl.searchParams.get("projectId");
-    if (!projectId) {
+    const rawProjectId = request.nextUrl.searchParams.get("projectId");
+    if (!rawProjectId) {
       return NextResponse.json({ error: "Missing projectId" }, { status: 400 });
     }
+
+    // Extract actual database projectId from multitenant Room ID (Format: CLIENT_ID_PROJECT_ID)
+    const parts = rawProjectId.split("_");
+    const projectId = parts.length > 1 ? parts.slice(1).join("_") : rawProjectId;
 
     const messages = await db
       .select({
@@ -49,12 +53,16 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { projectId, senderId, messageText } = body;
+    const { projectId: rawProjectId, senderId, messageText } = body;
     const attachments = body.attachments || [];
 
-    if (!projectId || !senderId) {
+    if (!rawProjectId || !senderId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
+
+    // Extract actual database projectId from multitenant Room ID (Format: CLIENT_ID_PROJECT_ID)
+    const parts = rawProjectId.split("_");
+    const projectId = parts.length > 1 ? parts.slice(1).join("_") : rawProjectId;
 
     const messageId = `MSG-${uuidv4().slice(0, 8).toUpperCase()}`;
 

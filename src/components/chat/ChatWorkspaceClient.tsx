@@ -128,10 +128,12 @@ export function ChatWorkspaceClient({
 
     setLoadingMessages(true);
     const host = process.env.NEXT_PUBLIC_PARTYKIT_HOST || "localhost:1999";
+    const clientId = process.env.NEXT_PUBLIC_CLIENT_ID || "default";
+    const multitenantRoomId = `${clientId}_${selectedProjectId}`;
 
     const socket = new PartySocket({
       host: host,
-      room: selectedProjectId,
+      room: multitenantRoomId,
     });
 
     socketRef.current = socket;
