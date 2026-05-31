@@ -21,6 +21,7 @@ import {
   Clock,
   CheckCheck,
   RefreshCw,
+  ArrowLeft,
 } from "lucide-react";
 import PartySocket from "partysocket";
 import { getChatMessagesAction, sendChatMessageAction } from "@/app/actions/chatActions";
@@ -458,7 +459,7 @@ export function ChatWorkspaceClient({
       )}
     >
       {/* LEFT PANEL: Projects Directory */}
-      {!hideSidebar && (
+      {!hideSidebar && !selectedProjectId && (
         <div className="w-80 border-r border-border flex flex-col bg-white shrink-0">
           {/* Directory Header */}
           <div className="p-6 border-b border-border space-y-4">
@@ -534,7 +535,15 @@ export function ChatWorkspaceClient({
             {/* Chat Room Header */}
             <div className="px-8 py-5 border-b border-border bg-white flex items-center justify-between z-10 shadow-sm shadow-slate-100/50">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-accent/5 border border-accent/15 flex items-center justify-center text-accent">
+                <button
+                  onClick={() => setSelectedProjectId("")}
+                  className="p-2 text-text-secondary hover:text-accent transition-all rounded-xl hover:bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200 bg-slate-50/50 cursor-pointer shadow-sm active:scale-95 duration-200"
+                  title="Back to Channels"
+                >
+                  <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
+                </button>
+
+                <div className="w-10 h-10 rounded-xl bg-accent/5 border border-accent/15 flex items-center justify-center text-accent shrink-0">
                   <MessageSquare className="w-5 h-5" />
                 </div>
                 <div>
