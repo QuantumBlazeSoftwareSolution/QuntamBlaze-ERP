@@ -30,3 +30,5 @@ export * from "./chat";
 export * from "./personalTasks";
 export * from "./knowledgeBase";
 export * from "./github";
+export * from "./notifications";
+

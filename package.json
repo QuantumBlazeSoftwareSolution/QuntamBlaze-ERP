@@ -30,6 +30,7 @@
     "@tiptap/react": "^3.23.1",
     "@tiptap/starter-kit": "^3.23.1",
     "@types/uuid": "^10.0.0",
+    "@types/web-push": "^3.6.4",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
@@ -51,6 +52,7 @@
     "recharts": "^3.8.1",
     "tailwind-merge": "^3.5.0",
     "uuid": "^14.0.0",
+    "web-push": "^3.6.7",
     "zod": "^4.4.3",
     "zustand": "^5.0.13"
   },
