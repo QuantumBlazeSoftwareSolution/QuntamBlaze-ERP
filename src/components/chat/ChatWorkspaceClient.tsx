@@ -134,6 +134,9 @@ export function ChatWorkspaceClient({
     const socket = new PartySocket({
       host: host,
       room: multitenantRoomId,
+      query: {
+        baseUrl: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
+      },
     });
 
     socketRef.current = socket;
@@ -372,6 +375,7 @@ export function ChatWorkspaceClient({
             senderId: currentUser.userId,
             messageText,
             attachments,
+            baseUrl: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
           })
         );
       } else {
@@ -396,6 +400,7 @@ export function ChatWorkspaceClient({
             senderId: currentUser.userId,
             messageText: msg.messageText || "",
             attachments: msg.attachments,
+            baseUrl: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
           })
         );
       } else {

@@ -4,9 +4,10 @@ export default class QuantumBlazeChatServer implements Party.Server {
   constructor(readonly room: Party.Room) {}
 
   async onConnect(connection: Party.Connection, ctx: Party.ConnectionContext) {
-    const nextjsApiUrl = process.env.NEXT_PUBLIC_BASE_URL
-      ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/chat`
-      : "http://localhost:3000/api/chat";
+    // Resolve Next.js Base URL dynamically from the client's connection query parameters
+    const url = new URL(ctx.request.url);
+    const clientBaseUrl = url.searchParams.get("baseUrl") || "http://localhost:3000";
+    const nextjsApiUrl = `${clientBaseUrl}/api/chat`;
 
     try {
       const response = await fetch(`${nextjsApiUrl}?projectId=${this.room.id}`);
@@ -22,11 +23,11 @@ export default class QuantumBlazeChatServer implements Party.Server {
   async onMessage(message: string, sender: Party.Connection) {
     try {
       const parsedData = JSON.parse(message);
-      const { senderId, messageText, attachments } = parsedData;
+      const { senderId, messageText, attachments, baseUrl } = parsedData;
 
-      const nextjsApiUrl = process.env.NEXT_PUBLIC_BASE_URL
-        ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/chat`
-        : "http://localhost:3000/api/chat";
+      // Resolve Next.js Base URL dynamically from payload or fallback
+      const clientBaseUrl = baseUrl || "http://localhost:3000";
+      const nextjsApiUrl = `${clientBaseUrl}/api/chat`;
 
       const response = await fetch(nextjsApiUrl, {
         method: "POST",
