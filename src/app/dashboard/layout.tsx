@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { Grid } from "lucide-react";
 import { ProfileDropdown } from "@/components/layout/ProfileDropdown";
 import { AskAIWidget } from "@/components/layout/AskAIWidget";
+import { RealtimeNotificationManager } from "@/components/layout/RealtimeNotificationManager";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { isCollapsed } = useSidebarStore();
@@ -60,6 +61,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <NotificationsPanel />
         <AuditLogDrawer />
         <AskAIWidget />
+        <RealtimeNotificationManager />
       </SearchProvider>
     </SystemConfigProvider>
   );

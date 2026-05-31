@@ -26,8 +26,10 @@ import {
   GitBranch,
   Globe,
   Webhook,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { subscribeUserToPush } from "@/components/layout/RealtimeNotificationManager";
 import {
   getGoogleDriveStatusAction,
   saveGoogleDriveClientConfigAction,
@@ -60,6 +62,25 @@ import {
 export function IntegrationsTab() {
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  // Push notifications state
+  const [pushStatus, setPushStatus] = useState<string>("default");
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      setPushStatus(Notification.permission);
+    }
+  }, []);
+
+  const handleBrowserPushSubscribe = async () => {
+    const success = await subscribeUserToPush();
+    if (success) {
+      setPushStatus("granted");
+      alert("✓ Browser push notifications configured successfully! You will now receive operational alerts.");
+    } else {
+      alert("Could not register push notifications. Please check your browser site settings and allow permissions.");
+    }
+  };
 
   // Integration card states
   const [gdriveStatus, setGDriveStatus] = useState<{
@@ -775,6 +796,23 @@ export function IntegrationsTab() {
       onAction: () => setDrawerType("pusher"),
     },
     {
+      id: "browser_push",
+      name: "Browser Push Notifications",
+      description:
+        "Receive native OS push alerts on your desktop or mobile even when the ERP tab is completely closed.",
+      icon: Bell,
+      status:
+        pushStatus.toLowerCase() === "default"
+          ? "Not Configured"
+          : pushStatus.toLowerCase() === "granted"
+            ? "Connected"
+            : "Blocked / Denied",
+      color: "text-emerald-500",
+      actionLabel:
+        pushStatus.toLowerCase() === "granted" ? "CONNECTED" : "ACTIVATE NOTIFICATIONS",
+      onAction: () => handleBrowserPushSubscribe(),
+    },
+    {
       id: "gmail",
       name: "Gmail SMTP",
       description: "Send outbound invoices and reports using your corporate SMTP server.",
@@ -904,7 +942,8 @@ export function IntegrationsTab() {
                 integration.id !== "gdrive" &&
                 integration.id !== "pusher" &&
                 integration.id !== "gemini" &&
-                integration.id !== "github"
+                integration.id !== "github" &&
+                integration.id !== "browser_push"
               }
               className={cn(
                 "mt-8 flex items-center justify-between w-full p-4 rounded-xl bg-page-bg border border-divider group-hover:border-accent/50 transition-all cursor-pointer",
@@ -912,6 +951,7 @@ export function IntegrationsTab() {
                   integration.id !== "pusher" &&
                   integration.id !== "gemini" &&
                   integration.id !== "github" &&
+                  integration.id !== "browser_push" &&
                   "opacity-50 cursor-not-allowed"
               )}
             >

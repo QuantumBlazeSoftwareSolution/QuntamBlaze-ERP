@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { logAction } from "@/lib/logger";
 import { projectSchema, ProjectFormData } from "@/lib/schemas/projectSchema";
+import { triggerRealtimeAlertAction } from "./notificationActions";
 
 export async function previewProjectIdAction(clientName: string) {
   if (!clientName || clientName.trim() === "") {
@@ -97,6 +98,18 @@ export async function createProjectAction(data: ProjectFormData) {
           projectId,
           employeeId: empId,
         });
+
+        // Trigger real-time and push notifications for the assigned employee
+        try {
+          await triggerRealtimeAlertAction(empId, {
+            type: "proposal",
+            entityId: projectId,
+            message: `New Assignment! You have been assigned to project: ${parsed.name.trim()} (${projectId})`,
+            url: `/dashboard/chat?projectId=${projectId}`,
+          });
+        } catch (notifErr) {
+          console.error(`Failed to send assignment notification to employee ${empId}:`, notifErr);
+        }
       }
     }
 

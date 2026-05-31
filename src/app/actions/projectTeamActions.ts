@@ -1,9 +1,10 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { projectTeam, employees, employeeRoles } from "@/lib/db/schema";
+import { projectTeam, employees, employeeRoles, projects } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { triggerRealtimeAlertAction } from "./notificationActions";
 
 /**
  * Returns all active employees in the system.
@@ -74,6 +75,23 @@ export async function assignProjectMemberAction(
       employeeId,
       projectRole: role,
     });
+
+    // 3b. Trigger real-time alert and push notifications for the assigned employee
+    try {
+      const project = await db.query.projects.findFirst({
+        where: eq(projects.id, projectId),
+      });
+      const projectName = project?.name || projectId;
+
+      await triggerRealtimeAlertAction(employeeId, {
+        type: "proposal",
+        entityId: projectId,
+        message: `New Assignment! You have been assigned as ${role} for project: ${projectName} (${projectId})`,
+        url: `/dashboard/chat?projectId=${projectId}`,
+      });
+    } catch (notifErr) {
+      console.error(`Failed to send dynamic assignment notification to employee ${employeeId}:`, notifErr);
+    }
 
     // 4. Revalidate paths to trigger dynamic server-side update
     revalidatePath(`/dashboard/projects/${projectId}`);
