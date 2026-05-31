@@ -176,7 +176,11 @@ export function ProjectDocumentsTab({ project }: ProjectDocumentsTabProps) {
       // 1. Fetch token and target folder ID from Server Action
       const contextRes = await getGDriveUploadContextAction(project.id, "project");
       if (!contextRes.success || !contextRes.accessToken || !contextRes.folderId) {
-        throw new Error(contextRes.error || "Failed to initialize cloud credentials.");
+        throw new Error(
+          contextRes.error?.includes("authenticated") || contextRes.error?.includes("configured") || contextRes.error?.includes("active")
+            ? "Google Drive is not linked or your authorization has expired. Please go to Settings > Integrations to authenticate."
+            : contextRes.error || "Failed to initialize cloud credentials."
+        );
       }
 
       const { accessToken, folderId } = contextRes;
@@ -294,7 +298,22 @@ export function ProjectDocumentsTab({ project }: ProjectDocumentsTabProps) {
             ) : (
               <AlertTriangle className="w-5 h-5 flex-shrink-0" />
             )}
-            <span className="flex-1">{notification.message}</span>
+            <span className="flex-1">
+              {notification.message.includes("Settings > Integrations") ? (
+                <>
+                  {notification.message.split("Settings > Integrations")[0]}
+                  <a
+                    href="/dashboard/settings?tab=integrations"
+                    className="underline hover:text-rose-700 ml-1 font-extrabold cursor-pointer"
+                  >
+                    Settings &gt; Integrations
+                  </a>
+                  {notification.message.split("Settings > Integrations")[1]}
+                </>
+              ) : (
+                notification.message
+              )}
+            </span>
             <button
               onClick={() => setNotification(null)}
               className="p-1 rounded-lg hover:bg-black/5 transition-colors"

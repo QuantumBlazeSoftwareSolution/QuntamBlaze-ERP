@@ -443,9 +443,11 @@ export function IntegrationsTab() {
         setFolders(res.folders);
       } else {
         setDrawerError(res.error || "Failed to load folders from Google Drive.");
+        loadStatus();
       }
     } catch (err: any) {
       setDrawerError(err.message || "Failed to retrieve folders.");
+      loadStatus();
     } finally {
       setLoadingFolders(false);
     }

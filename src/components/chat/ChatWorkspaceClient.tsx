@@ -22,13 +22,12 @@ import {
   CheckCheck,
   RefreshCw,
 } from "lucide-react";
-import Pusher from "pusher-js";
+import PartySocket from "partysocket";
 import { getChatMessagesAction, sendChatMessageAction } from "@/app/actions/chatActions";
 import {
   getGDriveUploadContextAction,
   grantGDriveFilePermissionAction,
 } from "@/app/actions/gdriveActions";
-import { getPusherStatusAction } from "@/app/actions/pusherActions";
 import { cn } from "@/lib/utils";
 
 interface Attachment {
@@ -99,8 +98,8 @@ export function ChatWorkspaceClient({
   const [uploadingFileSize, setUploadingFileSize] = useState<number>(0);
   const [uploadingFileMime, setUploadingFileMime] = useState<string>("");
 
-  // Pusher State
-  const [pusherConfig, setPusherConfig] = useState<{ key: string; cluster: string } | null>(null);
+  // PartySocket State & Reference
+  const socketRef = useRef<PartySocket | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -119,93 +118,69 @@ export function ChatWorkspaceClient({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Load Pusher configuration parameters dynamically
+  // Connect to PartyKit dynamically and load history/messages
   useEffect(() => {
-    async function loadPusherKeys() {
-      const res = await getPusherStatusAction();
-      if (res.success && res.isConfigured && res.key && res.cluster) {
-        setPusherConfig({ key: res.key, cluster: res.cluster });
-      }
+    if (!selectedProjectId) {
+      setMessages([]);
+      return;
     }
-    loadPusherKeys();
-  }, []);
 
-  // Fetch messages when selected project changes
-  useEffect(() => {
-    if (!selectedProjectId) return;
+    setLoadingMessages(true);
+    const host = process.env.NEXT_PUBLIC_PARTYKIT_HOST || "localhost:1999";
 
-    async function fetchMessages() {
-      setLoadingMessages(true);
+    const socket = new PartySocket({
+      host: host,
+      room: selectedProjectId,
+    });
+
+    socketRef.current = socket;
+
+    socket.onmessage = (event) => {
       try {
-        const res = await getChatMessagesAction(selectedProjectId);
-        if (res.success && res.messages) {
-          // Cast parsed jsonb column securely
-          const parsed = res.messages.map((m: any) => ({
-            ...m,
-            attachments:
-              typeof m.attachments === "string" ? JSON.parse(m.attachments) : m.attachments || [],
-          }));
-          setMessages(parsed);
+        const response = JSON.parse(event.data);
+
+        if (response.type === "history") {
+          setMessages(response.data);
+          setLoadingMessages(false);
+          setTimeout(scrollToBottom, 100);
+        } else if (response.type === "message") {
+          const newMessage = response.data;
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === newMessage.id)) return prev;
+
+            // Optimistic replacement
+            const optimisticIndex = prev.findIndex(
+              (m) =>
+                m.status === "waiting" &&
+                m.senderId === newMessage.senderId &&
+                m.messageText === newMessage.messageText
+            );
+
+            if (optimisticIndex !== -1) {
+              const updated = [...prev];
+              updated[optimisticIndex] = { ...newMessage, status: "delivered" };
+              return updated;
+            }
+
+            return [...prev, newMessage];
+          });
+          setTimeout(scrollToBottom, 80);
         }
       } catch (err) {
-        console.error("Error loading chat messages:", err);
-      } finally {
-        setLoadingMessages(false);
-        setTimeout(scrollToBottom, 100);
+        console.error("Failed to parse websocket message:", err);
       }
-    }
+    };
 
-    fetchMessages();
     setAttachmentsQueue([]);
     setUploadError("");
-  }, [selectedProjectId]);
-
-  // Connect to Pusher dynamically and subscribe to the project channel
-  useEffect(() => {
-    if (!selectedProjectId || !pusherConfig) return;
-
-    // Enable logging in dev for verification
-    if (process.env.NODE_ENV === "development") {
-      Pusher.logToConsole = true;
-    }
-
-    const pusherClient = new Pusher(pusherConfig.key, {
-      cluster: pusherConfig.cluster,
-    });
-
-    const channelName = `project-${selectedProjectId}`;
-    const channel = pusherClient.subscribe(channelName);
-
-    channel.bind("new-message", (newMessage: any) => {
-      // Prevent duplicating client's optimistic or already updated lists
-      setMessages((prev) => {
-        if (prev.some((m) => m.id === newMessage.id)) return prev;
-
-        // If this message belongs to the current user (optimistic message replacement check)
-        const optimisticIndex = prev.findIndex(
-          (m) =>
-            m.status === "waiting" &&
-            m.senderId === newMessage.senderId &&
-            m.messageText === newMessage.messageText
-        );
-
-        if (optimisticIndex !== -1) {
-          const updated = [...prev];
-          updated[optimisticIndex] = { ...newMessage, status: "delivered" };
-          return updated;
-        }
-
-        return [...prev, newMessage];
-      });
-      setTimeout(scrollToBottom, 80);
-    });
 
     return () => {
-      channel.unbind_all();
-      pusherClient.unsubscribe(channelName);
-      pusherClient.disconnect();
+      if (socketRef.current) {
+        socketRef.current.close();
+        socketRef.current = null;
+      }
     };
-  }, [selectedProjectId, pusherConfig]);
+  }, [selectedProjectId]);
 
   // Trigger scroll to bottom on initial message load
   useEffect(() => {
@@ -235,7 +210,11 @@ export function ChatWorkspaceClient({
       // 1. Fetch token and target folder ID from Server Action
       const contextRes = await getGDriveUploadContextAction(selectedProjectId, "chat");
       if (!contextRes.success || !contextRes.accessToken || !contextRes.folderId) {
-        throw new Error(contextRes.error || "Failed to initialize cloud credentials.");
+        throw new Error(
+          contextRes.error?.includes("authenticated") || contextRes.error?.includes("configured") || contextRes.error?.includes("active")
+            ? "Google Drive is not linked or your authorization has expired. Please go to Settings > Integrations to authenticate."
+            : contextRes.error || "Failed to initialize cloud credentials."
+        );
       }
 
       const { accessToken, folderId } = contextRes;
@@ -355,15 +334,14 @@ export function ChatWorkspaceClient({
   };
 
   // Handle message send submission
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedProjectId) return;
+  const handleSendMessage = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!inputValue.trim() && attachmentsQueue.length === 0) return;
 
     const messageText = inputValue.trim();
     const attachments = [...attachmentsQueue];
-
     const tempId = `temp-${Date.now()}`;
+
     const optimisticMessage: Message = {
       id: tempId,
       projectId: selectedProjectId,
@@ -382,30 +360,26 @@ export function ChatWorkspaceClient({
     setInputValue("");
     setAttachmentsQueue([]);
     setMessages((prev) => [...prev, optimisticMessage]);
-    setSendingMessage(true);
     setTimeout(scrollToBottom, 50);
 
     try {
-      const res = await sendChatMessageAction(selectedProjectId, messageText, attachments);
-      if (res.success && res.message) {
-        setMessages((prev) =>
-          prev.map((msg) => (msg.id === tempId ? { ...res.message, status: "delivered" } : msg))
+      if (socketRef.current) {
+        socketRef.current.send(
+          JSON.stringify({
+            senderId: currentUser.userId,
+            messageText,
+            attachments,
+          })
         );
       } else {
-        setMessages((prev) =>
-          prev.map((msg) => (msg.id === tempId ? { ...msg, status: "failed" } : msg))
-        );
-        setUploadError(res.error || "Failed to deliver message.");
+        throw new Error("Chat connection is offline.");
       }
     } catch (err: any) {
       console.error(err);
       setMessages((prev) =>
         prev.map((msg) => (msg.id === tempId ? { ...msg, status: "failed" } : msg))
       );
-      setUploadError("Could not dispatch message.");
-    } finally {
-      setSendingMessage(false);
-      setTimeout(scrollToBottom, 50);
+      setUploadError(err.message || "Could not dispatch message.");
     }
   };
 
@@ -413,18 +387,16 @@ export function ChatWorkspaceClient({
     setMessages((prev) => prev.map((m) => (m.id === msg.id ? { ...m, status: "waiting" } : m)));
 
     try {
-      const res = await sendChatMessageAction(
-        selectedProjectId,
-        msg.messageText || "",
-        msg.attachments
-      );
-      if (res.success && res.message) {
-        setMessages((prev) =>
-          prev.map((m) => (m.id === msg.id ? { ...res.message, status: "delivered" } : m))
+      if (socketRef.current) {
+        socketRef.current.send(
+          JSON.stringify({
+            senderId: currentUser.userId,
+            messageText: msg.messageText || "",
+            attachments: msg.attachments,
+          })
         );
       } else {
-        setMessages((prev) => prev.map((m) => (m.id === msg.id ? { ...m, status: "failed" } : m)));
-        setUploadError(res.error || "Failed to deliver message.");
+        throw new Error("Chat connection is offline.");
       }
     } catch (err: any) {
       console.error(err);
@@ -432,7 +404,6 @@ export function ChatWorkspaceClient({
       setUploadError("Could not dispatch message.");
     }
   };
-
   // Utility to format bytes beautifully
   const formatBytes = (bytes: number): string => {
     if (bytes === 0) return "0 Bytes";
@@ -443,11 +414,40 @@ export function ChatWorkspaceClient({
   };
 
   // Select friendly icons for attachments
-  const getFileIcon = (mime: string) => {
-    if (mime.startsWith("image/")) return <Image className="w-4 h-4 text-emerald-500" />;
-    if (mime.startsWith("video/")) return <Video className="w-4 h-4 text-rose-500" />;
-    if (mime.startsWith("audio/")) return <Music className="w-4 h-4 text-amber-500" />;
-    return <FileText className="w-4 h-4 text-blue-500" />;
+  const getFileIcon = (mime: string, name?: string) => {
+    const isImg = mime.startsWith("image/") || (name && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(name));
+    if (isImg) return <Image className="w-4.5 h-4.5 text-emerald-500" />;
+    if (mime.startsWith("video/")) return <Video className="w-4.5 h-4.5 text-rose-500" />;
+    if (mime.startsWith("audio/")) return <Music className="w-4.5 h-4.5 text-amber-500" />;
+    return <FileText className="w-4.5 h-4.5 text-blue-500" />;
+  };
+
+  // Resolve user-friendly document type labels
+  const getFileTypeLabel = (mime: string, name?: string): string => {
+    const lowerName = name ? name.toLowerCase() : "";
+    const lowerMime = mime.toLowerCase();
+    if (lowerMime.startsWith("image/") || /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(lowerName)) {
+      return "Image File";
+    }
+    if (lowerMime.startsWith("video/") || /\.(mp4|mkv|mov|avi|wmv)$/i.test(lowerName)) {
+      return "Video File";
+    }
+    if (lowerMime.startsWith("audio/") || /\.(mp3|wav|ogg|m4a|flac)$/i.test(lowerName)) {
+      return "Audio File";
+    }
+    if (lowerMime.includes("pdf") || lowerName.endsWith(".pdf")) {
+      return "PDF Document";
+    }
+    if (lowerMime.includes("word") || lowerName.endsWith(".docx") || lowerName.endsWith(".doc")) {
+      return "Word Document";
+    }
+    if (lowerMime.includes("excel") || lowerName.endsWith(".xlsx") || lowerName.endsWith(".xls") || lowerName.endsWith(".csv")) {
+      return "Spreadsheet";
+    }
+    if (lowerMime.includes("presentation") || lowerName.endsWith(".pptx") || lowerName.endsWith(".ppt")) {
+      return "Presentation";
+    }
+    return "Document";
   };
 
   return (
@@ -553,11 +553,26 @@ export function ChatWorkspaceClient({
               <div className="mx-8 mt-4 p-4 bg-danger/10 border border-danger/15 rounded-2xl flex items-center justify-between text-danger font-bold text-[12px]">
                 <div className="flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />
-                  <span>{uploadError}</span>
+                  <span>
+                    {uploadError.includes("Settings > Integrations") ? (
+                      <>
+                        {uploadError.split("Settings > Integrations")[0]}
+                        <a
+                          href="/dashboard/settings?tab=integrations"
+                          className="underline hover:text-rose-700 ml-1 font-extrabold cursor-pointer"
+                        >
+                          Settings &gt; Integrations
+                        </a>
+                        {uploadError.split("Settings > Integrations")[1]}
+                      </>
+                    ) : (
+                      uploadError
+                    )}
+                  </span>
                 </div>
                 <button
                   onClick={() => setUploadError("")}
-                  className="text-danger hover:scale-105 border-0 bg-transparent"
+                  className="text-danger hover:scale-105 border-0 bg-transparent cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -695,33 +710,7 @@ export function ChatWorkspaceClient({
                                 )}
                               >
                                 {msg.attachments.map((file) => {
-                                  const isImage = file.mimeType.startsWith("image/");
-
-                                  if (isImage) {
-                                    return (
-                                      <a
-                                        key={file.id}
-                                        href={file.link}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className={cn(
-                                          "block relative rounded-xl overflow-hidden border transition-all hover:opacity-90",
-                                          isSelf
-                                            ? "border-white/20 shadow-sm"
-                                            : "border-black/5 shadow-sm"
-                                        )}
-                                      >
-                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img
-                                          src={`https://drive.google.com/thumbnail?id=${file.id}&sz=w800`}
-                                          alt={file.name}
-                                          className="w-full max-w-[280px] h-auto object-cover block bg-slate-100"
-                                          loading="lazy"
-                                        />
-                                      </a>
-                                    );
-                                  }
-
+                                  const typeLabel = getFileTypeLabel(file.mimeType, file.name);
                                   return (
                                     <a
                                       key={file.id}
@@ -729,22 +718,43 @@ export function ChatWorkspaceClient({
                                       target="_blank"
                                       rel="noreferrer"
                                       className={cn(
-                                        "flex items-center justify-between gap-4 p-2.5 rounded-xl border transition-all text-[11px] font-medium leading-none group",
+                                        "flex items-center justify-between gap-4 p-3 rounded-2xl border transition-all text-left group w-full max-w-[320px] shadow-sm",
                                         isSelf
-                                          ? "bg-white/10 border-white/15 text-white hover:bg-white/15"
-                                          : "bg-slate-50 border-border text-text-secondary hover:bg-slate-100"
+                                          ? "bg-white/10 border-white/15 text-white hover:bg-white/20 hover:border-white/25"
+                                          : "bg-slate-50 border-slate-200/60 text-text-primary hover:bg-slate-100 hover:border-slate-300"
                                       )}
                                     >
-                                      <div className="flex items-center gap-2 truncate">
-                                        {getFileIcon(file.mimeType)}
-                                        <span className="truncate block font-bold max-w-[140px]">
-                                          {file.name}
-                                        </span>
-                                        <span className="opacity-60 text-[9px] font-mono shrink-0">
-                                          ({formatBytes(file.size)})
-                                        </span>
+                                      <div className="flex items-center gap-3 truncate min-w-0">
+                                        <div
+                                          className={cn(
+                                            "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm transition-colors",
+                                            isSelf
+                                              ? "bg-white/10 group-hover:bg-white/15"
+                                              : "bg-emerald-500/10 group-hover:bg-emerald-500/15"
+                                          )}
+                                        >
+                                          {getFileIcon(file.mimeType, file.name)}
+                                        </div>
+                                        <div className="truncate min-w-0">
+                                          <span className="block text-xs font-bold truncate leading-tight">
+                                            {file.name}
+                                          </span>
+                                          <span
+                                            className={cn(
+                                              "block text-[10px] mt-0.5 font-medium leading-none opacity-75",
+                                              isSelf ? "text-white/80" : "text-text-secondary/80"
+                                            )}
+                                          >
+                                            {typeLabel} • {formatBytes(file.size)}
+                                          </span>
+                                        </div>
                                       </div>
-                                      <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 shrink-0 transition-opacity" />
+                                      <ExternalLink 
+                                        className={cn(
+                                          "w-3.5 h-3.5 shrink-0 transition-opacity opacity-50 group-hover:opacity-100",
+                                          isSelf ? "text-white" : "text-text-secondary"
+                                        )} 
+                                      />
                                     </a>
                                   );
                                 })}
@@ -774,7 +784,7 @@ export function ChatWorkspaceClient({
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2.5 truncate">
                         <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-center text-emerald-600 shrink-0">
-                          {getFileIcon(uploadingFileMime)}
+                          {getFileIcon(uploadingFileMime, uploadingFileName)}
                         </div>
                         <div className="truncate">
                           <span className="font-bold text-[12px] text-text-primary block truncate max-w-[200px]">
@@ -818,7 +828,7 @@ export function ChatWorkspaceClient({
                       key={file.id}
                       className="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-border rounded-xl text-[11px] text-text-secondary"
                     >
-                      {getFileIcon(file.mimeType)}
+                      {getFileIcon(file.mimeType, file.name)}
                       <span className="font-bold truncate max-w-[150px]">{file.name}</span>
                       <button
                         type="button"

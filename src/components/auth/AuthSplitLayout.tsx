@@ -19,9 +19,23 @@ export const AuthSplitLayout = ({
     <div className="flex h-screen w-full overflow-hidden bg-surface-white">
       {/* Left Panel (Dark) */}
       <div className="hidden lg:flex w-1/2 bg-sidebar-bg relative flex-col justify-between p-12 overflow-hidden">
-        {/* Subtle diagonal geometric pattern overlay */}
+        {/* Luxury Background Image */}
         <div
-          className="absolute inset-0 opacity-5 pointer-events-none"
+          className="absolute inset-0 bg-cover bg-center opacity-85 pointer-events-none transition-opacity duration-1000"
+          style={{
+            backgroundImage: "url('/login_banner.png')",
+          }}
+        />
+
+        {/* Dynamic ambient glow overlay to elevate the modern tech aesthetic */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-sidebar-bg/95 via-sidebar-bg/40 to-transparent pointer-events-none z-0" />
+
+        {/* Elegant horizontal gradient overlay to ensure text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent pointer-events-none z-0" />
+
+        {/* Subtle diagonal geometric pattern overlay for extra technical depth */}
+        <div
+          className="absolute inset-0 opacity-5 pointer-events-none z-0"
           style={{
             backgroundImage: `repeating-linear-gradient(45deg, #ffffff 0, #ffffff 1px, transparent 0, transparent 50%)`,
             backgroundSize: "20px 20px",

@@ -1,0 +1,5 @@
+{
+  "name": "quantumblaze-chat",
+  "main": "party/server.ts",
+  "port": 1999
+}

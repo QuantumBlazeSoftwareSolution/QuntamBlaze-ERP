@@ -83,6 +83,21 @@ export async function getFreshAccessToken(): Promise<string | null> {
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Failed to refresh Google Drive token:", errorData);
+        if (
+          errorData.error === "invalid_grant" ||
+          errorData.error_description?.toLowerCase().includes("expired") ||
+          errorData.error_description?.toLowerCase().includes("revoked")
+        ) {
+          console.warn(
+            "Google Drive refresh token is expired or has been revoked. Auto-disconnecting integration..."
+          );
+          try {
+            await db.delete(systemConfig).where(eq(systemConfig.key, "gdrive_credentials"));
+            await db.delete(systemConfig).where(eq(systemConfig.key, "gdrive_settings"));
+          } catch (err) {
+            console.error("Failed to auto-purge invalid Google Drive credentials:", err);
+          }
+        }
         return null;
       }
 
