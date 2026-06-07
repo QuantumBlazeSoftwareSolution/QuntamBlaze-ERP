@@ -1,4 +1,5 @@
 import { pgTable, varchar, timestamp, text, jsonb, integer } from "drizzle-orm/pg-core";
+import { departments } from "./departments";
 
 export const employees = pgTable("employees", {
   id: varchar("id", { length: 255 }).primaryKey(),
@@ -8,7 +9,7 @@ export const employees = pgTable("employees", {
   name: varchar("name", { length: 255 }).notNull(), // Full name for quick access
   role: varchar("role", { length: 255 }),
   employeeRole: varchar("employee_role", { length: 50 }).default("SE").notNull(),
-  department: varchar("department", { length: 100 }),
+  departmentId: varchar("department_id", { length: 255 }).references(() => departments.id),
   status: varchar("status", { length: 50 }).default("Active").notNull(),
   joinDate: timestamp("join_date"),
   avatar: varchar("avatar", { length: 500 }),

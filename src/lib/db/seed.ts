@@ -1,3 +1,6 @@
+import * as dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+
 import { db } from "./index";
 import * as schema from "./schema";
 import {
@@ -100,7 +103,46 @@ async function main() {
       )
       .onConflictDoNothing();
 
+    console.log("Inserting Departments...");
+    const defaultDepartments = [
+      { id: "dept-eng", name: "Engineering", code: "ENGINEERING", description: "Core Software Engineering and Development" },
+      { id: "dept-fin", name: "Finance", code: "FINANCE", description: "Financial management and accounting" },
+      { id: "dept-des", name: "Design", code: "DESIGN", description: "UI/UX, Product, and Graphic Design" },
+      { id: "dept-mkt", name: "Marketing", code: "MARKETING", description: "Marketing and growth operations" },
+      { id: "dept-prd", name: "Product", code: "PRODUCT", description: "Product Management and Strategy" },
+      { id: "dept-hr", name: "HR", code: "HR", description: "Human Resources and Workforce Management" },
+      { id: "dept-sls", name: "Sales", code: "SALES", description: "Sales and Business Development" },
+      { id: "dept-oth", name: "Other", code: "OTHER", description: "Miscellaneous or other operations" },
+    ];
+    await db
+      .insert(schema.departments)
+      .values(defaultDepartments)
+      .onConflictDoNothing();
+
     console.log("Inserting Employees...");
+    const getDeptIdFromCode = (code: string | null | undefined): string => {
+      const normalized = (code || "").toUpperCase().trim();
+      switch (normalized) {
+        case "ENGINEERING":
+          return "dept-eng";
+        case "DESIGN":
+          return "dept-des";
+        case "PRODUCT":
+          return "dept-prd";
+        case "MARKETING":
+          return "dept-mkt";
+        case "SALES":
+          return "dept-sls";
+        case "HR":
+        case "HUMAN RESOURCES":
+          return "dept-hr";
+        case "FINANCE":
+          return "dept-fin";
+        default:
+          return "dept-oth";
+      }
+    };
+
     await db
       .insert(schema.employees)
       .values(
@@ -109,7 +151,7 @@ async function main() {
           name: e.name,
           email: e.email!,
           role: e.role,
-          department: e.department,
+          departmentId: getDeptIdFromCode(e.department),
           status: e.status,
           phone: e.phone || null,
           address: e.address || null,

@@ -4,6 +4,7 @@ import { projects, projectMilestones, projectTeam } from "./projects";
 import { invoices } from "./invoices";
 import { leads } from "./leads";
 import { employees } from "./hr/employees";
+import { departments } from "./hr/departments";
 
 // ─── Projects ─────────────────────────────────────────────────────────────────
 
@@ -53,4 +54,12 @@ export const employeesRelations = relations(employees, ({ one, many }) => ({
   }),
   reportees: many(employees, { relationName: "reportingHierarchy" }),
   projectTeam: many(projectTeam),
+  department: one(departments, {
+    fields: [employees.departmentId],
+    references: [departments.id],
+  }),
+}));
+
+export const departmentsRelations = relations(departments, ({ many }) => ({
+  employees: many(employees),
 }));

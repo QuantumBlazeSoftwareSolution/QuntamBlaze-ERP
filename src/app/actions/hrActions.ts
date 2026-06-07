@@ -9,9 +9,33 @@ import {
   candidates as candidatesTable,
   jobs as jobsTable,
   employees as employeesTable,
+  departments as departmentsTable,
 } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { MOCK_JOBS, MOCK_CANDIDATES } from "@/lib/mockData/hr";
+
+function getDeptIdFromCode(code: string): string {
+  const normalized = (code || "").toUpperCase().trim();
+  switch (normalized) {
+    case "ENGINEERING":
+      return "dept-eng";
+    case "DESIGN":
+      return "dept-des";
+    case "PRODUCT":
+      return "dept-prd";
+    case "MARKETING":
+      return "dept-mkt";
+    case "SALES":
+      return "dept-sls";
+    case "HR":
+    case "HUMAN RESOURCES":
+      return "dept-hr";
+    case "FINANCE":
+      return "dept-fin";
+    default:
+      return "dept-oth";
+  }
+}
 
 export async function createEmployeeAction(data: {
   firstName: string;
@@ -53,7 +77,7 @@ export async function createEmployeeAction(data: {
       nic,
       role,
       employeeRole,
-      department,
+      departmentId: getDeptIdFromCode(department),
       status: "Active",
       joinDate: new Date(),
     });
@@ -144,7 +168,7 @@ export async function updateEmployeeAction(
       nic,
       role,
       employeeRole,
-      department,
+      departmentId: getDeptIdFromCode(department),
       status: status || "Active",
       address: address || null,
       birthDate: formattedBirthDate,
@@ -351,9 +375,10 @@ export async function getRecruitmentDashboardDataAction() {
         name: employeesTable.name,
         email: employeesTable.email,
         role: employeesTable.role,
-        department: employeesTable.department,
+        department: departmentsTable.code,
       })
       .from(employeesTable)
+      .leftJoin(departmentsTable, eq(employeesTable.departmentId, departmentsTable.id))
       .where(eq(employeesTable.status, "Active"));
 
     const formattedEmployees = activeEmployees.map((emp) => ({

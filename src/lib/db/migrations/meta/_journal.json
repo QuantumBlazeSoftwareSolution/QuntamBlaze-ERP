@@ -92,6 +92,20 @@
       "when": 1780211862540,
       "tag": "0012_striped_anthem",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1780810865338,
+      "tag": "0013_awesome_enchantress",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1780810882544,
+      "tag": "0014_low_ogun",
+      "breakpoints": true
     }
   ]
 }
