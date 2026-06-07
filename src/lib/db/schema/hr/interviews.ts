@@ -93,3 +93,12 @@ export const scorecards = pgTable("scorecards", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export type Interview = typeof interviews.$inferSelect;
+export type InsertInterview = typeof interviews.$inferInsert;
+
+export type Interviewer = typeof interviewers.$inferSelect;
+export type InsertInterviewer = typeof interviewers.$inferInsert;
+
+export type Scorecard = typeof scorecards.$inferSelect;
+export type InsertScorecard = typeof scorecards.$inferInsert;

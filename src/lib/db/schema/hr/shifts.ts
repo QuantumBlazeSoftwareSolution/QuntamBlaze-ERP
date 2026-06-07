@@ -88,3 +88,12 @@ export const shiftSwaps = pgTable("shift_swaps", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export type Shift = typeof shifts.$inferSelect;
+export type InsertShift = typeof shifts.$inferInsert;
+
+export type ShiftAssignment = typeof shiftAssignments.$inferSelect;
+export type InsertShiftAssignment = typeof shiftAssignments.$inferInsert;
+
+export type ShiftSwap = typeof shiftSwaps.$inferSelect;
+export type InsertShiftSwap = typeof shiftSwaps.$inferInsert;

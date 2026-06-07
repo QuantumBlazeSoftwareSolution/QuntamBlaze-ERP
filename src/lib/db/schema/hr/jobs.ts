@@ -54,3 +54,6 @@ export const jobs = pgTable("jobs", {
   createdBy: varchar("created_by"),
   deletedAt: timestamp("deleted_at"),
 });
+
+export type Job = typeof jobs.$inferSelect;
+export type InsertJob = typeof jobs.$inferInsert;

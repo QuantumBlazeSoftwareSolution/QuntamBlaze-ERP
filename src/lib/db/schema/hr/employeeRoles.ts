@@ -11,3 +11,6 @@ export const employeeRoles = pgTable("employee_roles", {
   deletedAt: timestamp("deleted_at"),
   baseRole: varchar("base_role", { length: 50 }).default("None").notNull(),
 });
+
+export type EmployeeRole = typeof employeeRoles.$inferSelect;
+export type InsertEmployeeRole = typeof employeeRoles.$inferInsert;

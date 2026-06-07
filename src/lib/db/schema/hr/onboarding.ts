@@ -61,3 +61,9 @@ export const onboardingTasks = pgTable("onboarding_tasks", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export type OnboardingPlan = typeof onboardingPlans.$inferSelect;
+export type InsertOnboardingPlan = typeof onboardingPlans.$inferInsert;
+
+export type OnboardingTask = typeof onboardingTasks.$inferSelect;
+export type InsertOnboardingTask = typeof onboardingTasks.$inferInsert;

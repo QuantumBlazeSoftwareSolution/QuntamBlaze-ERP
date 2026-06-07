@@ -70,3 +70,12 @@ export const reviewCycles = pgTable("review_cycles", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export type PerformanceGoal = typeof performanceGoals.$inferSelect;
+export type InsertPerformanceGoal = typeof performanceGoals.$inferInsert;
+
+export type KeyResult = typeof keyResults.$inferSelect;
+export type InsertKeyResult = typeof keyResults.$inferInsert;
+
+export type ReviewCycle = typeof reviewCycles.$inferSelect;
+export type InsertReviewCycle = typeof reviewCycles.$inferInsert;

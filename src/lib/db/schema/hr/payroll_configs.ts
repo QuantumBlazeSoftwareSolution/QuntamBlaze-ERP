@@ -59,3 +59,15 @@ export const statutoryRules = pgTable("statutory_rules", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export type SalaryStructure = typeof salaryStructures.$inferSelect;
+export type InsertSalaryStructure = typeof salaryStructures.$inferInsert;
+
+export type AllowanceType = typeof allowanceTypes.$inferSelect;
+export type InsertAllowanceType = typeof allowanceTypes.$inferInsert;
+
+export type StructureAllowance = typeof structureAllowances.$inferSelect;
+export type InsertStructureAllowance = typeof structureAllowances.$inferInsert;
+
+export type StatutoryRule = typeof statutoryRules.$inferSelect;
+export type InsertStatutoryRule = typeof statutoryRules.$inferInsert;

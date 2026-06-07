@@ -7,3 +7,6 @@ export const hrActivities = pgTable("hr_activities", {
   timestamp: timestamp("timestamp").defaultNow().notNull(),
   entities: jsonb("entities"), // Array of entity IDs like ["EMP-001"]
 });
+
+export type HRActivity = typeof hrActivities.$inferSelect;
+export type InsertHRActivity = typeof hrActivities.$inferInsert;

@@ -58,3 +58,9 @@ export const payrollItems = pgTable("payroll_items", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export type PayrollBatch = typeof payrollBatches.$inferSelect;
+export type InsertPayrollBatch = typeof payrollBatches.$inferInsert;
+
+export type PayrollItem = typeof payrollItems.$inferSelect;
+export type InsertPayrollItem = typeof payrollItems.$inferInsert;

@@ -50,3 +50,9 @@ export const leavePolicies = pgTable("leave_policies", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export type LeaveType = typeof leaveTypes.$inferSelect;
+export type InsertLeaveType = typeof leaveTypes.$inferInsert;
+
+export type LeavePolicy = typeof leavePolicies.$inferSelect;
+export type InsertLeavePolicy = typeof leavePolicies.$inferInsert;
