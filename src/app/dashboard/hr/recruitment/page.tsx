@@ -11,12 +11,14 @@ import {
   Filter,
   ChevronDown,
   RefreshCw,
+  Briefcase,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { JobsTable } from "@/components/hr/recruitment/JobsTable";
 import { RecruitmentPipeline } from "@/components/hr/recruitment/RecruitmentPipeline";
 import { NewJobModal } from "@/components/hr/recruitment/NewJobModal";
 import { NewCandidateModal } from "@/components/hr/recruitment/NewCandidateModal";
+import { ManageJobsModal } from "@/components/hr/recruitment/ManageJobsModal";
 import { HRNavbar } from "@/components/hr/HRNavbar";
 import { getRecruitmentDashboardDataAction } from "@/app/actions/hrActions";
 import { Candidate, Job, Employee } from "@/types/hr";
@@ -25,6 +27,7 @@ export default function RecruitmentPage() {
   const [view, setView] = useState<"pipeline" | "table">("pipeline");
   const [isNewJobModalOpen, setIsNewJobModalOpen] = useState(false);
   const [isNewCandidateModalOpen, setIsNewCandidateModalOpen] = useState(false);
+  const [isManageJobsModalOpen, setIsManageJobsModalOpen] = useState(false);
 
   // Live database states
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -76,6 +79,13 @@ export default function RecruitmentPage() {
             >
               <UserPlus className="w-4 h-4" />
               <span>Add Candidate</span>
+            </button>
+            <button
+              onClick={() => setIsManageJobsModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-bold text-[#475569] hover:bg-[#F1F5F9] transition-all bg-white cursor-pointer active:scale-[0.98]"
+            >
+              <Briefcase className="w-4 h-4 text-[#10B981]" />
+              <span>Manage Openings</span>
             </button>
             <button
               onClick={() => setIsNewJobModalOpen(true)}
@@ -170,6 +180,12 @@ export default function RecruitmentPage() {
         onSuccess={loadData}
         jobs={jobs}
         employees={employees}
+      />
+      <ManageJobsModal
+        isOpen={isManageJobsModalOpen}
+        onClose={() => setIsManageJobsModalOpen(false)}
+        onSuccess={loadData}
+        jobs={jobs}
       />
     </div>
   );

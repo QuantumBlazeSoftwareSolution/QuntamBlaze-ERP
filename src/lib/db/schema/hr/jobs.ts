@@ -28,7 +28,8 @@ export const seniorityEnum = pgEnum("seniority_level", [
 
 export const workLocationEnum = pgEnum("work_location_type", ["Remote", "Hybrid", "On-Site"]);
 
-export const jobStatusEnum = pgEnum("job_status", ["Active", "Paused", "Closed", "Draft"]);
+export const jobStatusEnumItems = ["Active", "Paused", "Closed", "Draft"] as const;
+export const jobStatusEnum = pgEnum("job_status", jobStatusEnumItems);
 
 export const jobs = pgTable("jobs", {
   id: varchar("id").primaryKey(), // JOB-ENG-26-012
