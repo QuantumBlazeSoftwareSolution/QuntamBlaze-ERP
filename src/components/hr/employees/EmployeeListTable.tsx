@@ -73,7 +73,7 @@ export function EmployeeListTable({ employees }: EmployeeListTableProps) {
                 <td className="px-6 py-5">
                   <div className="flex items-center gap-2 text-[#64748B] text-xs font-medium">
                     <Clock className="w-3.5 h-3.5 text-[#94A3B8]" />
-                    {employee.joinDate}
+                    {employee.joinDate ? new Date(employee.joinDate).toLocaleDateString() : ""}
                   </div>
                 </td>
                 <td className="px-6 py-5">

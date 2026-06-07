@@ -26,7 +26,7 @@ export function EmploymentDetailsTab({ employee }: EmploymentDetailsTabProps) {
         <MetricCard
           label="Tenure"
           value="1y 4m"
-          subtext={`Joined ${employee.joinDate}`}
+          subtext={`Joined ${employee.joinDate ? new Date(employee.joinDate).toLocaleDateString() : "N/A"}`}
           icon={Clock}
           color="text-blue-500"
           bg="bg-blue-50"
