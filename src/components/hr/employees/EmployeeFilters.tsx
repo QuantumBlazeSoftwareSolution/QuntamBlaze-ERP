@@ -1,16 +1,17 @@
 "use client";
 
 import React from "react";
-import { Search, Filter, ChevronDown, LayoutGrid, List, Network, X } from "lucide-react";
+import { Search, Filter, ChevronDown, LayoutGrid, List, Network, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface EmployeeFiltersProps {
   view: "grid" | "list" | "chart";
   setView: (view: "grid" | "list" | "chart") => void;
   onExportCsv?: () => void;
+  isExportingCsv?: boolean;
 }
 
-export function EmployeeFilters({ view, setView, onExportCsv }: EmployeeFiltersProps) {
+export function EmployeeFilters({ view, setView, onExportCsv, isExportingCsv }: EmployeeFiltersProps) {
   return (
     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
       <div className="flex items-center gap-4 flex-1">
@@ -57,9 +58,14 @@ export function EmployeeFilters({ view, setView, onExportCsv }: EmployeeFiltersP
 
         <button
           onClick={onExportCsv}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F172A] text-white text-xs font-bold hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#0F172A]/20 cursor-pointer"
+          disabled={isExportingCsv}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F172A] text-white text-xs font-bold transition-all shadow-lg shadow-[#0F172A]/20 cursor-pointer",
+            isExportingCsv ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02] active:scale-[0.98]"
+          )}
         >
-          Export CSV
+          {isExportingCsv && <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-300" />}
+          <span>{isExportingCsv ? "Exporting..." : "Export CSV"}</span>
         </button>
       </div>
     </div>
