@@ -11,6 +11,7 @@ import { EmployeeListTable } from "@/components/hr/employees/EmployeeListTable";
 import { OrgChart } from "@/components/hr/employees/OrgChart";
 import { AddEmployeeDrawer } from "@/components/hr/employees/AddEmployeeDrawer";
 import { EmployeeCreationSelectorModal } from "@/components/hr/employees/EmployeeCreationSelectorModal";
+import * as XLSX from "xlsx";
 
 interface EmployeeDirectoryClientProps {
   employees: any[];
@@ -21,6 +22,81 @@ export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientPr
   const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
   const [isSelectorModalOpen, setIsSelectorModalOpen] = useState(false);
   const [prefillData, setPrefillData] = useState<any>(null);
+
+  const handleExportExcel = () => {
+    const formattedData = employees.map((emp) => ({
+      "Employee ID": emp.id || "",
+      "First Name": emp.firstName || "",
+      "Last Name": emp.lastName || "",
+      "Full Name": emp.name || `${emp.firstName || ""} ${emp.lastName || ""}`.trim(),
+      "Email": emp.email || "",
+      "Phone": emp.phone || "",
+      "NIC / Passport": emp.nic || "",
+      "Department": emp.department || "",
+      "Job Title": emp.role || "",
+      "Functional Role": emp.employeeRole || "",
+      "Status": emp.status || "Active",
+      "Join Date": emp.joinDate ? new Date(emp.joinDate).toLocaleDateString() : "",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+    const colWidths = [
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 25 },
+      { wch: 30 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 20 },
+      { wch: 18 },
+      { wch: 12 },
+      { wch: 15 },
+    ];
+    worksheet["!cols"] = colWidths;
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Employee Directory");
+    XLSX.writeFile(workbook, `Employee_Directory_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  };
+
+  const handleExportCsv = () => {
+    const headers = [
+      "Employee ID",
+      "Full Name",
+      "Email",
+      "Phone",
+      "Department",
+      "Job Title",
+      "Functional Role",
+      "Status",
+      "Join Date",
+    ];
+    const rows = employees.map((emp) => [
+      emp.id || "",
+      emp.name || "",
+      emp.email || "",
+      emp.phone || "",
+      emp.department || "",
+      emp.role || "",
+      emp.employeeRole || "",
+      emp.status || "",
+      emp.joinDate ? new Date(emp.joinDate).toLocaleDateString() : "",
+    ]);
+
+    const csvContent =
+      "\uFEFF" +
+      [headers.join(","), ...rows.map((e) => e.map((val) => `"${val.replace(/"/g, '""')}"`).join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Employee_Directory_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Compute dept stats from real data
   const deptCounts = employees.reduce((acc: Record<string, number>, e) => {
@@ -61,7 +137,10 @@ export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientPr
           </div>
 
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-bold text-[#475569] hover:bg-[#F1F5F9] transition-all bg-white shadow-sm">
+            <button
+              onClick={handleExportExcel}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-bold text-[#475569] hover:bg-[#F1F5F9] transition-all bg-white shadow-sm cursor-pointer"
+            >
               <Download className="w-4 h-4 text-[#94A3B8]" />
               <span>Export Directory</span>
             </button>
@@ -76,7 +155,7 @@ export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientPr
         </div>
 
         {/* Filters & View Switcher */}
-        <EmployeeFilters view={view} setView={setView} />
+        <EmployeeFilters view={view} setView={setView} onExportCsv={handleExportCsv} />
 
         {/* Content Area */}
         <AnimatePresence mode="wait">

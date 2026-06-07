@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils";
 interface EmployeeFiltersProps {
   view: "grid" | "list" | "chart";
   setView: (view: "grid" | "list" | "chart") => void;
+  onExportCsv?: () => void;
 }
 
-export function EmployeeFilters({ view, setView }: EmployeeFiltersProps) {
+export function EmployeeFilters({ view, setView, onExportCsv }: EmployeeFiltersProps) {
   return (
     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
       <div className="flex items-center gap-4 flex-1">
@@ -54,7 +55,10 @@ export function EmployeeFilters({ view, setView }: EmployeeFiltersProps) {
 
         <div className="h-8 w-px bg-[#E2E8F0] mx-2 hidden lg:block" />
 
-        <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F172A] text-white text-xs font-bold hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#0F172A]/20">
+        <button
+          onClick={onExportCsv}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F172A] text-white text-xs font-bold hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#0F172A]/20 cursor-pointer"
+        >
           Export CSV
         </button>
       </div>
