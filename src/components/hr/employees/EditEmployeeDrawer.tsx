@@ -23,12 +23,13 @@ import { updateEmployeeAction } from "@/app/actions/hrActions";
 import { getEmployeeRolesAction } from "@/app/actions/employeeRoleActions";
 import { cn } from "@/lib/utils";
 import { Employee } from "@/types/hr";
+import { Department } from "@/lib/db/schema";
 
 interface EditEmployeeDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   employee: Employee;
-  departments?: any[];
+  departments?: Department[];
 }
 
 export function EditEmployeeDrawer({ isOpen, onClose, employee, departments = [] }: EditEmployeeDrawerProps) {

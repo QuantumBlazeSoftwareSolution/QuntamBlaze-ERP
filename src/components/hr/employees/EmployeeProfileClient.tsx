@@ -40,9 +40,11 @@ const TABS = [
   { id: "timeline", label: "Timeline", icon: Sparkles },
 ];
 
+import { Department } from "@/lib/db/schema";
+
 interface EmployeeProfileClientProps {
   employee: any;
-  departments: any[];
+  departments: Department[];
 }
 
 export function EmployeeProfileClient({ employee, departments }: EmployeeProfileClientProps) {
