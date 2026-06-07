@@ -25,6 +25,23 @@ export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientPr
   const [isExportingExcel, setIsExportingExcel] = useState(false);
   const [isExportingCsv, setIsExportingCsv] = useState(false);
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+
+  const filteredEmployees = employees.filter((emp) => {
+    const query = searchQuery.toLowerCase();
+    const nameMatches = (emp.name || "").toLowerCase().includes(query);
+    const idMatches = (emp.id || "").toLowerCase().includes(query);
+    const roleMatches = (emp.role || "").toLowerCase().includes(query);
+    const searchMatches = nameMatches || idMatches || roleMatches;
+
+    const deptMatches = !selectedDepartment || emp.department === selectedDepartment;
+    const statusMatches = !selectedStatus || emp.status === selectedStatus;
+
+    return searchMatches && deptMatches && statusMatches;
+  });
+
   const handleExportExcel = () => {
     setIsExportingExcel(true);
     setTimeout(() => {
@@ -188,6 +205,12 @@ export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientPr
           setView={setView}
           onExportCsv={handleExportCsv}
           isExportingCsv={isExportingCsv}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedDepartment={selectedDepartment}
+          setSelectedDepartment={setSelectedDepartment}
+          selectedStatus={selectedStatus}
+          setSelectedStatus={setSelectedStatus}
         />
 
         {/* Content Area */}
@@ -200,8 +223,8 @@ export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientPr
             transition={{ duration: 0.2 }}
             className="flex-1"
           >
-            {view === "grid" && <EmployeeGrid employees={employees} />}
-            {view === "list" && <EmployeeListTable employees={employees} />}
+            {view === "grid" && <EmployeeGrid employees={filteredEmployees} />}
+            {view === "list" && <EmployeeListTable employees={filteredEmployees} />}
             {view === "chart" && <OrgChart />}
           </motion.div>
         </AnimatePresence>
