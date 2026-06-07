@@ -8,3 +8,6 @@ export const authentication = pgTable("authentication", {
   isUsed: boolean("is_used").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export type Authentication = typeof authentication.$inferSelect;
+export type InsertAuthentication = typeof authentication.$inferInsert;

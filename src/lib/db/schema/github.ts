@@ -27,3 +27,9 @@ export const projectRepositories = pgTable("project_repositories", {
   webhookSecret: varchar("webhook_secret", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export type UserGithubAccount = typeof userGithubAccounts.$inferSelect;
+export type InsertUserGithubAccount = typeof userGithubAccounts.$inferInsert;
+
+export type ProjectRepository = typeof projectRepositories.$inferSelect;
+export type InsertProjectRepository = typeof projectRepositories.$inferInsert;

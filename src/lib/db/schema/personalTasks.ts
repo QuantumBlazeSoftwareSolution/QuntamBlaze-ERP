@@ -16,3 +16,6 @@ export const personalTasks = pgTable("personal_tasks", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export type PersonalTask = typeof personalTasks.$inferSelect;
+export type InsertPersonalTask = typeof personalTasks.$inferInsert;

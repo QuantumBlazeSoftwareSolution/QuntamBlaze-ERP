@@ -39,3 +39,12 @@ export const projectTeam = pgTable("project_team", {
   projectRole: varchar("project_role", { length: 50 }).default("Dev").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export type Project = typeof projects.$inferSelect;
+export type InsertProject = typeof projects.$inferInsert;
+
+export type ProjectMilestone = typeof projectMilestones.$inferSelect;
+export type InsertProjectMilestone = typeof projectMilestones.$inferInsert;
+
+export type ProjectTeam = typeof projectTeam.$inferSelect;
+export type InsertProjectTeam = typeof projectTeam.$inferInsert;

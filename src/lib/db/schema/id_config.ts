@@ -6,3 +6,6 @@ export const idConfig = pgTable("id_config", {
   lastSequence: integer("last_sequence").default(0).notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export type IdConfig = typeof idConfig.$inferSelect;
+export type InsertIdConfig = typeof idConfig.$inferInsert;

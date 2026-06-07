@@ -10,3 +10,6 @@ export const pushSubscriptions = pgTable("push_subscriptions", {
   keys: jsonb("keys").notNull(), // { p256dh: string, auth: string }
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export type PushSubscription = typeof pushSubscriptions.$inferSelect;
+export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert;

@@ -14,3 +14,6 @@ export const chatMessages = pgTable("chat_messages", {
   attachments: jsonb("attachments").default("[]").notNull(), // Array of { name, link, mimeType, size, id }
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = typeof chatMessages.$inferInsert;

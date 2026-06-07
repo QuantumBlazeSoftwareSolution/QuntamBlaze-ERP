@@ -83,3 +83,9 @@ export const knowledgeChunks = pgTable("knowledge_chunks", {
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export type KnowledgeDocument = typeof knowledgeDocuments.$inferSelect;
+export type InsertKnowledgeDocument = typeof knowledgeDocuments.$inferInsert;
+
+export type KnowledgeChunk = typeof knowledgeChunks.$inferSelect;
+export type InsertKnowledgeChunk = typeof knowledgeChunks.$inferInsert;

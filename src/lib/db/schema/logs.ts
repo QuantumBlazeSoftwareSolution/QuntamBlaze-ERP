@@ -7,3 +7,6 @@ export const systemLog = pgTable("system_log", {
   details: jsonb("details").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export type SystemLog = typeof systemLog.$inferSelect;
+export type InsertSystemLog = typeof systemLog.$inferInsert;
