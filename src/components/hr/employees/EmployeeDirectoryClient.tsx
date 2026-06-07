@@ -10,6 +10,7 @@ import { EmployeeGrid } from "@/components/hr/employees/EmployeeGrid";
 import { EmployeeListTable } from "@/components/hr/employees/EmployeeListTable";
 import { OrgChart } from "@/components/hr/employees/OrgChart";
 import { AddEmployeeDrawer } from "@/components/hr/employees/AddEmployeeDrawer";
+import { EmployeeCreationSelectorModal } from "@/components/hr/employees/EmployeeCreationSelectorModal";
 
 interface EmployeeDirectoryClientProps {
   employees: any[];
@@ -18,6 +19,8 @@ interface EmployeeDirectoryClientProps {
 export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientProps) {
   const [view, setView] = useState<"grid" | "list" | "chart">("grid");
   const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
+  const [isSelectorModalOpen, setIsSelectorModalOpen] = useState(false);
+  const [prefillData, setPrefillData] = useState<any>(null);
 
   // Compute dept stats from real data
   const deptCounts = employees.reduce((acc: Record<string, number>, e) => {
@@ -63,7 +66,7 @@ export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientPr
               <span>Export Directory</span>
             </button>
             <button
-              onClick={() => setIsAddDrawerOpen(true)}
+              onClick={() => setIsSelectorModalOpen(true)}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#10B981] text-white text-sm font-bold shadow-lg shadow-[#10B981]/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
             >
               <UserPlus className="w-4 h-4" />
@@ -106,7 +109,29 @@ export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientPr
         )}
       </div>
 
-      <AddEmployeeDrawer isOpen={isAddDrawerOpen} onClose={() => setIsAddDrawerOpen(false)} />
+      <AddEmployeeDrawer
+        isOpen={isAddDrawerOpen}
+        onClose={() => {
+          setIsAddDrawerOpen(false);
+          setPrefillData(null);
+        }}
+        prefillData={prefillData}
+      />
+
+      <EmployeeCreationSelectorModal
+        isOpen={isSelectorModalOpen}
+        onClose={() => setIsSelectorModalOpen(false)}
+        onSelectScratch={() => {
+          setIsSelectorModalOpen(false);
+          setPrefillData(null);
+          setIsAddDrawerOpen(true);
+        }}
+        onSelectCandidate={(data) => {
+          setIsSelectorModalOpen(false);
+          setPrefillData(data);
+          setIsAddDrawerOpen(true);
+        }}
+      />
     </div>
   );
 }

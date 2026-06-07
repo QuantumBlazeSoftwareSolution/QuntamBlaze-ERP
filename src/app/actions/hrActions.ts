@@ -534,3 +534,52 @@ export async function createJobAction(data: {
     return { success: false, error: error.message || "Failed to create job opening." };
   }
 }
+
+/**
+ * Updates the status of a job opening (e.g. Active, Paused, Closed).
+ */
+export async function updateJobStatusAction(
+  jobId: string,
+  status: "Active" | "Paused" | "Closed" | "Draft"
+) {
+  try {
+    await db
+      .update(jobsTable)
+      .set({
+        status,
+        updatedAt: new Date(),
+      })
+      .where(eq(jobsTable.id, jobId));
+
+    revalidatePath("/dashboard/hr/recruitment");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Failed to update job status:", error);
+    return { success: false, error: error.message || "Failed to update job status." };
+  }
+}
+
+export async function getHiredCandidatesAction() {
+  try {
+    const hired = await db
+      .select({
+        id: candidatesTable.id,
+        firstName: candidatesTable.firstName,
+        lastName: candidatesTable.lastName,
+        email: candidatesTable.email,
+        phone: candidatesTable.phone,
+        jobId: candidatesTable.jobId,
+        jobTitle: jobsTable.title,
+        jobDepartment: jobsTable.department,
+      })
+      .from(candidatesTable)
+      .leftJoin(jobsTable, eq(candidatesTable.jobId, jobsTable.id))
+      .where(eq(candidatesTable.currentStage, "Hired"));
+
+    return { success: true, candidates: hired };
+  } catch (error: any) {
+    console.error("Failed to fetch hired candidates:", error);
+    return { success: false, error: error.message || "Failed to fetch hired candidates." };
+  }
+}
+

@@ -23,9 +23,17 @@ import { cn } from "@/lib/utils";
 interface AddEmployeeDrawerProps {
   isOpen: boolean;
   onClose: () => void;
+  prefillData?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string | null;
+    role?: string | null;
+    department?: string | null;
+  } | null;
 }
 
-export function AddEmployeeDrawer({ isOpen, onClose }: AddEmployeeDrawerProps) {
+export function AddEmployeeDrawer({ isOpen, onClose, prefillData }: AddEmployeeDrawerProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -44,6 +52,38 @@ export function AddEmployeeDrawer({ isOpen, onClose }: AddEmployeeDrawerProps) {
   });
 
   useEffect(() => {
+    if (isOpen) {
+      if (prefillData) {
+        setFormData({
+          firstName: prefillData.firstName || "",
+          lastName: prefillData.lastName || "",
+          email: prefillData.email || "",
+          phone: prefillData.phone || "",
+          nic: "",
+          role: prefillData.role || "",
+          employeeRole: "SE",
+          department: prefillData.department || "",
+          customDepartment: "",
+        });
+      } else {
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          nic: "",
+          role: "",
+          employeeRole: "SE",
+          department: "",
+          customDepartment: "",
+        });
+      }
+      setError("");
+      setSuccess(false);
+    }
+  }, [isOpen, prefillData]);
+
+  useEffect(() => {
     async function loadRoles() {
       try {
         const res = await getEmployeeRolesAction();
@@ -58,6 +98,7 @@ export function AddEmployeeDrawer({ isOpen, onClose }: AddEmployeeDrawerProps) {
       loadRoles();
     }
   }, [isOpen]);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
