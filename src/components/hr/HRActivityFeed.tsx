@@ -13,7 +13,13 @@ const iconMap: any = {
   "Resignation Submitted": { icon: LogOut, color: "text-red-600 bg-red-50" },
 };
 
-export function HRActivityFeed() {
+interface HRActivityFeedProps {
+  activities?: any[];
+}
+
+export function HRActivityFeed({ activities = [] }: HRActivityFeedProps) {
+  const displayActivities = activities.length > 0 ? activities : MOCK_HR_ACTIVITIES;
+
   return (
     <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
       <div className="p-6 border-b border-[#F1F5F9] flex items-center justify-between">
@@ -24,7 +30,7 @@ export function HRActivityFeed() {
       </div>
 
       <div className="divide-y divide-[#F1F5F9]">
-        {MOCK_HR_ACTIVITIES.map((activity) => {
+        {displayActivities.map((activity) => {
           const config = iconMap[activity.type] || {
             icon: FileText,
             color: "text-gray-600 bg-gray-50",
@@ -44,7 +50,7 @@ export function HRActivityFeed() {
                     <p className="text-sm text-[#0F172A] font-medium leading-relaxed">
                       {activity.description
                         .split(" ")
-                        .map((word, i) =>
+                        .map((word: string, i: number) =>
                           activity.entities.includes(word) ? (
                             <IDChip key={i} id={word} size="xs" className="mx-1" />
                           ) : (

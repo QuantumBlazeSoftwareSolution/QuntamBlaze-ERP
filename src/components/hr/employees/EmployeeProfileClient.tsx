@@ -42,9 +42,10 @@ const TABS = [
 
 interface EmployeeProfileClientProps {
   employee: any;
+  departments: any[];
 }
 
-export function EmployeeProfileClient({ employee }: EmployeeProfileClientProps) {
+export function EmployeeProfileClient({ employee, departments }: EmployeeProfileClientProps) {
   const [activeTab, setActiveTab] = useState("personal");
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 
@@ -150,6 +151,7 @@ export function EmployeeProfileClient({ employee }: EmployeeProfileClientProps) 
         isOpen={isEditDrawerOpen}
         onClose={() => setIsEditDrawerOpen(false)}
         employee={employee}
+        departments={departments}
       />
     </div>
   );

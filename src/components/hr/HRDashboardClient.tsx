@@ -14,9 +14,10 @@ import { cn } from "@/lib/utils";
 interface HRDashboardClientProps {
   hrStats: any[];
   deptHeadcountData: any[];
+  activities: any[];
 }
 
-export default function HRDashboardClient({ hrStats, deptHeadcountData }: HRDashboardClientProps) {
+export default function HRDashboardClient({ hrStats, deptHeadcountData, activities }: HRDashboardClientProps) {
   return (
     <div className="flex-1 bg-[#F8FAFC] min-h-screen">
       <HRNavbar />
@@ -62,7 +63,7 @@ export default function HRDashboardClient({ hrStats, deptHeadcountData }: HRDash
             </div>
 
             <div className="flex flex-col">
-              <HRActivityFeed />
+              <HRActivityFeed activities={activities} />
             </div>
           </div>
         </div>

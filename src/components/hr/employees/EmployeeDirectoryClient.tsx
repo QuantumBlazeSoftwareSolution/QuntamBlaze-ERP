@@ -12,12 +12,14 @@ import { OrgChart } from "@/components/hr/employees/OrgChart";
 import { AddEmployeeDrawer } from "@/components/hr/employees/AddEmployeeDrawer";
 import { EmployeeCreationSelectorModal } from "@/components/hr/employees/EmployeeCreationSelectorModal";
 import * as XLSX from "xlsx";
+import { Department } from "@/lib/db/schema";
 
 interface EmployeeDirectoryClientProps {
   employees: any[];
+  departments: Department[];
 }
 
-export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientProps) {
+export function EmployeeDirectoryClient({ employees, departments }: EmployeeDirectoryClientProps) {
   const [view, setView] = useState<"grid" | "list" | "chart">("grid");
   const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
   const [isSelectorModalOpen, setIsSelectorModalOpen] = useState(false);
@@ -225,6 +227,7 @@ export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientPr
           setSelectedDepartment={setSelectedDepartment}
           selectedStatus={selectedStatus}
           setSelectedStatus={setSelectedStatus}
+          departments={departments}
         />
 
         {/* Content Area */}
@@ -252,6 +255,7 @@ export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientPr
           setPrefillData(null);
         }}
         prefillData={prefillData}
+        departments={departments}
       />
 
       <EmployeeCreationSelectorModal

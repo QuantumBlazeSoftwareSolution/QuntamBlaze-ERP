@@ -19,6 +19,7 @@ import {
 import { createEmployeeAction } from "@/app/actions/hrActions";
 import { getEmployeeRolesAction } from "@/app/actions/employeeRoleActions";
 import { cn } from "@/lib/utils";
+import { Department } from "@/lib/db/schema";
 
 interface AddEmployeeDrawerProps {
   isOpen: boolean;
@@ -31,9 +32,10 @@ interface AddEmployeeDrawerProps {
     role?: string | null;
     department?: string | null;
   } | null;
+  departments?: Department[];
 }
 
-export function AddEmployeeDrawer({ isOpen, onClose, prefillData }: AddEmployeeDrawerProps) {
+export function AddEmployeeDrawer({ isOpen, onClose, prefillData, departments = [] }: AddEmployeeDrawerProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -313,14 +315,24 @@ export function AddEmployeeDrawer({ isOpen, onClose, prefillData }: AddEmployeeD
                             className="w-full pl-9 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-emerald-500 outline-none transition-colors appearance-none cursor-pointer"
                           >
                             <option value="">Select Department</option>
-                            <option value="ENGINEERING">Engineering</option>
-                            <option value="DESIGN">Design</option>
-                            <option value="PRODUCT">Product</option>
-                            <option value="MARKETING">Marketing</option>
-                            <option value="SALES">Sales</option>
-                            <option value="HR">HR</option>
-                            <option value="FINANCE">Finance</option>
-                            <option value="OTHER">Other</option>
+                            {departments.length > 0 ? (
+                              departments.map((dept) => (
+                                <option key={dept.id} value={dept.code}>
+                                  {dept.name}
+                                </option>
+                              ))
+                            ) : (
+                              <>
+                                <option value="ENGINEERING">Engineering</option>
+                                <option value="DESIGN">Design</option>
+                                <option value="PRODUCT">Product</option>
+                                <option value="MARKETING">Marketing</option>
+                                <option value="SALES">Sales</option>
+                                <option value="HR">HR</option>
+                                <option value="FINANCE">Finance</option>
+                                <option value="OTHER">Other</option>
+                              </>
+                            )}
                           </select>
                           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                         </div>

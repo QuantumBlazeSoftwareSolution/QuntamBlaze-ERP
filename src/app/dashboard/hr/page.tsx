@@ -1,8 +1,31 @@
 import { employeesCrud } from "@/lib/db/crud/employees";
 import HRDashboardClient from "@/components/hr/HRDashboardClient";
+import { db } from "@/lib/db";
+import { jobs, candidates, hrActivities } from "@/lib/db/schema";
+import { eq, desc } from "drizzle-orm";
 
 export default async function HRDashboard() {
   const employees = await employeesCrud.getAll();
+
+  const activeJobs = await db.select().from(jobs).where(eq(jobs.status, "Active"));
+  const openPositionsCount = activeJobs.length;
+
+  const allCandidates = await db.select().from(candidates);
+  const candidatesCount = allCandidates.length;
+
+  const dbActivities = await db
+    .select()
+    .from(hrActivities)
+    .orderBy(desc(hrActivities.timestamp))
+    .limit(10);
+
+  const activities = dbActivities.map((act) => ({
+    id: act.id,
+    type: act.type,
+    description: act.description,
+    timestamp: act.timestamp ? new Date(act.timestamp).toISOString().replace("T", " ").substring(0, 16) : "Just now",
+    entities: (act.entities as string[]) || [],
+  }));
 
   // Compute stats from real data
   const totalHeadcount = employees.length;
@@ -24,16 +47,16 @@ export default async function HRDashboard() {
     },
     {
       label: "Open Positions",
-      value: 12, // Stubbed for now
-      trend: "8 active JOB-IDs",
+      value: openPositionsCount,
+      trend: `${openPositionsCount} active JOB-IDs`,
       trendType: "up" as const,
       icon: "Briefcase",
       colorFamily: "blue" as const,
     },
     {
       label: "In Pipeline",
-      value: 47, // Stubbed for now
-      trend: "active CND-IDs",
+      value: candidatesCount,
+      trend: `${candidatesCount} active CND-IDs`,
       trendType: "up" as const,
       icon: "UserPlus",
       colorFamily: "violet" as const,
@@ -93,5 +116,5 @@ export default async function HRDashboard() {
     color: ["#3B82F6", "#F59E0B", "#8B5CF6", "#EC4899", "#10B981", "#06B6D4", "#EF4444"][i % 7],
   }));
 
-  return <HRDashboardClient hrStats={hrStats} deptHeadcountData={deptHeadcountData} />;
+  return <HRDashboardClient hrStats={hrStats} deptHeadcountData={deptHeadcountData} activities={activities} />;
 }

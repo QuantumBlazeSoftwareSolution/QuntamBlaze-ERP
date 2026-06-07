@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Search, Filter, LayoutGrid, List, Network, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { Department } from "@/lib/db/schema";
 
 interface EmployeeFiltersProps {
   view: "grid" | "list" | "chart";
@@ -16,6 +17,7 @@ interface EmployeeFiltersProps {
   setSelectedDepartment: (dept: string) => void;
   selectedStatus: string;
   setSelectedStatus: (status: string) => void;
+  departments?: Department[];
 }
 
 export function EmployeeFilters({
@@ -29,6 +31,7 @@ export function EmployeeFilters({
   setSelectedDepartment,
   selectedStatus,
   setSelectedStatus,
+  departments = [],
 }: EmployeeFiltersProps) {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
@@ -126,14 +129,24 @@ export function EmployeeFilters({
                   className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500 cursor-pointer"
                 >
                   <option value="">All Departments</option>
-                  <option value="ENGINEERING">Engineering</option>
-                  <option value="DESIGN">Design</option>
-                  <option value="PRODUCT">Product</option>
-                  <option value="MARKETING">Marketing</option>
-                  <option value="SALES">Sales</option>
-                  <option value="HR">HR</option>
-                  <option value="FINANCE">Finance</option>
-                  <option value="OTHER">Other</option>
+                  {departments.length > 0 ? (
+                    departments.map((dept) => (
+                      <option key={dept.id} value={dept.code}>
+                        {dept.name}
+                      </option>
+                    ))
+                  ) : (
+                    <>
+                      <option value="ENGINEERING">Engineering</option>
+                      <option value="DESIGN">Design</option>
+                      <option value="PRODUCT">Product</option>
+                      <option value="MARKETING">Marketing</option>
+                      <option value="SALES">Sales</option>
+                      <option value="HR">HR</option>
+                      <option value="FINANCE">Finance</option>
+                      <option value="OTHER">Other</option>
+                    </>
+                  )}
                 </select>
               </div>
 
