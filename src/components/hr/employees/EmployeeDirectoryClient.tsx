@@ -199,6 +199,20 @@ export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientPr
           </div>
         </div>
 
+        {/* Stats Summary Header */}
+        {view !== "chart" && (
+          <div className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+            {topDepts.map(([dept, count], i) => (
+              <QuickStat
+                key={dept}
+                label={dept}
+                value={String(count)}
+                color={deptColors[i] || "border-slate-500"}
+              />
+            ))}
+          </div>
+        )}
+
         {/* Filters & View Switcher */}
         <EmployeeFilters
           view={view}
@@ -229,19 +243,6 @@ export function EmployeeDirectoryClient({ employees }: EmployeeDirectoryClientPr
           </motion.div>
         </AnimatePresence>
 
-        {/* Stats Summary Footer */}
-        {view !== "chart" && (
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6">
-            {topDepts.map(([dept, count], i) => (
-              <QuickStat
-                key={dept}
-                label={dept}
-                value={String(count)}
-                color={deptColors[i] || "border-slate-500"}
-              />
-            ))}
-          </div>
-        )}
       </div>
 
       <AddEmployeeDrawer
